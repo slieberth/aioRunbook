@@ -6,4 +6,4 @@ Python package providing a framework for automated
 network tests and network migrations. 
 
 Documentation is under development:
-http://aiorunbook.readthedocs.io/en/latest/index.html?highlight=Junos
+http://aiorunbook.readthedocs.io/en/latest/index.html
