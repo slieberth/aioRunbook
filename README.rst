@@ -81,7 +81,7 @@ verification criteria. Based on experience is a good habit to verify the test st
 if possible.
 
 .. _stepTypes:
-.. figure::  overview1.jpeg
+.. figure::  overview1.jpg
    :align:   center
 
 Following Step Types are implemented:
