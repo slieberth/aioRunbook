@@ -44,6 +44,7 @@ setup(name = 'aioRunbook',
       platforms = 'Any',
       install_requires = ['asyncssh >= 1.0'],
       extras_require = {
+          'aiohttp':     ['aiohttp>=2.3.10'],
           'pysnmp':     ['pysnmp>=4.4.4'],
           'PyYAML':     ['PyYAML>=3.12'],
           'Jinja2':    ['Jinja2>=2.10'],
