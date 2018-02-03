@@ -1,0 +1,230 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# Copyright (c) 2018 by Stefan Lieberth <stefan@lieberth.net>.
+# All rights reserved.
+#
+# This program and the accompanying materials are made available under
+# the terms of the Eclipse Public License v1.0 which accompanies this
+# distribution and is available at:
+#
+#     http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#     Stefan Lieberth - initial implementation, API, and documentation
+
+#  \modification
+#  0.1.1 base line for history
+#  0.1.2 add disconnect / close function
+#  0.1.3 work in respect to asyncio loop fix
+#  0.1.4 clean up 
+#  0.1.5 clean up 
+
+
+import asyncio
+import random
+import logging
+import yaml
+from copy import deepcopy
+import asyncssh
+import pprint
+import datetime
+import os
+import sys
+import re
+sys.path.insert(0, os.path.abspath('../tools'))
+from tools.helperFunctions import _isInDictionary, _addTimeStampsToStepDict
+
+
+VENDOR_DICT = { "juniper" : { "initPrompt" : ">", 
+                            "lambdaCliPrompt" : lambda output : [ output.rstrip().split("\n")[-1][:-1] + "(>|#)" ] ,
+                            "stripPrologueLines" : 1,
+                            "stripEpilogueLines" : 2,
+                            "initCmds" : [ "set cli screen-length 0\n"],
+                            "outputCorrections" : [ lambda output : re.sub(r'(\r\n|\r|\n)', '\n',  output) ] } ,
+                "cisco" : { "initPrompt" : "#", 
+                            "lambdaCliPrompt" : lambda output : [ output.strip(), output.strip()[:-1]+'\\(.*\\)#' ],
+                            "stripPrologueLines" : 2,
+                            "stripEpilogueLines" : 1,
+                            "initCmds" : [ "terminal length 0\n"],
+                            "outputCorrections" : [ lambda output : re.sub(r'(\r\n|\r|\n)', '\n',  output) , 
+                                                    lambda output : re.sub(r'\x08','', output)                ] } ,   
+                "ubuntu" : { "initPrompt" : "$ ", 
+                            "lambdaCliPrompt" : lambda output : [ output.rstrip().lstrip()[:-2] + "\S*\$ " ],
+                            "stripPrologueLines" : 1,
+                            "stripEpilogueLines" : 1,
+                            "initCmds" : [],
+                            "outputCorrections" : [ lambda output : re.sub(r'(\r\n|\r|\n)', '\n',  output) , 
+                                                    lambda output : re.sub(r'\[\d+(;\d+)*m', '', output)  ] } }
+
+
+
+class aioSshConnect():
+    """asyncio ssh client. Based in `asyncssh <http://asyncssh.readthedocs.io/en/latest/>`_
+
+          :param stepDict: the specific test step dictionary. The stepDict includes the attributes for device access and the commands to be executed.
+          :param stepDict["device"]: defines the IP address of the device under test. tested with IPv4 only. 
+          :param stepDict["port"]: defines the TCP port for the session. Optional, default = 22.
+          :param stepDict["vendor"]: defines the vendor type for this ssh connection. currently ubuntu, juniper and cisco are supported 
+          :param stepDict["user"]: defines the user for ssh authentication
+          :param stepDict["password"]: defines the clear text password for user authentication
+          :param stepDict["enc-password"]: defines the encrypted password for user authentication
+          :param stepDict["commands"]: defines the list for all commands. \n
+          :param stepDict["timeout"]: defines a specific timeout for this step for ssh interactions, default = 60 secs.
+          :param stepDict["optionalPrompt"]: is useful to react for confirmation request, for which the usuall prompt does not match
+          :param stepDict["optionalPrompts"]: is useful to react for confirmation request, but for more than one optional prompts
+          :param configDict: optional, the overall test dictionary.
+          :param configDict["config"]["timeout"]: optional, defines the generic timeout for all steps
+          :param configDict["config"]["user"]: optional, defines the generic user for all steps. Has lower precedence than the user attribute in stepDict.
+          :param configDict["config"]["password"]: optional, defines the generic clear-text password for all steps. Has lower precedence than the user attribute in stepDict.
+          :param configDict["config"]["enc-password"]: optional, defines the generic encrypted password for all steps. Has lower precedence than the user attribute in stepDict.
+          :type stepDict: dict
+          :type stepDict["device"]: string   
+          :type stepDict["port"]: int  
+          :type stepDict["vendor"]: string   
+          :type stepDict["user"]: string   
+          :type stepDict["password"]: string   
+          :type stepDict["enc-password"]: string   
+          :type stepDict["commands"]: list of strings  
+          :type stepDict["timeout"]: int
+          :type stepDict["optionalPrompt"]: string
+          :type stepDict["optionalPrompts"]: list of strings
+          :type configDict: dict
+          :type configDict["config"]["timeout"]: int
+          :type configDict["config"]["user"]: string   
+          :type configDict["config"]["password"]: string   
+          :type configDict["config"]["enc-password"]: string   
+
+    """
+
+    def __init__(self,stepDict,configDict = {"config":{}},port=22,eventLoop=None): 
+
+        #def __init__(self,configDict,stepDict,method="ssh",port=22):
+        self.hostname = stepDict["device"]
+        self.vendor= stepDict["vendor"]
+        self.port = _isInDictionary ("port",stepDict,port)
+        self.startShellCommand = _isInDictionary ("startShellCommand",stepDict,"")
+        if self.vendor in [ "juniper" , "cisco" , "ubuntu" ] :
+            self.stripPrologueLines = _isInDictionary("stripPrologueLines",stepDict,VENDOR_DICT[self.vendor]["stripPrologueLines"])
+            self.stripEpilogueLines = _isInDictionary("stripEpilogueLines",stepDict,VENDOR_DICT[self.vendor]["stripEpilogueLines"])
+        self.stepDict = stepDict
+        self.device = stepDict["device"]
+        self.port = _isInDictionary ("port",stepDict,22)
+        self.vendor = stepDict["vendor"]
+
+        self.username = _isInDictionary ("user",configDict["config"],None)
+        self.username = _isInDictionary ("user",stepDict,self.username)
+        self.password = _isInDictionary ("password",configDict["config"],None)     
+        if "enc-password" in configDict["config"].keys():
+            logging.debug('enc-password: {0}'.format(configDict["config"]["enc-password"]))
+            self.password = base64.b64decode(base64.b64decode(configDict["config"]["enc-password"]).decode('utf-8')).decode('utf-8') ##SECURE##
+        self.password = _isInDictionary ("password",stepDict,self.password)
+        if "enc-password" in stepDict.keys():
+            logging.debug('enc-password: {0}'.format(stepDict["enc-password"]))
+            self.password = base64.b64decode(base64.b64decode(stepDict["enc-password"]).decode('utf-8')).decode('utf-8') ##SECURE##
+            logging.debug('password: {0}'.format(self.password))     
+        if self.password == None:
+            logging.error('password not set for stepDict: {0}'.format(stepDict)) 
+        self.timeout = _isInDictionary ("timeout",configDict["config"],60)
+        self.timeout = _isInDictionary ("timeout",stepDict,self.timeout)
+        self.optionalPrompt = _isInDictionary("optionalPrompt",stepDict,None)
+        if self.optionalPrompt: 
+            self.optionalPrompts = [self.optionalPrompt]
+        else:
+            self.optionalPrompts = []
+        self.optionalPrompts = _isInDictionary("optionalPrompts",stepDict,self.optionalPrompts)
+
+
+
+    async def connect(self):
+        """This function establishes the communication channel to the device by
+        setting the pexpect.spawn object in self.device and perform the user auth with
+        the credentials stored in self.username ans self.password.
+        
+        :param timeout: The timeout for user credential negotiation.
+        :type timeout: int. 
+        :returns: boolean -- True if channel has been established and  
+        :raises: Exception if self.method is not ssh or telnet.
+
+        """ 
+        logging.debug('connect {} {}'.format(self.stepDict["hostname"],self.stepDict["device"]))
+        #def task(self):
+        try:
+            self._conn = await asyncio.wait_for(asyncssh.connect(self.hostname, 
+                                username=self.username, 
+                                password=self.password), timeout=self.timeout)
+        except:
+            logging.error ("aioSshConnect.connect to {} finally failed".format(self.hostname))  
+            self._conn = None
+            return False
+        self._stdin, self._stdout, self._stderr = await self._conn.open_session(term_type='Dumb', term_size=(200, 24))
+
+        #print (VENDOR_DICT[self.vendor])
+
+        if self.vendor in [ "juniper" , "cisco" , "ubuntu" ] :
+            foundPrompt = False
+            while not foundPrompt:
+                output = await self._stdout.read(64000)
+                if VENDOR_DICT[self.vendor]["initPrompt"] in output: foundPrompt = True  
+            self.rePromptList = VENDOR_DICT[self.vendor]["lambdaCliPrompt"](output)
+            if self.optionalPrompts != []:
+                self.rePromptList += self.optionalPrompts
+            logging.debug ("set prompts to {}".format(self.rePromptList))
+            for initCmd in VENDOR_DICT[self.vendor]["initCmds"]:
+                self._stdin.write(initCmd )
+                output = ""
+                gotPrompt = False
+                while not gotPrompt:
+                    output += await self._stdout.read(64000)
+                    for rePattern in self.rePromptList:
+                        if re.search(rePattern,output): gotPrompt = True    
+        else:
+            logging.error ("aioSshConnect.connect to {} unknown vendor".format(self.hostname))  
+            self._conn = None
+            return False
+        return True
+
+
+    async def runCommands (self,delayTimer=0):
+        """sends all commands from the the test step and stores the return CLI values in the stepDict output section
+
+              :param delayTimer: a waiting time (in seconds) periods before the commands are executed. required for await.
+              :type delayTimer: int
+
+              :return: the enriched stepDict output dict
+
+        """
+        time = await asyncio.sleep(delayTimer)
+        for i,command in enumerate(self.stepDict["commands"]):
+            if self._conn:
+                t1=datetime.datetime.now()
+                #self.stepDict["output"][i]["startTS"] = t1.strftime('%Y-%m-%d %H:%M:%S.%f')   
+                self._stdin.write(command + "\n")
+                output = ""
+                gotPrompt = False
+                try:
+                    while not gotPrompt:
+                        output += await asyncio.wait_for(self._stdout.read(64000),timeout=self.timeout)
+                        for rePattern in self.rePromptList:
+                            if re.search(rePattern,output): gotPrompt = True
+                except:
+                    logging.warning ("prompt timeout step {} command {}".format(i,self.stepDict["stepCounter"]))
+                    #print (output)
+                t2=datetime.datetime.now()
+                for correctionLambda in VENDOR_DICT[self.vendor]["outputCorrections"]:
+                    output = correctionLambda(output)
+                output = "\n".join(output.split("\n")[self.stripPrologueLines:-self.stripEpilogueLines])
+                _addTimeStampsToStepDict(t1,self.stepDict,i)  
+                self.stepDict["output"][i]["output"] = output
+            else:
+                t1=datetime.datetime.now()
+                self.stepDict["output"][i]["output"] = "ssh connect failed"
+                _addTimeStampsToStepDict(t1,self.stepDict,i)
+        return self.stepDict["output"]
+
+    async def disconnect (self):
+        #print ("self._conn.close() {}".format(self._conn))
+        if self._conn:
+            self._conn.close()
+        return True
+
