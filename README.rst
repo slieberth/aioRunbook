@@ -147,7 +147,7 @@ Two modes of scheduling for test steps are supported:
 It is possible to loop the list of test steps by configuring a loop counter.:
 
 .. _stepScheduler:
-.. figure::  scheduler1.pdf
+.. figure::  scheduler1.jpg
    :align:   center
 
 This example lists the config options for aioRunbook step concurrency:
