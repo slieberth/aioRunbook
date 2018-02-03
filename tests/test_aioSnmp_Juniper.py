@@ -24,7 +24,7 @@ import pprint
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-from aioRunbook import aioRunbook
+from aioRunbook.aioRunbook import aioRunbook
 
 import time
 

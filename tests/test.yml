@@ -2,9 +2,10 @@ config:
   hostfiles:
     - ./host.yml
   steps:
-    - sleep:
-        name: test sleep 1 sec
+    - record:
+        name: "DUT - get SNMP OID "
         startInBackground: true
-    - sleep:
-        name: test sleep 2 sec
-        startInBackground: true
+        blockingAdapter: true
+        commands:
+          - get iso.3.6.1.2.1.1.1.0
+          - get iso.3.6.1.2.1.1.1.0
