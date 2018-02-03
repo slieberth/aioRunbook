@@ -1,7 +1,10 @@
 config:
   hostfiles:
     - ./host.yml
-  valueMatrix: [[""]]
   steps:
-    - break: 
-        name: break test
+    - sleep:
+        name: test sleep 1 sec
+        startInBackground: true
+    - sleep:
+        name: test sleep 2 sec
+        startInBackground: true

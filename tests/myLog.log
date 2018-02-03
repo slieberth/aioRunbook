@@ -1,0 +1,25 @@
+INFO:root:reading config file: test.yml
+DEBUG:root:{'config': {'hostfiles': ['./host.yml'], 'steps': [{'sleep': {'name': 'test sleep 1 sec'}}, {'sleep': {'name': 'test sleep 2 sec'}}]}}
+DEBUG:root:configured hostfiles: ['./host.yml']
+INFO:root:reading config host file: ./host.yml
+DEBUG:asyncio:Using selector: KqueueSelector
+INFO:root:start loop 1
+DEBUG:root:async step: 0 started test sleep 1 sec
+INFO:root:step:0 test sleep 1 sec sleep: 1
+DEBUG:root:async step: 1 started test sleep 2 sec
+INFO:root:step:1 test sleep 2 sec sleep: 2
+INFO:root:waiting for background tasks to be done
+INFO:root:background tasks done
+INFO:root:reading config file: test.yml
+DEBUG:root:{'config': {'hostfiles': ['./host.yml'], 'steps': [{'sleep': {'name': 'test sleep 1 sec', 'startInBackground': True}}, {'sleep': {'name': 'test sleep 2 sec', 'startInBackground': True}}]}}
+DEBUG:root:configured hostfiles: ['./host.yml']
+INFO:root:reading config host file: ./host.yml
+INFO:root:start loop 1
+DEBUG:root:adding background tasks test sleep 1 sec
+DEBUG:root:adding background tasks test sleep 2 sec
+INFO:root:waiting for background tasks to be done
+DEBUG:root:async step: 0 started test sleep 1 sec
+INFO:root:step:0 test sleep 1 sec sleep: 1
+DEBUG:root:async step: 1 started test sleep 2 sec
+INFO:root:step:1 test sleep 2 sec sleep: 2
+INFO:root:background tasks done
