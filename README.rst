@@ -7,11 +7,7 @@ Documentation is under development:
 http://aiorunbook.readthedocs.io/en/latest/index.html
 
 aioRunbook is designed to be controlled by either shell execution respectively an 
-aihttp web microservice. 
-
-.. warning::
-
-    the aiohttp based web control app is not yet included.
+aihttp web microservice (not added yet). 
 
 Use cases for aioRunbook are:
 
@@ -32,6 +28,11 @@ structures and stored at the end of the execution in a JSON file, for further pr
 
 * rendering to PDF documents
 * dispatching the results in a web app
+
+Installation
+============
+
+pip3 install git+https://github.com/slieberth/aioRunbook.git
 
 Concept of a YAML config
 ========================
