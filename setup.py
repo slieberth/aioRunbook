@@ -27,10 +27,10 @@ print ("base_dir: {}".format(base_dir))
 
 doclines = __doc__.split('\n', 1)
 
-with open(path.join(base_dir, "aioRunbook", 'README.rst')) as desc:
+with open(path.join(base_dir, 'README.rst')) as desc:
     long_description = desc.read()
 
-with open(path.join(base_dir, "aioRunbook", 'version.py')) as version:
+with open(path.join(base_dir, 'version.py')) as version:
     exec(version.read())
 
 setup(name = 'aioRunbook',
