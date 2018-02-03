@@ -18,4 +18,4 @@ __author_email__ = 'stefan@lieberth.net'
 
 __url__ = 'https://github.com/slieberth/aioRunbook'
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
