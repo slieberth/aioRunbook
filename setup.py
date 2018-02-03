@@ -19,7 +19,7 @@ aioRunbook is a Python package providing a framework for automated network tests
 """
 
 from os import path
-from setuptools import setup
+from setuptools import setup, find_packages
 
 base_dir = path.abspath(path.dirname(__file__))
 
@@ -50,7 +50,7 @@ setup(name = 'aioRunbook',
           'jtextfsm':  ['jtextfsm==0.3.1'],
           'ncclient':  ['ncclient==0.5.3']
       },
-      packages = ['aioRunbook'],
+      packages = find_packages(),
       scripts = [],
       test_suite = 'tests',
       classifiers = [
