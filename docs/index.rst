@@ -90,7 +90,7 @@ verification criteria. Based on experience is a good habit to verify the test st
 if possible.
 
 .. _stepTypes:
-.. figure::  images/overview1.pdf
+.. figure::  images/overview1.jpg
    :align:   center
 
 Following Step Types are implemented:
@@ -156,7 +156,7 @@ Two modes of scheduling for test steps are supported:
 It is possible to loop the list of test steps by configuring a loop counter.:
 
 .. _stepScheduler:
-.. figure::  images/scheduler1.pdf
+.. figure::  images/scheduler1.jpg
    :align:   center
 
 This example lists the config options for aioRunbook step concurrency:
