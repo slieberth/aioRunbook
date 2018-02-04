@@ -24,11 +24,11 @@ test1
 
 test1
 
-under development
+under development2
 
 .. currentmodule:: aioRunbook
 
-.. autoclass:: aioRunbook/aioRunbook
+.. autoclass:: aioRunbook.aioRunbook
 
 test2
 
@@ -39,5 +39,21 @@ test2
    .. automethod:: execSteps
 
 test2
+
+under development3
+
+.. currentmodule:: error
+
+.. autoclass:: error
+
+test3
+
+   ================================== =
+   methods
+   ================================== =
+
+   .. automethod:: error
+
+test3
 
 

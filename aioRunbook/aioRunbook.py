@@ -296,19 +296,3 @@ class aioRunbook():
             logging.info("waiting for background tasks to be done")   
             await awaitOpenedTasksToBeDone(numberOfTasksBeforeStart)
             logging.info("background tasks done")   
-
-
-if __name__ == "__main__":
-
-    logging.basicConfig(filename="myLog.log", filemode='w', level=logging.DEBUG)
-    logging.getLogger().setLevel(logging.DEBUG)
-    console = logging.StreamHandler()
-    console.setLevel(logging.DEBUG)
-    # set a format which is simpler for console use
-    formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
-    console.setFormatter(formatter)
-    logging.getLogger("").addHandler(console)
-
-    myRunbook = aioRunbook("runbooks/test2.yml")
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(myRunbook.execSteps(loop)) 
