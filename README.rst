@@ -22,7 +22,8 @@ Hello World
     import asyncio
     from aioRunbook.aioRunbook import aioRunbook
 
-    ymlConfigString = """config:
+    ymlConfigString = """#hello world yml
+    config:
       steps:
         - record:
             name: record test local-shell
