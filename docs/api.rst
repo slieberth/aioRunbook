@@ -5,15 +5,11 @@
 API Documentation
 *****************
 
-Overview
-========
-
-
 aioRunbook
 ==========
 
 
-.. currentmodule:: aioRunbook
+.. currentmodule:: aioRunbook.aioRunbook
 
 .. autoclass:: aioRunbook
 
