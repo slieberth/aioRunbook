@@ -14,6 +14,22 @@ under development
 
 .. autoclass:: aioRunbook
 
+test1
+
+   ================================== =
+   methods
+   ================================== =
+
+   .. automethod:: execSteps
+
+test1
+
+under development
+
+.. currentmodule:: aioRunbook
+
+.. autoclass:: aioRunbook/aioRunbook
+
 test2
 
    ================================== =
@@ -21,4 +37,7 @@ test2
    ================================== =
 
    .. automethod:: execSteps
+
+test2
+
 
