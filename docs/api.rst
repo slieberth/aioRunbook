@@ -1,4 +1,4 @@
-.. module:: aioRunbook.aioRunbook
+.. module:: aioRunbook
 
 .. _API:
 
@@ -8,10 +8,11 @@ API Documentation
 aioRunbook
 ==========
 
+under development
 
-.. currentmodule:: aioRunbook.aioRunbook
+.. currentmodule:: aioRunbook
 
-.. autoclass:: aioRunbook
+.. autoclass:: aioRunbook.aioRunbook
 
    ================================== =
    methods
