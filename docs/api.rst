@@ -1,4 +1,4 @@
-.. module:: runbook
+.. module:: aioRunbook
 
 .. _API:
 
@@ -37,7 +37,7 @@ aioStdin
 aioSshConnect
 -------------
 
-.. currentmodule:: adaptors.aioSshConnect
+.. currentmodule:: aioRunbook.adaptors.aioSshConnect
 
 .. autoclass:: aioSshConnect
 
