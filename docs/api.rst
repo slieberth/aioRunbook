@@ -10,7 +10,7 @@ aioRunbook
 
 under development
 
-.. currentmodule:: aioRunbook
+.. currentmodule:: aioRunbook.aioRunbook
 
 .. autoclass:: aioRunbook.aioRunbook
 
