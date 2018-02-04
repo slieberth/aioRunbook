@@ -13,7 +13,7 @@ aioRunbook
 ==========
 
 
-.. currentmodule:: aioRunbook
+.. currentmodule:: aioRunbook.aioRunbook
 
 .. autoclass:: aioRunbook
 
@@ -30,7 +30,7 @@ Adaptors
 aioStdin
 --------
 
-.. currentmodule:: adaptors.aioStdin
+.. currentmodule:: aioRunbook.adaptors.aioStdin
 
 .. autoclass:: aioStdin
 
