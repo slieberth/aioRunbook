@@ -726,7 +726,7 @@ example rtbrick
 aioSnmpConnect
 --------------
 
-an adAdapter to send SNMPv2c and SNMPv3 requests. based on underlying pysnmp framework from Ilya.
+an adAdapter to send SNMPv2c and SNMPv3 requests. based on underlying pysnmp framework.
 
 example snmp v2
 +++++++++++++++
@@ -748,8 +748,33 @@ example snmp v2
 
 .. code-block:: yaml
 
-    "DUT:  {'device': '192.168.56.11','port':'161','method':'snmp',\
-            'community': 'COMMUNITY1', 'version': 'v2c'}"+"\n"+"mySystem: {'device': 'local-shell','vendor':'local-shell', 'method':'local-shell' }"
+    "DUT:  {'device': '192.168.56.11','port':'161','method':'snmp','community': 'COMMUNITY1', 'version': 'v2c'}"
+
+aioNetconfConnect
+--------------
+
+an adAdapter to send netconf requests via the ncclient framework
+
+example snmp v2
++++++++++++++++
+
+* YAML config file step definitions:
+
+.. code-block:: yaml
+
+    config:
+      hostfiles:
+        - ./host.yml
+      steps:
+        - record:
+            name: "DUT - this is a test for get_netconf config"
+            commands:
+              - get_config running 
+
+
+.. code-block:: yaml
+
+    "DUT:  {'device': '192.168.56.11','port':'830','method':'netconf', 'ncclientVendor': 'junos', 'password': 'admin1', 'user': 'admin'}"
 
 
 Analyzers
