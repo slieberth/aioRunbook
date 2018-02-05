@@ -34,9 +34,6 @@ import pprint
 
 
 import asyncio
-#from threading import Thread
-
-#sys.path.insert(0, os.path.abspath('../tools'))
 from aioRunbook.tools.helperFunctions import _isInDictionary
 
 class aioSnmpConnect:

@@ -13,7 +13,7 @@
 # Contributors:
 #     Stefan Lieberth - initial implementation, API, and documentation
 
-#  \version   0.1.6
+#  \version   0.1.7
 #  \date      01.02.2018
 #  \modification:
 #  0.1.1 - get started
@@ -25,6 +25,7 @@
 #  0.1.4 get rid of callback
 #  0.1.5 prepare for blocking functions; test with SNMP, first successful implementation
 #  0.1.6 continue work on blocking functions, cleanup ... 
+#  0.1.7 integration of aioNetconfConnect
 
 import asyncio
 import concurrent.futures
@@ -45,6 +46,7 @@ from aioRunbook.adaptors.aioRtbRestConnect import aioRtbRestConnect
 from aioRunbook.adaptors.aioLocalShellConnect import aioLocalShellConnect
 from aioRunbook.adaptors.aioSftp import aioSftp
 from aioRunbook.adaptors.aioSnmpConnect import aioSnmpConnect
+from aioRunbook.adaptors.aioNetconfConnect import aioNetconfConnect
 from aioRunbook.analyzers.textFsmCheck import textFsmCheck
 from aioRunbook.analyzers.jsonCheck import jsonCheck
 from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeValue, _addTimeStampsToStepDict
@@ -148,6 +150,10 @@ class aioRunbook():
             elif method in ["snmp"]:            ### TESTME ####
                 self.adaptor = aioSnmpConnect(stepDict)      
                 self.commandFunction =  self.adaptor.sendSnmpRequests   
+                await self.commandFunction(threadExecutor) #this is a blocking function call
+            elif method in ["netconf"]:            ### TESTME ####
+                self.adaptor = aioNetconfConnect(stepDict)      
+                self.commandFunction =  self.adaptor.sendNetconfRequests   
                 await self.commandFunction(threadExecutor) #this is a blocking function call
             else: 
                 logging.error('###error adpater selection step {}###'.format(stepCounter))

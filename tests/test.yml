@@ -3,9 +3,6 @@ config:
     - ./host.yml
   steps:
     - record:
-        name: "DUT - get SNMP OID "
-        startInBackground: true
-        blockingAdapter: true
+        name: "DUT - this is a test for get_netconf config"
         commands:
-          - get iso.3.6.1.2.1.1.1.0
-          - get iso.3.6.1.2.1.1.1.0
+          - get_config running 
