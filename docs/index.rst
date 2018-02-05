@@ -755,8 +755,8 @@ aioNetconfConnect
 
 an adAdapter to send netconf requests via the ncclient framework
 
-example snmp v2
-+++++++++++++++
+example Junos
++++++++++++++
 
 * YAML config file step definitions:
 
