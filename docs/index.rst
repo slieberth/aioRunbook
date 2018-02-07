@@ -12,8 +12,9 @@ Overview
 ========
 
 aioRunbook (`asyncio <https://docs.python.org/3/library/asyncio.html>`_ runbook) is a 
-Python package providing a framework for automated 
-network tests and network migrations. 
+Python package providing an orchestration framework for automated 
+network tests and network migrations using supporting libraries like asyncssh, netconf and snmp 
+for interaction with the netwok elements.
 
 aioRunbook is designed to be controlled by either shell execution respectively an 
 aihttp web microservice. 
@@ -27,17 +28,15 @@ Use cases for aioRunbook are:
 * automated lab tests for recurring test scenarios
 * automated network migrations based on sequencial test steps with the option of a rollback functionality
 
-In comparison to other atomization tools (e.g. Ansible), aioRunbook is explicitly designed for 
-customizable inspection of the results of each test steps in a sequence of 
-test steps. Each test step interacts with just one device. 
-Another design differentiation is the documentation of the test results in customizable 
-PDF outputs, respectively the flexibility to export the test results via an API.
+aioRunbook is explicitly designed for customizable inspection of the results of scheduled test/migration steps in a sequence of 
+test steps. Each test step interacts with just one single device. 
+aioRunbook is designed to document the test/migration results in customizable PDF/HTML outputs.
 
 All characteristics of the test sequence and the behaviour of the io-adapters to the network 
 devices is controlled by a single config file.
 
-The results of the aioRunbook steps are stored intermediately in an internal python data 
-structures and stored at the end of the execution in a JSON file, for further processing:
+The results of the aioRunbook steps are stored intermediately in an internal data 
+structures, which can be exported as JSON file, for further processing like:
 
 * rendering to PDF documents
 * dispatching the results in a web app
@@ -45,16 +44,11 @@ structures and stored at the end of the execution in a JSON file, for further pr
 Concept of a YAML config
 ========================
 
-The aioRunbook configuration is defined in a YAML file, which is a human friedly way
-of documenting data-structures.
-For details on the YAML format, please refer to `YAML spec/1.21 <http://yaml.org/spec/1.2/spec.html>`_
+The aioRunbook configuration is defined in a single YAML file. During the execution of the test/migration,
+the data structure is enriched with the output of the network interactions.
 
-This concept allows that the data structure can be imported with the default YAML parser.
-
-Also it allows the flexibility that additional attributes of any kind can added on demand 
-without changing any logic in the input file parsing. Consumers of the input configuration
-(adapters, analyzers, or rendering)  of attributes can access those attributes as those have
-access to the complete data structure.
+The concept allows the flexibility to add additional attributes on demand. Adapters, analyzers, or rendering 
+(PDF/HTML) can access those attributes as those have access to the complete data structure.
 
 .. code-block:: yaml
     
@@ -770,6 +764,7 @@ example Junos
             name: "DUT - this is a test for get_netconf config"
             commands:
               - get_config running 
+              - get_chassis_inventory
 
 
 .. code-block:: yaml
