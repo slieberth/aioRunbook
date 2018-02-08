@@ -23,7 +23,7 @@ import os
 import sys
 import re
 #sys.path.insert(0, os.path.abspath('../tools'))
-from tools.helperFunctions import _isInDictionary, _addTimeStampsToStepDict
+from aioRunbook.tools.helperFunctions import _isInDictionary, _addTimeStampsToStepDict
 
 # ssh parameters
 #sys.path.insert(0, os.path.abspath('../adaptors'))
