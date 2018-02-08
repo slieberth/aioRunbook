@@ -12,9 +12,9 @@ under development
 
 .. currentmodule:: aioRunbook.aioRunbook
 
-.. autoclass:: aioRunbook
+.. autoclass:: aioRunbook.aioRunbook
 
-test1
+test aioRunbook.aioRunbook aioRunbook.aioRunbook
 
    ================================== =
    methods
