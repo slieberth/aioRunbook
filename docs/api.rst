@@ -8,20 +8,25 @@ API Documentation
 aioRunbook
 ==========
 
-test1 aioRunbook aioRunbook
+111
 
-.. currentmodule:: aioRunbook
+Submodule1 module
+----------------------------------
+
+.. automodule:: aioRunbook.aioRunbook
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+222
+
+Submodule1 module
+----------------------------------
 
 .. automodule:: aioRunbook
-
-.. autoclass:: aioRunbook
-
-
-   ================================== =
-   methods
-   ================================== =
-
-   .. automethod:: execSteps
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 
 
