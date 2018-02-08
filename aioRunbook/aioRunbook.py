@@ -48,8 +48,8 @@ from aioRunbook.adaptors.aioLocalShellConnect import aioLocalShellConnect
 #from aioRunbook.adaptors.aioNetconfConnect import aioNetconfConnect
 #from aioRunbook.analyzers.textFsmCheck import textFsmCheck
 #from aioRunbook.analyzers.jsonCheck import jsonCheck
-#from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeValue, _addTimeStampsToStepDict
-#from aioRunbook.tools.helperFunctions import _createOutputList, _setHostfileAttributes
+from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeValue, _addTimeStampsToStepDict
+from aioRunbook.tools.helperFunctions import _createOutputList, _setHostfileAttributes
 
 _GENENERIC_TIMEOUT = 60 #set generic timeout to 60 seconds
 
