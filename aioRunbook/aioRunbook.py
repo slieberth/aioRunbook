@@ -13,7 +13,7 @@
 # Contributors:
 #     Stefan Lieberth - initial implementation, API, and documentation
 
-#  \version   0.1.7
+#  \version   0.1.8
 #  \date      01.02.2018
 #  \modification:
 #  0.1.1 - get started
