@@ -6,7 +6,7 @@
 .. toctree::
    :hidden:
 
-   api
+   api.rst
 
 Overview
 ========
