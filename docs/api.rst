@@ -14,7 +14,7 @@ under development
 
 .. autoclass:: aioRunbook.aioRunbook
 
-test aioRunbook.aioRunbook aioRunbook.aioRunbook
+test2 aioRunbook.aioRunbook aioRunbook.aioRunbook
 
    ================================== =
    methods
@@ -22,6 +22,18 @@ test aioRunbook.aioRunbook aioRunbook.aioRunbook
 
    .. automethod:: execSteps
 
-test1
+.. currentmodule:: aioRunbook.aioRunbook.aioRunbook
+
+.. autoclass:: aioRunbook.aioRunbook.aioRunbook
+
+test2 aioRunbook.aioRunbook aioRunbook.aioRunbook.aioRunbook
+
+   ================================== =
+   methods
+   ================================== =
+
+   .. automethod:: execSteps
+
+
 
 
