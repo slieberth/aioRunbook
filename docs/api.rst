@@ -12,6 +12,8 @@ test1 aioRunbook aioRunbook
 
 .. currentmodule:: aioRunbook
 
+.. automodule:: aioRunbook
+
 .. autoclass:: aioRunbook
 
 
