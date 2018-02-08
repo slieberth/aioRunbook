@@ -33,7 +33,7 @@ import os
 import sys
 import re
 #sys.path.insert(0, os.path.abspath('../tools'))
-from aioRunbook.tools.helperFunctions import _isInDictionary, _addTimeStampsToStepDict
+from tools.helperFunctions import _isInDictionary, _addTimeStampsToStepDict
 
 
 VENDOR_DICT = { "juniper" : { "initPrompt" : ">", 

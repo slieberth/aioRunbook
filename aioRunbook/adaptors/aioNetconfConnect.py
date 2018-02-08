@@ -35,7 +35,7 @@ class aioNetconfConnect:
             timeout=10,
             device_params = {'name': stepDict["ncclientVendor"] },
             hostkey_verify=False)
-        logging.info ("netconfConnect.__init__ succeeded: prompt {} {}".format(self.hostname,self.port ))   
+        logging.debug ("netconfConnect.__init__ succeeded: prompt {} {}".format(self.hostname,self.port ))   
   
 
     async def sendNetconfRequests(self,loopExector,timeout = -1):
@@ -43,17 +43,24 @@ class aioNetconfConnect:
             for i,command in enumerate(self.stepDict["commands"]):
                 logging.debug('sendNetconfRequests {}'.format(command))
                 t1=datetime.datetime.now()
+                netconfAttribute = ""
                 if isinstance(command, str):
                     splitList = command.split(" ")
                     if len(splitList) < 2:
-                        logging.error ("incorrect netconf command length: {}".format(command))
+                        netconfCommand = splitList[0]
+                        logging.debug ("incorrect netconf command length: {}".format(command))
                     elif len(splitList) == 2:
                         netconfCommand = splitList[0]
                         netconfAttribute = splitList[1]
                     else :
+                        netconfCommand = splitList[0]
+                        netconfAttribute = " ".join(splitList[1:])
                         logging.error ("incorrect netconf command length: {}".format(command))
-                logging.debug('sendNetconfRequests {}("{}")'.format(netconfCommand,netconfAttribute))
-                netconfResponse = eval('self.myNetconfConnection.{}("{}")'.format(netconfCommand,netconfAttribute))
+                if len(netconfAttribute) > 0:
+                    logging.debug('sendNetconfRequests {}("{}")'.format(netconfCommand,netconfAttribute))
+                    netconfResponse = eval('self.myNetconfConnection.{}("{}")'.format(netconfCommand,netconfAttribute))
+                else:
+                    netconfResponse = eval('self.myNetconfConnection.{}()'.format(netconfCommand))
                 #return str(netconfResponse)
                 #output = "\n".join(output.split("\n")[self.stripPrologueLines:-self.stripEpilogueLines])
                 _addTimeStampsToStepDict(t1,self.stepDict,i)  

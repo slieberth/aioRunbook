@@ -25,7 +25,7 @@ import datetime
 import logging
 import os
 #sys.path.insert(0, os.path.abspath('../tools'))
-from aioRunbook.tools.helperFunctions import _isInDictionary
+from tools.helperFunctions import _isInDictionary
 
 
 class aioLocalShellConnect:
