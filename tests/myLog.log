@@ -1,423 +1,96 @@
 INFO:root:reading config file: test.yml
-DEBUG:root:{'config': {'hostfiles': ['./host.yml'], 'steps': [{'record': {'name': 'DUT - this is a test for get_netconf config', 'commands': ['get_config running']}}]}}
-DEBUG:root:configured hostfiles: ['./host.yml']
-INFO:root:reading config host file: ./host.yml
+DEBUG:root:configured hostfiles: []
 DEBUG:asyncio:Using selector: KqueueSelector
 INFO:root:start loop 1
-DEBUG:root:async step: 0 started DUT - this is a test for get_netconf config
-DEBUG:root:using hostReferenceName DUT
-DEBUG:ncclient.transport.session:<SSHSession(session, initial daemon)> created: client_capabilities=<dict_keyiterator object at 0x1057d4958>
-DEBUG:ncclient.transport.ssh:starting thread (client mode): 0x57cde10
-DEBUG:ncclient.transport.ssh:Local version/idstring: SSH-2.0-paramiko_2.4.0
-DEBUG:ncclient.transport.ssh:Remote version/idstring: SSH-2.0-OpenSSH_6.4
-INFO:ncclient.transport.ssh:Connected (version 2.0, client OpenSSH_6.4)
-DEBUG:ncclient.transport.ssh:kex algos:['ecdh-sha2-nistp256', 'ecdh-sha2-nistp384', 'ecdh-sha2-nistp521', 'diffie-hellman-group-exchange-sha256', 'diffie-hellman-group-exchange-sha1', 'diffie-hellman-group14-sha1', 'diffie-hellman-group1-sha1'] server key:['ssh-rsa', 'ssh-dss', 'ecdsa-sha2-nistp256'] client encrypt:['aes128-ctr', 'aes192-ctr', 'aes256-ctr', 'arcfour256', 'arcfour128', 'aes128-gcm@openssh.com', 'aes256-gcm@openssh.com', 'aes128-cbc', '3des-cbc', 'blowfish-cbc', 'cast128-cbc', 'aes192-cbc', 'aes256-cbc', 'arcfour', 'rijndael-cbc@lysator.liu.se'] server encrypt:['aes128-ctr', 'aes192-ctr', 'aes256-ctr', 'arcfour256', 'arcfour128', 'aes128-gcm@openssh.com', 'aes256-gcm@openssh.com', 'aes128-cbc', '3des-cbc', 'blowfish-cbc', 'cast128-cbc', 'aes192-cbc', 'aes256-cbc', 'arcfour', 'rijndael-cbc@lysator.liu.se'] client mac:['hmac-md5-etm@openssh.com', 'hmac-sha1-etm@openssh.com', 'umac-64-etm@openssh.com', 'umac-128-etm@openssh.com', 'hmac-sha2-256-etm@openssh.com', 'hmac-sha2-512-etm@openssh.com', 'hmac-ripemd160-etm@openssh.com', 'hmac-sha1-96-etm@openssh.com', 'hmac-md5-96-etm@openssh.com', 'hmac-md5', 'hmac-sha1', 'umac-64@openssh.com', 'umac-128@openssh.com', 'hmac-sha2-256', 'hmac-sha2-512', 'hmac-ripemd160', 'hmac-ripemd160@openssh.com', 'hmac-sha1-96', 'hmac-md5-96'] server mac:['hmac-md5-etm@openssh.com', 'hmac-sha1-etm@openssh.com', 'umac-64-etm@openssh.com', 'umac-128-etm@openssh.com', 'hmac-sha2-256-etm@openssh.com', 'hmac-sha2-512-etm@openssh.com', 'hmac-ripemd160-etm@openssh.com', 'hmac-sha1-96-etm@openssh.com', 'hmac-md5-96-etm@openssh.com', 'hmac-md5', 'hmac-sha1', 'umac-64@openssh.com', 'umac-128@openssh.com', 'hmac-sha2-256', 'hmac-sha2-512', 'hmac-ripemd160', 'hmac-ripemd160@openssh.com', 'hmac-sha1-96', 'hmac-md5-96'] client compress:['none', 'zlib@openssh.com'] server compress:['none', 'zlib@openssh.com'] client lang:[''] server lang:[''] kex follows?False
-DEBUG:ncclient.transport.ssh:Kex agreed: ecdh-sha2-nistp256
-DEBUG:ncclient.transport.ssh:HostKey agreed: ecdsa-sha2-nistp256
-DEBUG:ncclient.transport.ssh:Cipher agreed: aes128-ctr
-DEBUG:ncclient.transport.ssh:MAC agreed: hmac-sha2-256
-DEBUG:ncclient.transport.ssh:Compression agreed: none
-DEBUG:ncclient.transport.ssh:kex engine KexNistp256 specified hash_algo <built-in function openssl_sha256>
-DEBUG:ncclient.transport.ssh:Switch to new keys ...
-DEBUG:ncclient.transport.ssh:Trying SSH agent key b'9180713a267e6da532cfff7a99b85ee1'
-DEBUG:ncclient.transport.ssh:userauth is OK
-INFO:ncclient.transport.ssh:Authentication (publickey) failed.
-DEBUG:ncclient.transport.ssh:Authentication failed.
-DEBUG:ncclient.transport.ssh:userauth is OK
-INFO:ncclient.transport.ssh:Authentication (password) successful!
-DEBUG:ncclient.transport.ssh:[chan 0] Max packet in: 32768 bytes
-DEBUG:ncclient.transport.ssh:[chan 0] Max packet out: 32768 bytes
-DEBUG:ncclient.transport.ssh:Secsh channel 0 opened.
-DEBUG:ncclient.transport.ssh:[chan netconf-subsystem-0] Sesch channel 0 request ok
-DEBUG:ncclient.transport.session:installing listener <ncclient.transport.session.NotificationHandler object at 0x1057dfa90>
-DEBUG:ncclient.transport.session:installing listener <ncclient.transport.session.HelloHandler object at 0x1057df978>
-DEBUG:ncclient.transport.session:queueing <?xml version="1.0" encoding="UTF-8"?><nc:hello xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0"><nc:capabilities><nc:capability>urn:ietf:params:netconf:base:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:base:1.1</nc:capability><nc:capability>urn:ietf:params:netconf:capability:writable-running:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:candidate:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:confirmed-commit:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:rollback-on-error:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:startup:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:url:1.0?scheme=http,ftp,file,https,sftp</nc:capability><nc:capability>urn:ietf:params:netconf:capability:validate:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:xpath:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:notification:1.0</nc:capability><nc:capability>urn:liberouter:params:netconf:capability:power-control:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:interleave:1.0</nc:capability></nc:capabilities></nc:hello>
-DEBUG:ncclient.transport.session:starting main loop
-DEBUG:ncclient.transport.ssh:Sending message
-DEBUG:ncclient.transport.ssh:Sending: <?xml version="1.0" encoding="UTF-8"?><nc:hello xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0"><nc:capabilities><nc:capability>urn:ietf:params:netconf:base:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:base:1.1</nc:capability><nc:capability>urn:ietf:params:netconf:capability:writable-running:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:candidate:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:confirmed-commit:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:rollback-on-error:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:startup:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:url:1.0?scheme=http,ftp,file,https,sftp</nc:capability><nc:capability>urn:ietf:params:netconf:capability:validate:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:xpath:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:notification:1.0</nc:capability><nc:capability>urn:liberouter:params:netconf:capability:power-control:1.0</nc:capability><nc:capability>urn:ietf:params:netconf:capability:interleave:1.0</nc:capability></nc:capabilities></nc:hello>]]>]]>
-DEBUG:ncclient.transport.ssh:parsing netconf v1.0
-DEBUG:ncclient.transport.ssh:parsing netconf v1.0
-DEBUG:ncclient.transport.ssh:parsing netconf v1.0
-DEBUG:ncclient.transport.ssh:parsing netconf v1.0
-DEBUG:ncclient.transport.session:dispatching message to <ncclient.transport.session.NotificationHandler object at 0x1057dfa90>: <!-- No zombies were killed during the creation of this user interface -->
-<!-- user admin, class j-super-user -->
-<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
-  <capabilities>
-    <capability>urn:ietf:params:netconf:base:1.0</capability>
-    <capability>urn:ietf:params:netconf:capability:candidate:1.0</capability>
-    <capability>urn:ietf:params:netconf:capability:confirmed-commit:1.0</capability>
-    <capability>urn:ietf:params:netconf:capability:validate:1.0</capability>
-    <capability>urn:ietf:params:netconf:capability:url:1.0?scheme=http,ftp,file</capability>
-    <capability>urn:ietf:params:xml:ns:netconf:base:1.0</capability>
-    <capability>urn:ietf:params:xml:ns:netconf:capability:candidate:1.0</capability>
-    <capability>urn:ietf:params:xml:ns:netconf:capability:confirmed-commit:1.0</capability>
-    <capability>urn:ietf:params:xml:ns:netconf:capability:validate:1.0</capability>
-    <capability>urn:ietf:params:xml:ns:netconf:capability:url:1.0?protocol=http,ftp,file</capability>
-    <capability>http://xml.juniper.net/netconf/junos/1.0</capability>
-    <capability>http://xml.juniper.net/dmi/system/1.0</capability>
-  </capabilities>
-  <session-id>78024</session-id>
-</hello>
-DEBUG:ncclient.transport.session:dispatching message to <ncclient.transport.session.HelloHandler object at 0x1057df978>: <!-- No zombies were killed during the creation of this user interface -->
-<!-- user admin, class j-super-user -->
-<hello xmlns="urn:ietf:params:xml:ns:netconf:base:1.0">
-  <capabilities>
-    <capability>urn:ietf:params:netconf:base:1.0</capability>
-    <capability>urn:ietf:params:netconf:capability:candidate:1.0</capability>
-    <capability>urn:ietf:params:netconf:capability:confirmed-commit:1.0</capability>
-    <capability>urn:ietf:params:netconf:capability:validate:1.0</capability>
-    <capability>urn:ietf:params:netconf:capability:url:1.0?scheme=http,ftp,file</capability>
-    <capability>urn:ietf:params:xml:ns:netconf:base:1.0</capability>
-    <capability>urn:ietf:params:xml:ns:netconf:capability:candidate:1.0</capability>
-    <capability>urn:ietf:params:xml:ns:netconf:capability:confirmed-commit:1.0</capability>
-    <capability>urn:ietf:params:xml:ns:netconf:capability:validate:1.0</capability>
-    <capability>urn:ietf:params:xml:ns:netconf:capability:url:1.0?protocol=http,ftp,file</capability>
-    <capability>http://xml.juniper.net/netconf/junos/1.0</capability>
-    <capability>http://xml.juniper.net/dmi/system/1.0</capability>
-  </capabilities>
-  <session-id>78024</session-id>
-</hello>
-DEBUG:ncclient.transport.ssh:Trying another round of parsing since there is still data
-DEBUG:ncclient.transport.ssh:parsing netconf v1.0
-DEBUG:ncclient.transport.session:discarding listener <ncclient.transport.session.HelloHandler object at 0x1057df978>
-INFO:ncclient.transport.session:initialized: session-id=78024 | server_capabilities=<dict_keyiterator object at 0x1057d4bd8>
-INFO:root:netconfConnect.__init__ succeeded: prompt 192.168.56.11 830
-DEBUG:root:sendNetconfRequests get_config running
-DEBUG:root:sendNetconfRequests get_config("running")
-DEBUG:ncclient.transport.session:installing listener <ncclient.operations.rpc.RPCReplyListener object at 0x105802358>
-INFO:ncclient.operations.rpc:Requesting 'GetConfig'
-DEBUG:ncclient.transport.session:queueing <?xml version="1.0" encoding="UTF-8"?><nc:rpc xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="urn:uuid:ea00770b-2c8b-45de-a842-9fc2f1ea86cf"><nc:get-config><nc:source><nc:running/></nc:source></nc:get-config></nc:rpc>
-DEBUG:ncclient.operations.rpc:Sync request, will wait for timeout=10
-DEBUG:ncclient.transport.ssh:Sending message
-DEBUG:ncclient.transport.ssh:Sending: <?xml version="1.0" encoding="UTF-8"?><nc:rpc xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="urn:uuid:ea00770b-2c8b-45de-a842-9fc2f1ea86cf"><nc:get-config><nc:source><nc:running/></nc:source></nc:get-config></nc:rpc>]]>]]>
-DEBUG:ncclient.transport.ssh:Selecting netconf:base:1.0 for encoding
-DEBUG:ncclient.transport.ssh:parsing netconf v1.0
-DEBUG:ncclient.transport.ssh:Selecting netconf:base:1.0 for encoding
-DEBUG:ncclient.transport.ssh:parsing netconf v1.0
-DEBUG:ncclient.transport.ssh:Selecting netconf:base:1.0 for encoding
-DEBUG:ncclient.transport.ssh:parsing netconf v1.0
-DEBUG:ncclient.transport.session:dispatching message to <ncclient.transport.session.NotificationHandler object at 0x1057dfa90>: <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" xmlns:junos="http://xml.juniper.net/junos/14.1R1/junos" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="urn:uuid:ea00770b-2c8b-45de-a842-9fc2f1ea86cf">
-<data>
-<configuration xmlns="http://xml.juniper.net/xnm/1.1/xnm" junos:commit-seconds="1515755694" junos:commit-localtime="2018-01-12 11:14:54 UTC" junos:commit-user="admin">
-    <version>14.1R1.10</version>
-    <system>
-        <host-name>myMX</host-name>
-        <authentication-order>password</authentication-order>
-        <root-authentication>
-            <encrypted-password>$1$IYtaQe0T$lmtZPSWUQTcZlulyK2ske/</encrypted-password>
-        </root-authentication>
-        <name-server>
-            <name>2001:4860:4860::8888</name>
-        </name-server>
-        <name-server>
-            <name>2001:4860:4860::8844</name>
-        </name-server>
-        <tacplus-server>
-            <name>192.168.56.21</name>
-            <secret>$9$lONev8-dwaJUjH01IceKaJG</secret>
-            <timeout>10</timeout>
-            <source-address>192.168.56.11</source-address>
-        </tacplus-server>
-        <login>
-            <user>
-                <name>DEFAULT</name>
-                <uid>2003</uid>
-                <class>super-user</class>
-            </user>
-            <user>
-                <name>admin</name>
-                <uid>2000</uid>
-                <class>super-user</class>
-                <authentication>
-                    <encrypted-password>$1$U2qU74jr$kgjSs5rUlEi3SGMK8S6nx/</encrypted-password>
-                </authentication>
-            </user>
-            <user>
-                <name>script</name>
-                <uid>2001</uid>
-                <class>super-user</class>
-                <authentication>
-                    <ssh-rsa>
-                        <name>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0QROWVhDT1rTe5xBz61JgJRzN/oi0zUxC1EoNqNvyl9WRFfEUeSvmi0Uu3esl6Vxcm7bFbEX1SlaMehp6CJQazjmdtggQjR+GqD6+fSEiclNjfoKofPmsuChU9Kj4qzSvcyRedC4nzt3bbpps+TX1ij7RUW4RtJQ18V6R6zL89MxpmMy8HI3GnNJOdxsMU1xd28w//L0rlv78bgezm81c6LZHiVs+i/oMPO/3q8s5U2tJlwzku/reYpdu3yA+oSA2Du71zIJf4iHjhziLnCkTkkhPnca+OV0h3JlsLhgHuuBlN3PQiPq7Af8sgX+naxbqokuEoGwZ8UGLjQHgbq0t script@192.168.122.11</name>
-                    </ssh-rsa>
-                </authentication>
-            </user>
-            <user>
-                <name>taclogin</name>
-                <uid>2002</uid>
-                <class>superuser</class>
-            </user>
-        </login>
-        <services>
-            <ssh>
-            </ssh>
-            <telnet>
-            </telnet>
-            <netconf>
-                <ssh>
-                </ssh>
-            </netconf>
-        </services>
-        <syslog>
-            <user>
-                <name>*</name>
-                <contents>
-                    <name>any</name>
-                    <emergency/>
-                </contents>
-            </user>
-            <file>
-                <name>messages</name>
-                <contents>
-                    <name>any</name>
-                    <notice/>
-                </contents>
-                <contents>
-                    <name>authorization</name>
-                    <info/>
-                </contents>
-            </file>
-            <file>
-                <name>interactive-commands</name>
-                <contents>
-                    <name>interactive-commands</name>
-                    <any/>
-                </contents>
-            </file>
-        </syslog>
-    </system>
-    <interfaces>
-        <interface>
-            <name>ge-0/0/0</name>
-            <mac>08:00:27:1f:11:5c</mac>
-            <unit>
-                <name>0</name>
-                <family>
-                    <inet>
-                        <address>
-                            <name>192.168.56.11/24</name>
-                        </address>
-                    </inet>
-                </family>
-            </unit>
-        </interface>
-        <interface>
-            <name>ge-0/0/1</name>
-            <mac>08:00:27:5d:6d:d3</mac>
-            <unit>
-                <name>0</name>
-                <family>
-                    <inet>
-                        <address>
-                            <name>192.168.122.11/24</name>
-                        </address>
-                    </inet>
-                </family>
-            </unit>
-        </interface>
-        <interface>
-            <name>lo0</name>
-            <unit>
-                <name>0</name>
-                <family>
-                    <inet>
-                        <address>
-                            <name>10.10.10.11/32</name>
-                        </address>
-                    </inet>
-                </family>
-            </unit>
-        </interface>
-    </interfaces>
-    <snmp>
-        <view>
-            <name>full_view</name>
-            <oid>
-                <name>.1</name>
-                <include/>
-            </oid>
-        </view>
-        <community>
-            <name>COMMUNITY1</name>
-            <view>full_view</view>
-            <authorization>read-write</authorization>
-        </community>
-        <traceoptions>
-            <file>
-                <undocumented><filename>SNMP_TRACE</filename></undocumented>
-                <size>10000</size>
-                <files>2</files>
-            </file>
-            <flag>
-                <name>all</name>
-            </flag>
-        </traceoptions>
-    </snmp>
-</configuration>
-</data>
-</rpc-reply>
-DEBUG:ncclient.transport.session:dispatching message to <ncclient.operations.rpc.RPCReplyListener object at 0x105802358>: <rpc-reply xmlns="urn:ietf:params:xml:ns:netconf:base:1.0" xmlns:junos="http://xml.juniper.net/junos/14.1R1/junos" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0" message-id="urn:uuid:ea00770b-2c8b-45de-a842-9fc2f1ea86cf">
-<data>
-<configuration xmlns="http://xml.juniper.net/xnm/1.1/xnm" junos:commit-seconds="1515755694" junos:commit-localtime="2018-01-12 11:14:54 UTC" junos:commit-user="admin">
-    <version>14.1R1.10</version>
-    <system>
-        <host-name>myMX</host-name>
-        <authentication-order>password</authentication-order>
-        <root-authentication>
-            <encrypted-password>$1$IYtaQe0T$lmtZPSWUQTcZlulyK2ske/</encrypted-password>
-        </root-authentication>
-        <name-server>
-            <name>2001:4860:4860::8888</name>
-        </name-server>
-        <name-server>
-            <name>2001:4860:4860::8844</name>
-        </name-server>
-        <tacplus-server>
-            <name>192.168.56.21</name>
-            <secret>$9$lONev8-dwaJUjH01IceKaJG</secret>
-            <timeout>10</timeout>
-            <source-address>192.168.56.11</source-address>
-        </tacplus-server>
-        <login>
-            <user>
-                <name>DEFAULT</name>
-                <uid>2003</uid>
-                <class>super-user</class>
-            </user>
-            <user>
-                <name>admin</name>
-                <uid>2000</uid>
-                <class>super-user</class>
-                <authentication>
-                    <encrypted-password>$1$U2qU74jr$kgjSs5rUlEi3SGMK8S6nx/</encrypted-password>
-                </authentication>
-            </user>
-            <user>
-                <name>script</name>
-                <uid>2001</uid>
-                <class>super-user</class>
-                <authentication>
-                    <ssh-rsa>
-                        <name>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0QROWVhDT1rTe5xBz61JgJRzN/oi0zUxC1EoNqNvyl9WRFfEUeSvmi0Uu3esl6Vxcm7bFbEX1SlaMehp6CJQazjmdtggQjR+GqD6+fSEiclNjfoKofPmsuChU9Kj4qzSvcyRedC4nzt3bbpps+TX1ij7RUW4RtJQ18V6R6zL89MxpmMy8HI3GnNJOdxsMU1xd28w//L0rlv78bgezm81c6LZHiVs+i/oMPO/3q8s5U2tJlwzku/reYpdu3yA+oSA2Du71zIJf4iHjhziLnCkTkkhPnca+OV0h3JlsLhgHuuBlN3PQiPq7Af8sgX+naxbqokuEoGwZ8UGLjQHgbq0t script@192.168.122.11</name>
-                    </ssh-rsa>
-                </authentication>
-            </user>
-            <user>
-                <name>taclogin</name>
-                <uid>2002</uid>
-                <class>superuser</class>
-            </user>
-        </login>
-        <services>
-            <ssh>
-            </ssh>
-            <telnet>
-            </telnet>
-            <netconf>
-                <ssh>
-                </ssh>
-            </netconf>
-        </services>
-        <syslog>
-            <user>
-                <name>*</name>
-                <contents>
-                    <name>any</name>
-                    <emergency/>
-                </contents>
-            </user>
-            <file>
-                <name>messages</name>
-                <contents>
-                    <name>any</name>
-                    <notice/>
-                </contents>
-                <contents>
-                    <name>authorization</name>
-                    <info/>
-                </contents>
-            </file>
-            <file>
-                <name>interactive-commands</name>
-                <contents>
-                    <name>interactive-commands</name>
-                    <any/>
-                </contents>
-            </file>
-        </syslog>
-    </system>
-    <interfaces>
-        <interface>
-            <name>ge-0/0/0</name>
-            <mac>08:00:27:1f:11:5c</mac>
-            <unit>
-                <name>0</name>
-                <family>
-                    <inet>
-                        <address>
-                            <name>192.168.56.11/24</name>
-                        </address>
-                    </inet>
-                </family>
-            </unit>
-        </interface>
-        <interface>
-            <name>ge-0/0/1</name>
-            <mac>08:00:27:5d:6d:d3</mac>
-            <unit>
-                <name>0</name>
-                <family>
-                    <inet>
-                        <address>
-                            <name>192.168.122.11/24</name>
-                        </address>
-                    </inet>
-                </family>
-            </unit>
-        </interface>
-        <interface>
-            <name>lo0</name>
-            <unit>
-                <name>0</name>
-                <family>
-                    <inet>
-                        <address>
-                            <name>10.10.10.11/32</name>
-                        </address>
-                    </inet>
-                </family>
-            </unit>
-        </interface>
-    </interfaces>
-    <snmp>
-        <view>
-            <name>full_view</name>
-            <oid>
-                <name>.1</name>
-                <include/>
-            </oid>
-        </view>
-        <community>
-            <name>COMMUNITY1</name>
-            <view>full_view</view>
-            <authorization>read-write</authorization>
-        </community>
-        <traceoptions>
-            <file>
-                <undocumented><filename>SNMP_TRACE</filename></undocumented>
-                <size>10000</size>
-                <files>2</files>
-            </file>
-            <flag>
-                <name>all</name>
-            </flag>
-        </traceoptions>
-    </snmp>
-</configuration>
-</data>
-</rpc-reply>
-DEBUG:ncclient.operations.rpc:Delivering to <ncclient.operations.retrieve.GetConfig object at 0x1058022e8>
-DEBUG:ncclient.transport.ssh:Trying another round of parsing since there is still data
-DEBUG:ncclient.transport.ssh:parsing netconf v1.0
+DEBUG:root:async step: 1 started record test local-shell
+DEBUG:root:using hostReferenceName record
+INFO:root:host-dict lookup failed for step: record test local-shell
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:missing diffStrings in ConfigDict
+INFO:root:check/await analyserfuntion returns: False
+INFO:root:waiting for background tasks to be done
+INFO:root:background tasks done
+INFO:root:writing config file: test.yml
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: []
+INFO:root:start loop 1
+DEBUG:root:async step: 1 started record test local-shell
+DEBUG:root:using hostReferenceName record
+INFO:root:host-dict lookup failed for step: record test local-shell
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:existing diffStrings found in ConfigDict
+INFO:root:check/await analyserfuntion returns: True
+INFO:root:waiting for background tasks to be done
+INFO:root:background tasks done
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: []
+INFO:root:start loop 1
+DEBUG:root:async step: 1 started record test local-shell
+DEBUG:root:using hostReferenceName record
+INFO:root:host-dict lookup failed for step: record test local-shell
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:existing diffStrings found in ConfigDict
+INFO:root:check/await analyserfuntion returns: False
+INFO:root:waiting for background tasks to be done
+INFO:root:background tasks done
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: []
+INFO:root:start loop 1
+DEBUG:root:async step: 1 started record test local-shell
+DEBUG:root:using hostReferenceName record
+INFO:root:host-dict lookup failed for step: record test local-shell
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:missing diffStrings in ConfigDict
+INFO:root:check/await analyserfuntion returns: False
+DEBUG:root:async step: 2 started record test local-shell
+DEBUG:root:using hostReferenceName record
+INFO:root:host-dict lookup failed for step: record test local-shell
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:existing diffStrings found in ConfigDict
+INFO:root:check/await analyserfuntion returns: False
+INFO:root:waiting for background tasks to be done
+INFO:root:background tasks done
+INFO:root:writing config file: test.yml
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: []
+INFO:root:start loop 1
+DEBUG:root:async step: 1 started record test local-shell
+DEBUG:root:using hostReferenceName record
+INFO:root:host-dict lookup failed for step: record test local-shell
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:existing diffStrings found in ConfigDict
+INFO:root:check/await analyserfuntion returns: True
+DEBUG:root:async step: 2 started record test local-shell
+DEBUG:root:using hostReferenceName record
+INFO:root:host-dict lookup failed for step: record test local-shell
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:existing diffStrings found in ConfigDict
+INFO:root:check/await analyserfuntion returns: True
+INFO:root:waiting for background tasks to be done
+INFO:root:background tasks done
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: []
+INFO:root:start loop 1
+DEBUG:root:async step: 1 started record test local-shell
+DEBUG:root:using hostReferenceName record
+INFO:root:host-dict lookup failed for step: record test local-shell
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:existing diffStrings found in ConfigDict
+INFO:root:check/await analyserfuntion returns: True
+DEBUG:root:async step: 2 started record test local-shell
+DEBUG:root:using hostReferenceName record
+INFO:root:host-dict lookup failed for step: record test local-shell
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:existing diffStrings found in ConfigDict
+INFO:root:check/await analyserfuntion returns: False
 INFO:root:waiting for background tasks to be done
 INFO:root:background tasks done

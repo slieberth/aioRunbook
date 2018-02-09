@@ -42,9 +42,12 @@ class test_aioNetconf(unittest.TestCase):
     - ./host.yml
   steps:
     - record:
-        name: "DUT - this is a test for get_netconf config"
+        name: "DUT - this a basic test for netconf"
         commands:
-          - get_config running """
+          - get_config running
+          - get_chassis_inventory
+          - 'rpc <get-chassis-inventory><detail/></get-chassis-inventory>' 
+          - command show version """
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.flush()

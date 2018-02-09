@@ -1,8 +1,22 @@
+# diff test 1 runbook
 config:
-  hostfiles:
-    - ./host.yml
   steps:
-    - record:
-        name: "DUT - this is a test for get_netconf config"
+    - check:
+        name: record test local-shell
+        method: local-shell
         commands:
-          - get_config running 
+          - 'pip3 freeze | tail -n 2'
+        checkMethod: diff
+    - check:
+        name: record test local-shell
+        method: local-shell
+        commands:
+          - 'pip3 freeze | tail -n 2'
+        checkMethod: diff 
+diffStrings:
+  loop_1_step_1: 'urllib3==1.22
+
+    yarl==1.1.0'
+  loop_1_step_2: 'urllib3==1.22
+
+    yarl==1.1.1'

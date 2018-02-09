@@ -10,10 +10,11 @@
 # Contributors:
 #     Stefan Lieberth - initial implementation, API, and documentation
 
-#  \version   0.1.1
+#  \version   0.1.2
 #  \date      01.02.2018
 #  \modification:
 #  0.1.1 - get started
+#  0.1.2 - catch possible exception on missing textFSM attribute.
 
 import sys
 import os
@@ -41,7 +42,7 @@ class textFsmCheck:
 
 
     @classmethod
-    def checkCliOutputString (self,stepDict,valueList):
+    def checkCliOutputString (self,stepDict,valueList,configDict={}):
         """classmethod function for validatiting the CLI output of a stepdict.
 
               :param stepDict: The specific test step dictionary, which has both CLI outout and textFSM template attributes.
@@ -70,8 +71,12 @@ class textFsmCheck:
         if "textFSMOneLine" in stepDict.keys():
             parameterString = " ".join(stepDict["textFSMOneLine"].split(" ")[:-1])
             stepDict["textFSM"] = "Value Required P0 {}\n\nStart\n".format(parameterString) + "  ^${P0} -> Record\n\nEnd"
-            stepDict["checkResultCount"] = int((stepDict["textFSMOneLine"].split(" ")[-1]))        
-        textFSMString = stepDict["textFSM"]
+            stepDict["checkResultCount"] = int((stepDict["textFSMOneLine"].split(" ")[-1]))
+        try:        
+            textFSMString = stepDict["textFSM"]
+        except:
+            logging.error('check: analyzer without textFSM attribute (textFSM is the default analyzer)')    
+            return False,'check: analyzer without textFSM attribute (textFSM is the default analyzer)'        
         #textFSMString = substitudeValue (stepDict["textFSM"],valueList)
         re_table = textfsm.TextFSM(StringIO(textFSMString))
         logging.debug('before TextFSMOutput: offset {} relevant output {}'.format(checkCommandOffsetFromLastCommand,

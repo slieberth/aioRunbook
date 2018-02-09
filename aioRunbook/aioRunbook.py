@@ -13,10 +13,8 @@
 # Contributors:
 #     Stefan Lieberth - initial implementation, API, and documentation
 
-#  \version   0.1.8
-#  \date      01.02.2018
-#  \modification:
-#  0.1.1 - get started
+#  \version   0.1.11
+#  \date      09.02.2018
 
 #  \modification
 #  0.1.1 base line for history
@@ -26,6 +24,9 @@
 #  0.1.5 prepare for blocking functions; test with SNMP, first successful implementation
 #  0.1.6 continue work on blocking functions, cleanup ... 
 #  0.1.7 integration of aioNetconfConnect
+#  0.1.11 work on diff analyzer
+#         change to ...counter and ...index for loop, step, command
+#         index starts with 0, whereas counter starts with 1
 
 import asyncio
 import concurrent.futures
@@ -48,8 +49,10 @@ from aioRunbook.adaptors.aioSnmpConnect import aioSnmpConnect
 from aioRunbook.adaptors.aioNetconfConnect import aioNetconfConnect
 from aioRunbook.analyzers.textFsmCheck import textFsmCheck
 from aioRunbook.analyzers.jsonCheck import jsonCheck
+from aioRunbook.analyzers.diffCheck import diffCheck
 from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeValue, _addTimeStampsToStepDict
 from aioRunbook.tools.helperFunctions import _createOutputList, _setHostfileAttributes
+from aioRunbook.tools.aioRunbookYmlBlockParser import aioRunbookYmlBlockParser
 
 _GENENERIC_TIMEOUT = 60 #set generic timeout to 60 seconds
 
@@ -92,6 +95,7 @@ class aioRunbook():
 
     def __init__(self,configFile):    
         self.errorCounter = 0
+        self.diffStringsModificationFlag = False
         self._readYamlFile(configFile)
         self.loops = 1
 
@@ -108,8 +112,9 @@ class aioRunbook():
         """
         name = stepDict["name"]
         stepCounter = stepDict["stepCounter"]
+        stepIndex = stepDict["stepIndex"]
         logging.debug ("async step: {} started {}".format(stepCounter,name))
-        stepListItem = self.configDict["config"]["steps"][stepCounter]
+        stepListItem = self.configDict["config"]["steps"][stepIndex]
         stepId = list(stepListItem.keys())[0]
         if stepId not in ["sleep", "break", "comment"]:
             _setHostfileAttributes(stepDict,self.hostDict)
@@ -120,6 +125,7 @@ class aioRunbook():
         vendor = _isInDictionary("vendor",stepDict,"")
         method = _isInDictionary("method",stepDict,"")
         timeout = _GENENERIC_TIMEOUT
+        stepDict["loopCounter"] = self.loopCounter
         _createOutputList(stepCounter,stepId,stepDict,self.loopCounter)
         t1=datetime.datetime.now()
         if stepId in  [ "check", "await","config","record"]:
@@ -167,20 +173,26 @@ class aioRunbook():
                     analyserFunction = textFsmCheck.checkCliOutputString
                 elif _checkMethod == "json":
                     analyserFunction = jsonCheck.checkOutputData
+                elif _checkMethod == "diff":
+                    analyserFunction = diffCheck.checkCliOutputString
+                else:
+                    logging.error('###error analyzer selection step {}###'.format(stepCounter))
+                    analyserFunction = None                    
                 logging.debug('analyserFunction set to {0}'.format(analyserFunction))
                 checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1
                 logging.debug(' checkCommandOffsetFromLastCommand set to {0}'.format(checkCommandOffsetFromLastCommand))
-                valueList = self.configDict["config"]["valueMatrix"][self.loopCounter-1]  ###FIXME###
+                #valueList = self.configDict["config"]["valueMatrix"][self.loopCounter-1]  ###FIXME###
+                valueList = self.valueMatrix[self.loopCounter-1]
                 try:
                     (stepDict["output"][checkCommandOffsetFromLastCommand]["pass"],
                     stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"]) = \
-                                analyserFunction(stepDict,valueList)           
+                                analyserFunction(stepDict,valueList,configDict = self.configDict)           
                 except Exception as errmsg:
                     logging.error(errmsg) 
                     stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = False
                     stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"] = ["!!! Analyser Error !!!"]
                     logging.error('check function {0}'.format(analyserFunction))
-                    raise
+                    #raise
                 logging.info('check/await analyserfuntion returns: {0}'.format(stepDict["output"][checkCommandOffsetFromLastCommand]["pass"]))
                 if stepId == "await":
                     _tWait = _isInDictionary("command-repetition-timer",stepDict,1)
@@ -194,7 +206,7 @@ class aioRunbook():
                         try:
                             (stepDict["output"][checkCommandOffsetFromLastCommand]["pass"],
                             stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"]) = \
-                                        analyserFunction(stepDict,valueList) #FXIME Valuelist            
+                                        analyserFunction(stepDict,valueList,configDict = self.configDict)           
                         except Exception as errmsg:
                             logging.error(errmsg) 
                             stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = False
@@ -204,6 +216,10 @@ class aioRunbook():
                     if self.disconnectFunction != None and stepId in ["await"] :
                         self.disconnectFunction()
                     _addTimeStampsToStepDict(t1,stepDict)
+                if stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffStringInitalized"):
+                    self.diffStringsModificationFlag = True
+                if stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffStringModified"):
+                    self.diffStringsModificationFlag = True
             #
             # FIXME - is it required to close the asyncSsh Session?  self.disconnect funtion
             #
@@ -237,12 +253,13 @@ class aioRunbook():
         return stepDict
 
     def _readYamlFile (self,configFile):
+        self.yamlConfigFile = configFile
         logging.info('reading config file: {0}'.format(configFile))
         with open(configFile) as fh:
             YamlDictString = fh.read ()
             fh.close ()
         self.configDict = yaml.load(YamlDictString)
-        logging.debug('{0}'.format(self.configDict))
+        #logging.debug('{0}'.format(self.configDict))
         #
         #   FIXME Start Host Dict Reader should be a function
         #
@@ -270,6 +287,19 @@ class aioRunbook():
         #
         self.valueMatrix = _isInDictionary("valueMatrix",self.configDict["config"],[[""]])
 
+    def _writeYamlFile (self):
+        logging.info('writing config file: {0}'.format(self.yamlConfigFile))
+        diffStringYamlBlockLines = yaml.dump({"diffStrings":self.configDict["diffStrings"]},default_flow_style = False).split("\n")
+        print(diffStringYamlBlockLines)
+        configBlockLines = aioRunbookYmlBlockParser.getConfigBlock(configFile=self.yamlConfigFile).split("\n")
+        newYamlConfigString = "\n".join(configBlockLines+diffStringYamlBlockLines)
+        #print (newYamlConfigString)
+        fh = open(self.yamlConfigFile,'w') 
+        fh.write(newYamlConfigString)  
+        fh.close() 
+
+
+
 
     async def execSteps (self,eventLoop,threadExecutor=None): 
         """coroutine to execute the test steps, which are defined in a YAML config file.
@@ -283,13 +313,16 @@ class aioRunbook():
                 await asyncio.sleep(0.001)
         numberOfTasksBeforeStart =  len([task for task in asyncio.Task.all_tasks() if not task.done()])
         for self.loopCounter in range(1,self.loops+1):
+            self.loopIndex = self.loopCounter - 1
             bgList = []
             logging.info('start loop {}'.format(self.loopCounter))
             self.valueMatrixLoopList = self.valueMatrix[self.loopCounter-1]
-            for stepCounter,stepListItem in enumerate(self.configDict["config"]["steps"]):
+            for stepIndex,stepListItem in enumerate(self.configDict["config"]["steps"]):
+                stepCounter = stepIndex + 1
                 stepId = list(stepListItem.keys())[0]
                 stepDict = stepListItem[list(stepListItem.keys())[0]]
-                stepDict["stepCounter"],stepDict["stepCounter1"] = stepCounter,stepCounter + 1
+                stepDict["stepIndex"] = stepIndex
+                stepDict["stepCounter"] = stepCounter
                 backgroundStep = _isInDictionary("startInBackground",stepDict,False)
                 blockingAdapter = _isInDictionary("blockingAdapter",stepDict,False)
                 if backgroundStep:
@@ -301,3 +334,5 @@ class aioRunbook():
             logging.info("waiting for background tasks to be done")   
             await awaitOpenedTasksToBeDone(numberOfTasksBeforeStart)
             logging.info("background tasks done")   
+        if self.diffStringsModificationFlag == True:
+            self._writeYamlFile()

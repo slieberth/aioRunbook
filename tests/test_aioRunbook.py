@@ -21,7 +21,9 @@ import logging
 
 import os
 import sys
+#sys.path.insert(0, os.path.abspath('..'))
 from aioRunbook.aioRunbook import aioRunbook
+#import aioRunbook
 import pprint
 import yaml
 
@@ -121,7 +123,7 @@ class test_aioRunbook(unittest.TestCase):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertGreater(myRunbook.configDict["config"]["steps"][0]['sleep']['output'][0]['elapsedRaw'],1)
-        self.assertGreater(myRunbook.configDict["config"]["steps"][1]['sleep']['output'][0]['elapsedRaw'],2)
+        self.assertGreater(myRunbook.configDict["config"]["steps"][1]['sleep']['output'][0]['elapsedRaw'],1.99)
         pprint.pprint (myRunbook.configDict)
 
     def test_schedulerBackground(self):
@@ -143,7 +145,7 @@ class test_aioRunbook(unittest.TestCase):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertGreater(myRunbook.configDict["config"]["steps"][0]['sleep']['output'][0]['elapsedRaw'],1)
-        self.assertGreater(myRunbook.configDict["config"]["steps"][1]['sleep']['output'][0]['elapsedRaw'],2)
+        self.assertGreater(myRunbook.configDict["config"]["steps"][1]['sleep']['output'][0]['elapsedRaw'],1.99)
         pprint.pprint (myRunbook.configDict)
 
     def test_record_localShell(self):

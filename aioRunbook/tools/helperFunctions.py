@@ -69,8 +69,8 @@ def _createOutputList(step,stepType,stepDict,loopCounter):
         if "device" in stepDict.keys():
             outputContainer["device"] = stepDict["device"]
         outputContainer["loopCounter"] = loopCounter
-        outputContainer["stepCount"] = step
-        outputContainer["commandCount"] = i + 1
+        outputContainer["stepCounter"] = step
+        outputContainer["commandCounter"] = i + 1
         outputContainer["stepType"] = stepType
         outputContainer["commandOrig"] = str(command).replace("+","")
         outputContainer["pass"] = True  #default
