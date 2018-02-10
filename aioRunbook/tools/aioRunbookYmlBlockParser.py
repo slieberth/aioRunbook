@@ -73,8 +73,8 @@ class aioRunbookYmlBlockParser(object):
             self.configLines = kwargs["configString"].split("\n")
         configLine = self._findFirstLineStartingWith("config:",self.configLines )
         pdfLine = self._findFirstLineStartingWith("pdfRender:",self.configLines )
-        diffStringLine = self._findFirstLineStartingWith("diffStrings:",self.configLines )
-        print (configLine,pdfLine,diffStringLine)
+        diffStringLine = self._findFirstLineStartingWith("diffSnapshot:",self.configLines )
+        #print (configLine,pdfLine,diffStringLine)
         if configLine and pdfLine:
             return "\n".join(self.configLines[configLine:pdfLine])
         elif configLine and diffStringLine:

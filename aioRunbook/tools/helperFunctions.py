@@ -84,17 +84,16 @@ def _createOutputList(step,stepType,stepDict,loopCounter):
 
 def _setHostfileAttributes(stepDict,hostDict):
     hostReferenceName = stepDict["name"].split(" ")[0]
-    logging.debug('using hostReferenceName {}'.format(hostReferenceName))
+    logging.debug('checking hostReferenceName {}'.format(hostReferenceName))
     hostDictEntry = _isInDictionary(hostReferenceName,hostDict,None)
-    if hostDictEntry:
-        pass
-    else:
-        logging.info ("host-dict lookup failed for step: {}".format(stepDict["name"]))
-        if "device" in stepDict.keys():
-            if stepDict["device"] == "local-shell":
-                pass
-            else:
-                logging.warning ("host-dict lookup failed for step: {} device:{}".format(stepDict["name"],stepDict["device"]))
+    #if hostDictEntry:
+    #    pass
+    #else:
+    #    if "device" in stepDict.keys():
+    #        if stepDict["device"] == "local-shell":
+    #            pass
+    #        else:
+    #            logging.warning ("host-dict lookup failed for step: {} device:{}".format(stepDict["name"],stepDict["device"]))
     stepDict["hostname"] = ""
     if hostDictEntry:
         stepDict["hostname"] = hostReferenceName

@@ -95,8 +95,7 @@ class aioRunbook():
 
     def __init__(self,configFile):    
         self.errorCounter = 0
-        self.diffStringsModificationFlag = False
-        self._readYamlFile(configFile)
+        self.configLoaded = self._readYamlFile(configFile)
         self.loops = 1
 
     @classmethod
@@ -216,13 +215,6 @@ class aioRunbook():
                     if self.disconnectFunction != None and stepId in ["await"] :
                         self.disconnectFunction()
                     _addTimeStampsToStepDict(t1,stepDict)
-                if stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffStringInitalized"):
-                    self.diffStringsModificationFlag = True
-                if stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffStringModified"):
-                    self.diffStringsModificationFlag = True
-            #
-            # FIXME - is it required to close the asyncSsh Session?  self.disconnect funtion
-            #
         elif stepId == "sleep":
             #stepDict["output"][0]["startTS"] = t1.strftime('%Y-%m-%d %H:%M:%S.%f')   
             if "seconds" not in stepDict.keys():
@@ -255,11 +247,18 @@ class aioRunbook():
     def _readYamlFile (self,configFile):
         self.yamlConfigFile = configFile
         logging.info('reading config file: {0}'.format(configFile))
-        with open(configFile) as fh:
-            YamlDictString = fh.read ()
-            fh.close ()
-        self.configDict = yaml.load(YamlDictString)
-        #logging.debug('{0}'.format(self.configDict))
+        try:
+            with open(configFile) as fh:
+                YamlDictString = fh.read ()
+                fh.close ()
+        except:
+            logging.error('cannot open configFile {}'.format(configFile))
+            return False   
+        try:     
+            self.configDict = yaml.load(YamlDictString)
+        except:
+            logging.error('cannot load YAML File {}'.format(configFile))
+            return False   
         #
         #   FIXME Start Host Dict Reader should be a function
         #
@@ -286,14 +285,13 @@ class aioRunbook():
         #   FIXME End Host Dict Reader
         #
         self.valueMatrix = _isInDictionary("valueMatrix",self.configDict["config"],[[""]])
+        return True   
 
-    def _writeYamlFile (self):
+    def writeDiffSnapshotToFile (self):
         logging.info('writing config file: {0}'.format(self.yamlConfigFile))
-        diffStringYamlBlockLines = yaml.dump({"diffStrings":self.configDict["diffStrings"]},default_flow_style = False).split("\n")
-        print(diffStringYamlBlockLines)
+        diffStringYamlBlockLines = diffCheck.getDiffSnapshotYamlBlockLines(self.configDict)
         configBlockLines = aioRunbookYmlBlockParser.getConfigBlock(configFile=self.yamlConfigFile).split("\n")
         newYamlConfigString = "\n".join(configBlockLines+diffStringYamlBlockLines)
-        #print (newYamlConfigString)
         fh = open(self.yamlConfigFile,'w') 
         fh.write(newYamlConfigString)  
         fh.close() 
@@ -302,7 +300,7 @@ class aioRunbook():
 
 
     async def execSteps (self,eventLoop,threadExecutor=None): 
-        """coroutine to execute the test steps, which are defined in a YAML config file.
+        """coroutine to execute the testhost-dict lookup failed for step steps, which are defined in a YAML config file.
 
           :param loop: defines the encpomassing asyncio event loop
           :type loop: asyncio.event_loop
@@ -311,6 +309,9 @@ class aioRunbook():
         async def awaitOpenedTasksToBeDone(numberOfTasksBeforeStarted):
             while len([task for task in asyncio.Task.all_tasks() if not task.done()]) > numberOfTasksBeforeStarted:
                 await asyncio.sleep(0.001)
+        if self.configLoaded == False:
+            logging.error("execSteps without loaded config")  
+            return False            
         numberOfTasksBeforeStart =  len([task for task in asyncio.Task.all_tasks() if not task.done()])
         for self.loopCounter in range(1,self.loops+1):
             self.loopIndex = self.loopCounter - 1
@@ -334,5 +335,4 @@ class aioRunbook():
             logging.info("waiting for background tasks to be done")   
             await awaitOpenedTasksToBeDone(numberOfTasksBeforeStart)
             logging.info("background tasks done")   
-        if self.diffStringsModificationFlag == True:
-            self._writeYamlFile()
+        return True

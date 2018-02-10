@@ -30,6 +30,8 @@ import jtextfsm as textfsm
 from six import StringIO
 from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeValue
 import difflib
+import zlib
+import binascii
 
 
 class diffCheck:
@@ -41,6 +43,11 @@ class diffCheck:
     def __init__(self):
         pass    
 
+    def _compress(clearTestString):
+        return binascii.hexlify(zlib.compress(clearTestString.encode()))
+
+    def _deCompress(compressedDiffStringInHex):
+        return zlib.decompress(binascii.unhexlify(compressedDiffStringInHex)).decode()
 
     @classmethod
     def checkCliOutputString (self,stepDict,valueList,configDict={}):
@@ -50,22 +57,48 @@ class diffCheck:
         """
         checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1   
         diffInformationTag = ("loop_{}_step_{}".format(stepDict["loopCounter"],stepDict["stepCounter"])) 
-        if "diffStrings" in configDict:
-            logging.debug ('existing diffStrings found in ConfigDict'.format(stepDict["stepCounter"])) 
-            if diffInformationTag  in configDict["diffStrings"].keys():
-                outputStringList = stepDict["output"][checkCommandOffsetFromLastCommand]["output"].split("\n")
-                diffStringList = configDict["diffStrings"][diffInformationTag].split("\n")
+        self.output = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
+        if "diffSnapshot" in configDict:
+            logging.debug ('existing diffSnapshot in ConfigDict'.format(stepDict["stepCounter"])) 
+            if diffInformationTag  in configDict["diffSnapshot"].keys():
+                outputStringList = self.output.split("\n")
+                #diffStringList = configDict["diffStrings"][diffInformationTag].split("\n")
+                compressedDiffStringInHex = configDict["diffSnapshot"][diffInformationTag]
+                diffStringList = self._deCompress(compressedDiffStringInHex).split("\n")
                 diffResultList = list(difflib.unified_diff(diffStringList,outputStringList))
                 if len(diffResultList) == 0:
                     return True, ""
                 else:
                     return False, "\n".join(diffResultList)
             else:
-                configDict["diffStrings"][diffInformationTag] = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
-                return False, "diffStringModified"
+                logging.debug ('missing diffSnapshot for {} in ConfigDict'.format(diffInformationTag)) 
+                #configDict["diffStrings"][diffInformationTag] = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
+                outputString = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
+                compressedStringInHex = self._compress(outputString)
+                #compressedStringInHex = binascii.hexlify(zlib.compress(outputString.encode()))
+                configDict["diffSnapshot"][diffInformationTag] = compressedStringInHex 
+                return False, "diffSnapshotModified"
         else:
-            logging.debug ('missing diffStrings in ConfigDict'.format(stepDict["stepCounter"])) 
-            diffStringsDict = {diffInformationTag:stepDict["output"][checkCommandOffsetFromLastCommand]["output"]}
-            configDict["diffStrings"] = diffStringsDict
-            return False, "diffStringInitalized"
+            logging.debug ('missing diffSnapshot in ConfigDict'.format(stepDict["stepCounter"])) 
+            outputString = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
+            compressedStringInHex = self._compress(outputString)
+            #diffStringsDict = {diffInformationTag:stepDict["output"][checkCommandOffsetFromLastCommand]["output"]}
+            diffStringsDict = {diffInformationTag:compressedStringInHex}
+            configDict["diffSnapshot"] = diffStringsDict
+            return False, "diffSnapshotInitalized"
+
+    @classmethod
+    def setModificationFlag (self,stepDict):
+        checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1  
+        if stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffSnapshotModified") or \
+           stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffSnapshotInitalized"):
+            return True
+        else:
+            return False
+
+    @classmethod
+    def getDiffSnapshotYamlBlockLines (self,configDict):
+        configDict["diffSnapshot"]["created"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') 
+        return yaml.dump({"diffSnapshot":configDict["diffSnapshot"]},default_flow_style = False).split("\n")
+        
 
