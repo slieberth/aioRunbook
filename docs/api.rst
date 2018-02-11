@@ -13,7 +13,7 @@ aioRunbook
 ==========
 
 
-.. currentmodule:: aioRunbook.aioRunbook
+.. currentmodule:: aioRunbook
 
 .. autoclass:: aioRunbook
 
