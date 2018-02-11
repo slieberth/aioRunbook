@@ -21,7 +21,7 @@ aioRunbook
 aioRunbook
 ==========
 
-.. currentmodule:: aioRunbook
+.. currentmodule:: aioRunbook.aioRunbook
 
 .. autoclass:: aioRunbook.aioRunbook
 
@@ -46,7 +46,31 @@ aioPdfRender
 
    .. automethod:: writePdfFile
 
+aioPdfRender
+============
 
+.. currentmodule:: aioRunbook.postProcessing-aioPdfRender
+
+.. autoclass:: aioRunbook.postProcessing-aioPdfRender
+
+   ================================== =
+   methods
+   ================================== =
+
+   .. automethod:: writePdfFile
+
+aioPdfRender
+============
+
+.. currentmodule:: aioRunbook.postProcessing-aioPdfRender
+
+.. autoclass:: aioRunbook
+
+   ================================== =
+   methods
+   ================================== =
+
+   .. automethod:: writePdfFile
 
 
 
