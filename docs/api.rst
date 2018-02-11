@@ -8,9 +8,9 @@ API Documentation
 aioRunbook
 ==========
 
-.. currentmodule:: aioRunbook
+.. currentmodule:: aioRunbook.aioRunbook
 
-.. autoclass:: aioRunbook
+.. autoclass:: aioRunbook.aioRunbook
 
    ================================== =
    methods
