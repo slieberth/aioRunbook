@@ -49,9 +49,9 @@ aioPdfRender
 aioPdfRender
 ============
 
-.. currentmodule:: aioRunbook.postProcessing-aioPdfRender
+.. currentmodule:: aioRunbook.postProcessing.aioPdfRender
 
-.. autoclass:: aioRunbook.postProcessing-aioPdfRender
+.. autoclass:: aioRunbook.postProcessing.aioPdfRender
 
    ================================== =
    methods
@@ -62,9 +62,9 @@ aioPdfRender
 aioPdfRender
 ============
 
-.. currentmodule:: aioRunbook.postProcessing-aioPdfRender
+.. currentmodule:: aioRunbook.postProcessing.aioPdfRender
 
-.. autoclass:: aioRunbook
+.. autoclass:: aioPdfRender
 
    ================================== =
    methods
