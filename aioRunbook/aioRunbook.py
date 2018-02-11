@@ -258,7 +258,8 @@ class aioRunbook():
             self.configDict = yaml.load(YamlDictString)
         except:
             logging.error('cannot load YAML File {}'.format(configFile))
-            return False   
+            return False  
+        self.configDict["yamlConfigFile"] = self.yamlConfigFile #for pdfRender
         #
         #   FIXME Start Host Dict Reader should be a function
         #

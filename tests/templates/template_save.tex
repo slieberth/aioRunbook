@@ -1,0 +1,381 @@
+%version 3.03.16
+
+
+
+\documentclass[10pt,a4paper]{article}
+
+%\usepackage{Fmed541}
+
+%Pakete allgemein
+\usepackage[utf8]{inputenc}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}          		% Einbindung von Grafiken
+\usepackage[usenames,dvipsnames]{color} % farbige Texte auch im PDF
+\usepackage{lastpage}         	 	% Seitenzahl von Gesamtzahl
+\usepackage{fancyhdr}          		% Fuﬂzeilengestaltung
+\usepackage{multirow}          		% mehrere Zeilen pro Tabellen-Zelle
+\usepackage{sectsty}           		% ƒnderung der Abschnittsgestaltung
+\usepackage{fancyvrb}          		% verbatim Texte
+\usepackage{supertabular}      		% lange Tabellen mit Seitenumbruca
+\usepackage[pdftex,pdfpagemode=UseNone,pdfstartview=FitH, pdfborder={0 0 0}, colorlinks=true, urlcolor=blue, linkcolor=darkgray]{hyperref}	% Sprungmarken und Referenzen im PDF
+\usepackage{framed, color}     		% farbige Texthintergr¸nde
+\usepackage{colortbl}          		% farbige Tabellen (-kˆpfe)
+\usepackage{wallpaper}         		% Hintergrundbild auf erster Seite
+\usepackage{ifthen}      		% Bedingte Kommandos ermˆglichen
+\usepackage{listings}
+\usepackage{courier}
+\usepackage{array, ragged2e}
+\usepackage{datetime}
+
+%Formate allgemein
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{12pt}
+\setlength{\topmargin}{-1.5cm}
+\setlength{\headsep}{1.2cm}
+\setlength{\headheight}{20pt}
+\setlength{\footskip}{1.2cm}
+\setlength{\textheight}{25cm}
+\setlength{\textwidth}{17cm}
+\setlength{\evensidemargin}{1cm}
+\setlength{\oddsidemargin}{-0.6cm}
+\setlength{\fboxsep}{4pt}
+\setcounter{secnumdepth}{6}
+\setcounter{tocdepth}{3}
+\renewcommand{\rmdefault}{ftg}\rmfamily
+\sectionfont{\fontsize{18}{18}\selectfont}
+\subsectionfont{\normalfont\fontsize{14}{14}\selectfont}
+\subsubsectionfont{\normalfont}
+\paragraphfont{\normalfont}
+\subparagraphfont{\normalfont}
+\pagestyle{fancy}
+\clubpenalty 9000 \widowpenalty 9000 \displaywidowpenalty 9000
+
+\pdfminorversion=3
+
+%Schalter allgemein
+
+%Kommandos allgemein
+\newcommand{\PreserveBackslash}[1]{\let\temp=\\#1\let\\=\temp}
+\newcommand{\vbackslash}{$\backslash$}
+\newcommand{\magenta}{\color{magenta}}
+\newcommand{\schwarz}{\color{black}}
+\newcommand{\grau}{\color{Gray}}
+\newcommand{\rot}{\color{Red}}
+\newcommand{\blau}{\color{blue}}
+\newcommand{\royalblue}{\color{RoyalBlue}}
+\definecolor{shadecolor}{gray}{.85}
+\definecolor{dunkelgrau}{gray}{0.65}
+\definecolor{hellgrau}{gray}{0.85}
+\definecolor{darkgray}{gray}{0.4}
+
+%Spaltentypen allgemein
+\newcolumntype{X}{>{\cellcolor{hellgrau}}l} %graue Trennzeile in GS-Tabelle
+\newcolumntype{P}{>{\raggedright} p{3.5cm}} %Produkt in GS-Tabelle
+\newcolumntype{H}{>{\raggedright} p{1.3cm}} %Hersteller in GS-Tabelle
+\newcolumntype{G}{>{\raggedright} p{1.4cm}} %Gesch‰ftsfall in GS-Tabelle
+\newcolumntype{I}{>{\raggedright} p{2.7cm}} %Interface in GS-Tabelle
+\newcolumntype{K}{>{\PreserveBackslash{\raggedright}} p{6.0cm}} %Konfigurationspfad in GS-Tabelle
+\newcolumntype{V}{>{\raggedright} p{1cm}} %Version in Versionstabelle
+\newcolumntype{D}{>{\raggedright} p{2cm}} %Datum in Versionstabelle
+\newcolumntype{S}{>{\raggedright} p{2.5cm}} %Status in Versionstabelle
+\newcolumntype{v}{>{\PreserveBackslash{\RaggedRight}} p{9.7cm}} %ƒnderungen in Versionstabelle
+
+%Kommando-ƒnderungen allgemein
+
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}
+                                    {3.25ex \@plus1ex \@minus.2ex}
+                                    {0.5ex \@plus .2ex}
+                                    {\normalfont\normalsize}}
+
+\renewcommand\subparagraph{\@startsection{subparagraph}{5}{\parindent}
+                                       {3.25ex \@plus1ex \@minus .2ex}
+                                       {0.1ex \@plus .2ex}
+                                      {\normalfont\normalsize}}
+
+
+%List Mono Font
+%\usepackage[T1]{fontenc}
+%\usepackage[scaled]{beramono}
+%\newcommand\Small{\fontsize{9}{9.2}\selectfont}
+%\newcommand*\LSTfont{\Small\ttfamily\SetTracking{encoding=*}{-60}\lsstyle}
+%Listingformat allgemein
+%% \lstset{language=,frame=tbrl,extendedchars=true,basicstyle=\fontsize{7}{7}\selectfont}
+%% \lstset{language=,frame=tbrl,extendedchars=true,basicstyle=\footnotesize\ttfamily,columns=fullflexible,breaklines=true,breakatwhitespace=true,aboveskip=\bigskipamount}
+%\lstset{language=,frame=tbrl,extendedchars=true,basicstyle=\LSTfont,columns=fixed,breaklines=true,breakatwhitespace=true,aboveskip=\bigskipamount}
+
+\lstset{language=,frame=tbrl,extendedchars=true,basicstyle=\scriptsize\ttfamily,breaklines=true,breakatwhitespace=true,aboveskip=\bigskipamount,escapeinside={(*@}{@*)}}
+
+%Kopfzeile allgemein
+\renewcommand{\headrulewidth}{0pt}
+\rhead{\fontsize{10}{10}\selectfont \testCaseId - \testCaseTitle \\[0pt]}
+\lhead{\fontsize{10}{10}\selectfont Deutsche Telekom Technik GmbH \\[0pt]\rule{170mm}{0.1mm}~~~}
+\chead{\fontsize{10}{10}\selectfont FMED-541\\[0pt]}
+
+% Logo allgemein
+%\newcommand{\TLogo}{\fontfamily{ftl}\fontsize{36}{36}\selectfont
+%{\magenta ============================
+%\hspace{-0.65ex}T\hspace{-0.65ex}===}\\}
+
+
+%Fusszeile allgemein
+\newcommand{\Fusszeile}
+{
+\fancyfoot[L]{\fontsize{10}{10}\selectfont \jobname.pdf}
+\fancyfoot[C]{}
+\fancyfoot[R]{\fontsize{10}{10}\selectfont  \thepage \ of \pageref{LastPage} }
+}
+
+
+%
+%
+%
+% end Fmed541.sty
+
+
+
+
+\usepackage[ngermanb]{babel}
+\usepackage[german]{isodate}
+\usepackage[table]{xcolor}% http://ctan.org/pkg/xcolor
+
+\usepackage{tabularx}
+
+\usepackage{xpatch}
+
+\newenvironment{testHeader}
+    {%
+    \expandafter\xpretocmd\csname endtabular*\endcsname{\hline}{}{}%
+    \tabularx{\linewidth}{|  c  |  X  |}
+        \hline
+        \cellcolor{gray!50} Testcase Id & \cellcolor{gray!50} Testcase Title \\
+        \hline}
+    {\endtabularx}
+    
+\newenvironment{testExecution}
+    {%
+    \expandafter\xpretocmd\csname endtabular*\endcsname{\hline}{}{}%
+    \tabularx{\linewidth}{| X |  p{0.6cm} |  p{0.5cm} |  p{0.5cm}  | p{0.5cm} |}}
+    {\endtabularx}
+
+\newenvironment{testExecutionHeader}
+    {%
+    \expandafter\xpretocmd\csname endtabular*\endcsname{\hline}{}{}%
+    \tabularx{\linewidth}{| X |  p{0.6cm} | p{0.5cm} | p{0.5cm} | p{0.5cm} |}
+        \hline
+        \cellcolor{gray!25} Test execution & \cellcolor{gray!25} >> & \cellcolor{gray!25} pass & \cellcolor{gray!25} fail & \cellcolor{gray!25} skip \\
+        \hline}
+    {\endtabularx}
+
+\newenvironment{loopTable}
+    {%
+    \expandafter\xpretocmd\csname endtabular*\endcsname{\hline}{}{}%
+    \tabularx{\linewidth}{|  c  |  c  | X  |}
+        \hline
+        \cellcolor{gray!50} loop & \cellcolor{gray!50} check name & \cellcolor{gray!50} textfsmOutput \\
+        \hline}
+    {\endtabularx}
+
+\usepackage{tikz}
+\usetikzlibrary{calc,trees,positioning,arrows,chains,shapes.geometric,%
+    decorations.pathreplacing,decorations.pathmorphing,shapes,%
+    matrix,shapes.symbols,automata} 
+
+\usepackage{newfloat}
+\usepackage{hyperref}
+\usepackage{sidecap}
+\DeclareFloatingEnvironment[fileext=frm,placement={!ht},name=CLI Output]{cliOutput}
+\usepackage{caption}
+\captionsetup[cliOutput]{labelfont=bf,font=small,
+  justification=raggedright,
+  singlelinecheck=false
+}    
+
+\usepackage{attachfile}
+\usepackage{fancyvrb}
+
+\newboolean{skip}
+\newboolean{pass}
+
+\font\tt=rm-lmtl10
+\font\itt=rm-lmtlo10
+\font\btt=rm-lmtk10
+\font\bitt=rm-lmtko10
+
+\begin{document}
+\sloppy
+
+\newcommand{\testCaseId}{\VAR{configDict["name"]}}
+\newcommand{\testCaseTitle}{\VAR{configDict["title"]}}
+\newcommand{\testCaseCompound}{\testCaseId \testCaseTitle}
+\newcommand{\testDescription}{\VAR{configDict["description"]|replace("_", "\_")|replace('"', "''")}}
+\newcommand{\testExpected}{\VAR{configDict["expected"]|replace("_", "\_")|replace('"', "''")}}
+\newcommand{\testPreparation}{\VAR{configDict["preparation"]|replace("_", "\_")|replace('"', "''")}}
+
+\newcommand{\Teil}{\VAR{configDict["pdfOutput"]["title1"]}}
+\newcommand{\TestCase}{\VAR{configDict["name"]} - \VAR{configDict["title"]}}
+
+\newcommand{\Version}{1.0}
+\newcommand{\Author}{\VAR{configDict["pdfOutput"]["author"]}}
+\newcommand{\Tester}{\VAR{configDict["tester"]}}
+
+%\newcommand{\Versionen}{\subsection{1.0t}}
+%\newcommand{\WeitereMitgeltendeUnterlagen}{}
+
+%TestResult allgemein
+\newpage
+%~\\
+%%\vfill
+\section { Test Report Overview }  
+
+\begin{testHeader}
+\cellcolor{gray!25} \testCaseId & \cellcolor{gray!25} \testCaseTitle   \\  \hline
+Description     & \testDescription   \\  \hline
+Expected        & \testExpected      \\  \hline
+Preparation     & \testPreparation   \\  \hline
+Author       &  \Author    \\  \hline
+Tester       &  \Tester  \\  \hline
+Date   & \today\ \currenttime   \\  \hline
+\end{testHeader}
+
+
+\begin{testExecutionHeader}
+\end{testExecutionHeader}
+\label{link-testExecution}
+ \BLOCK{ for y in configDict["steps"] }
+ \begin{testExecution} 
+  \BLOCK{ for stepType,stepDict in y.items() }
+    \BLOCK{ for x in stepDict["output"] }
+      \BLOCK{ if x["skip"] }
+         \setboolean{skip}{true} 
+         \setboolean{pass}{false} 
+       \BLOCK{ else }
+        \BLOCK{ if x["pass"] }
+         \setboolean{pass}{true} 
+        \BLOCK{ else }
+         \setboolean{pass}{false} 
+        \BLOCK{ endif }
+      \BLOCK{ endif }
+    \BLOCK{ endfor }
+   \ifthenelse{\boolean{skip}}
+    {Step \VAR{stepDict["stepCount"]}: \VAR{stepDict["output"][0]["name"]} &  & - & - & \cellcolor{yellow!25} skip \\ \hline }
+    {\ifthenelse{\boolean{pass}}
+      {Step \VAR{stepDict["stepCount"]}: \VAR{stepDict["output"][0]["name"]} &  & \cellcolor{green!25} pass & - & - \\ \hline }
+      {Step \VAR{stepDict["stepCount"]}: \VAR{stepDict["output"][0]["name"]}  &  & - & \cellcolor{red!25} fail & - \\ \hline }
+    }
+  \BLOCK{ if stepType == "check" or stepType == "record" or stepType == "config" or stepType == "comment" or stepType == "await"}
+   \BLOCK{ for o in stepDict["output"] }
+    \BLOCK{ if ( stepType == "check" or stepType == "record" or stepType == "await") and ( stepDict["hideOutput"] is not defined  ) }
+\tt\tiny  \VAR{o["commandTt"]} & \tiny \ref{label-\VAR{o["stepCount"]}-\VAR{o["commandCount"]}} & " "  &  " " & " " \\
+    \BLOCK{ else }
+\tt\tiny  \VAR{o["commandTt"]} & " " & " "  &  " " & " " \\
+    \BLOCK{ endif }
+   \BLOCK{ endfor }
+  \BLOCK{ endif }
+   \hline
+  \BLOCK{ endfor }
+  \end{testExecution}
+ \BLOCK{ endfor }
+
+%\end{testExecution}
+
+\section { Test Setup }  
+
+\BLOCK{ if "tikzpicture" in configDict["pdfOutput"] }
+\VAR{configDict["pdfOutput"]["tikzpicture"]}
+\BLOCK{ endif }
+
+\BLOCK{ if "tikzmatrix" in configDict["pdfOutput"] }
+        \begin{tikzpicture}[
+          font=\sffamily,
+          every matrix/.style={ampersand replacement=\&,column sep=0cm,row sep=2cm},
+          dut/.style={draw,thick,circle,fill=gray!40},
+          router/.style={draw,thick,circle,fill=gray!20},
+          system/.style={draw,thick,rounded corners,fill=gray!20,inner sep=.4cm},
+          ip2/.style={draw,thick,rounded corners,fill=gray!20},
+          interface/.style={draw,thick,rounded corners,fill=gray!20},
+          lineId/.style={draw,thick,rounded corners,fill=gray!10},
+          to/.style={->,>=stealth',shorten >=1pt,semithick,font=\sffamily\footnotesize},
+          biDir/.style={<->,>=stealth',shorten >=1pt,semithick,font=\sffamily\footnotesize},
+          every node/.style={align=center}]
+\VAR{configDict["pdfOutput"]["tikzmatrix"]}
+\end{tikzpicture}
+\BLOCK{ endif }
+
+
+\pagebreak
+
+
+\section { Output }  
+\BLOCK{ for y in configDict["steps"] }
+ \BLOCK{ for stepType,stepDict in y.items() }
+  \BLOCK{ if stepType == "check" or stepType == "record" or stepType == "comment" or stepType == "await" }
+  \BLOCK{ if stepDict["hideOutput"] is not defined }
+  \subsection {Step-\VAR{stepDict["stepCount"]} \VAR{stepDict["output"][0]["name"]} }
+  \small \VAR{stepDict["description"]|replace("_", "\_")|replace('"', "''")}
+  \BLOCK{ if stepType == "check" or stepType == "record" or stepType == "await" }
+   \BLOCK{ for x in stepDict["output"] }
+   \subsubsection { \tt Step-\VAR{x["stepCount"]}-Command-\VAR{x["commandCount"]}: \VAR{x["commandTt"]} }
+   \label{label-\VAR{x["stepCount"]}-\VAR{x["commandCount"]}}
+
+\rm\tiny{\underline{verbatim command}: \quad \verb+\VAR{x["commandOrig"]}+} \\
+\rm\tiny{\underline{Device}: \VAR{stepDict["device"]}\\}
+\rm\tiny{\underline{Step-Name}: \VAR{stepDict["name"]}\\}
+\rm\tiny{\underline{TS(end)}: \VAR{x["endTS"]} \quad \underline{Elapsed}: \VAR{x["elapsed"]} \\}
+%\tt\scriptsize{\begin{verbatim} \VAR{x["commandOrig"]} \end{verbatim} } } 
+
+     \begin{lstlisting}[]]
+\VAR{x["output"]}
+     \end{lstlisting}
+     \BLOCK{ if x["stepType"] == "check" or x["stepType"] == "await"}
+       \VAR{x["stepType"]} pass result: \VAR{x["pass"]}
+       \tiny \begin{lstlisting}[]]
+\VAR{x["checkResult"]}
+       \end{lstlisting}
+     \BLOCK{ endif }
+     \tt\scriptsize goto top:\ref{link-testExecution} \normalsize \\
+   \BLOCK{ endfor }
+  \BLOCK{ endif }
+  \BLOCK{ if stepType == "comment"}
+   \BLOCK{ for x in stepDict["output"] }
+      \BLOCK{ if x["lstlisting"]|length > 1 }
+       \begin{lstlisting}[]]
+\VAR{x["lstlisting"]}
+       \end{lstlisting}
+      \BLOCK{ endif }
+      \BLOCK{ if x["inludeImageFromFile"]|length > 1 }
+\graphicspath{{../../}}
+\includegraphics[width=1\textwidth]{\VAR{x["inludeImageFromFile"]}}
+      \BLOCK{ endif }
+      \BLOCK{ if x["attachFile"]|length > 1 }
+\graphicspath{{../../}}
+\attachfile[icon=Paperclip]{\VAR{x["attachFile"]}}
+      \BLOCK{ endif }
+   \BLOCK{ endfor }
+  \BLOCK{ endif }
+  \BLOCK{ endif }
+  \BLOCK{ endif }
+ \BLOCK{ endfor }
+\BLOCK{ endfor }
+
+
+
+
+\pagebreak
+\section { Attachments }  
+
+\subsection {yaml runbook}  
+\tiny \begin{verbatim}\VAR{configDict["configFile"]}\end{verbatim} \normalsize
+\attachfile[icon=Paperclip]{\VAR{configDict["configFile"]}}
+
+%\subsection { latex source code }  
+%\attachfile[icon=Paperclip]{\jobname.tex}
+
+\BLOCK{ if "appendFiles" in configDict["pdfOutput"] }
+ \BLOCK{ for appendFile in configDict["pdfOutput"]["appendFiles"] }
+    \subsection {\VAR{appendFile|replace("_", " ")|replace('"', "")}}
+    \attachfile[icon=Paperclip]{\VAR{appendFile}}
+ \BLOCK{ endfor }
+\BLOCK{ endif }
+
+\end{document}

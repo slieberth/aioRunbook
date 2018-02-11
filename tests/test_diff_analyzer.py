@@ -57,6 +57,7 @@ config:
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],False)
         self.assertEqual(myRunbook.configDict["config"]["steps"][1]['check']['output'][0]['pass'],False)
+        #pprint.pprint(myRunbook.configDict)
         myRunbook.writeDiffSnapshotToFile()
         time.sleep(1)
 

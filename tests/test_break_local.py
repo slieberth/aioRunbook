@@ -23,6 +23,7 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 from aioRunbook.aioRunbook import aioRunbook
 import logging
+import pprint
 
 
 
@@ -40,7 +41,7 @@ class test_aioRunbook_break(unittest.TestCase):
         myRunbook = aioRunbook("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
-        #print(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['output'])
+        #pprint.pprint(myRunbook.configDict)
 
 if __name__ == '__main__':
     logLevel = logging.DEBUG
