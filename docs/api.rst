@@ -18,11 +18,27 @@ aioRunbook
 
    .. automethod:: execSteps
 
+aioRunbook
+==========
+
+.. currentmodule:: aioRunbook
+
+.. autoclass:: aioRunbook.aioRunbook
+
+   ================================== =
+   methods
+   ================================== =
+
+   .. automethod:: execSteps
+
 test
+
+aioPdfRender
+============
 
 .. currentmodule:: aioPdfRender
 
-.. autoclass:: aioPdfRender
+.. autoclass:: aioPdfRender.aioPdfRender
 
    ================================== =
    methods
