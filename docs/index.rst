@@ -6,8 +6,6 @@
 .. toctree::
    :hidden:
 
-   api
-
 Overview
 ========
 
