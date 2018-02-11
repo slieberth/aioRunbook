@@ -8,16 +8,27 @@ API Documentation
 aioRunbook
 ==========
 
+.. currentmodule:: aioRunbook
 
-.. currentmodule:: aioRunbook.aioRunbook
-
-.. autoclass:: aioRunbook.aioRunbook
+.. autoclass:: aioRunbook
 
    ================================== =
    methods
    ================================== =
 
    .. automethod:: execSteps
+
+test
+
+.. currentmodule:: aioPdfRender
+
+.. autoclass:: aioPdfRender
+
+   ================================== =
+   methods
+   ================================== =
+
+   .. automethod:: writePdfFile
 
 
 
