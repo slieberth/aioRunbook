@@ -1,0 +1,37 @@
+%version 0.0.2
+
+\documentclass[10pt,a4paper]{article}
+
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  frame=single,
+  breaklines=true,
+}
+
+\begin{document}
+
+configDict:
+
+\begin{lstlisting}[]]
+\VAR{configDict}
+\end{lstlisting}
+
+
+
+Iteration Example:
+
+\BLOCK{ for y in configDict["config"]["steps"] }
+ \BLOCK{ for stepType,stepDict in y.items() }
+  \BLOCK{ if stepType == "check" or stepType == "record" or stepType == "comment" or stepType == "await" }
+   \BLOCK{ for x in stepDict["output"] }
+\begin{lstlisting}[]]
+\VAR{x["output"]}
+\end{lstlisting}
+   \BLOCK{ endfor }
+  \BLOCK{ endif }
+ \BLOCK{ endfor }
+\BLOCK{ endfor }
+
+\end{document}

@@ -25,7 +25,7 @@ import yaml
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-from aioRunbook.aioRunbook import aioRunbook
+#from aioRunbook.aioRunbookScheduler import aioRunbookScheduler
 sys.path.insert(0, os.path.abspath('../aioRunbook/postProcessing/'))
 from aioPdfRender import aioPdfRender
 
@@ -66,7 +66,7 @@ config:
       stepIndex: 0
 yamlConfigFile: test.yml"""
         processedConfigDict = yaml.load(ymlConfigString)
-        myAioPdfRender = aioPdfRender(processedConfigDict,{},"...",False)
+        myAioPdfRender = aioPdfRender(processedConfigDict,{},False)
 
     def test_pdfRender2(self):
         ymlConfigString = """#
@@ -95,7 +95,7 @@ config:
       stepCounter: 1
       stepIndex: 0"""
         processedConfigDict = yaml.load(ymlConfigString)
-        myAioPdfRender = aioPdfRender(processedConfigDict,{},"...",False)
+        myAioPdfRender = aioPdfRender(processedConfigDict,{},False)
 
     def test_pdfRender3(self):
         ymlConfigString = """#
@@ -103,7 +103,7 @@ config:
   pdfOutput:
     author: SL
     pdfResultDir: ./results_pdfTests
-    template: templates/template.tex
+    template: templates/template2.tex
   steps:
   - record:
       commands:
@@ -129,7 +129,7 @@ config:
       stepIndex: 0
 yamlConfigFile: test.yml"""
         processedConfigDict = yaml.load(ymlConfigString)
-        myAioPdfRender = aioPdfRender(processedConfigDict,{},"...",False)
+        myAioPdfRender = aioPdfRender(processedConfigDict,{},True)
         threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=3,)
         loop = asyncio.get_event_loop()
         try:

@@ -10,7 +10,7 @@
 # Contributors:
 #     Stefan Lieberth - initial implementation, API, and documentation
 
-"""Unit tests for aioRunbook connection API"""
+"""Unit tests for aioRunbookScheduler connection API"""
 
 import asyncio
 from copy import copy
@@ -21,8 +21,8 @@ import logging
 
 import os
 import sys
-#sys.path.insert(0, os.path.abspath('..'))
-from aioRunbook.aioRunbook import aioRunbook
+sys.path.insert(0, os.path.abspath('..'))
+from aioRunbook.aioRunbookScheduler import aioRunbookScheduler
 #import aioRunbook
 import pprint
 import yaml
@@ -30,7 +30,7 @@ import yaml
 from six import StringIO
 
 
-class test_aioRunbook(unittest.TestCase):
+class test_aioRunbookScheduler(unittest.TestCase):
 
     def test_loadRunbook(self):
 
@@ -44,7 +44,7 @@ class test_aioRunbook(unittest.TestCase):
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbook("test.yml")
+        myRunbook = aioRunbookScheduler("test.yml")
         self.assertEqual(myRunbook.configDict, 
              {'config': {'steps': [{'record': {'commands': ['show version', 'show system users'], 
              'name': 'DUT - show version'}}]}})
@@ -68,7 +68,7 @@ class test_aioRunbook(unittest.TestCase):
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbook("test.yml")
+        myRunbook = aioRunbookScheduler("test.yml")
         self.assertEqual(myRunbook.hostfiles,['./host.yml'])
         self.assertEqual(myRunbook.hostDict["DUT"],{'device': '192.168.56.11','method':'ssh',
                                    'vendor':'juniper','password': 'admin1', 'user': 'admin'})
@@ -84,7 +84,7 @@ class test_aioRunbook(unittest.TestCase):
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbook("test.yml")
+        myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertGreater(myRunbook.configDict["config"]["steps"][0]['sleep']['output'][0]['elapsedRaw'],1)
@@ -101,7 +101,7 @@ class test_aioRunbook(unittest.TestCase):
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbook("test.yml")
+        myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertGreater(myRunbook.configDict["config"]["steps"][0]['sleep']['output'][0]['elapsedRaw'],0.5)
@@ -119,7 +119,7 @@ class test_aioRunbook(unittest.TestCase):
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbook("test.yml")
+        myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertGreater(myRunbook.configDict["config"]["steps"][0]['sleep']['output'][0]['elapsedRaw'],1)
@@ -141,7 +141,7 @@ class test_aioRunbook(unittest.TestCase):
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbook("test.yml")
+        myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertGreater(myRunbook.configDict["config"]["steps"][0]['sleep']['output'][0]['elapsedRaw'],1)
@@ -167,7 +167,7 @@ class test_aioRunbook(unittest.TestCase):
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbook("test.yml")
+        myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         print (yaml.dump (myRunbook.configDict, default_flow_style=False))
@@ -188,7 +188,7 @@ class test_aioRunbook(unittest.TestCase):
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbook("test.yml")
+        myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         print (yaml.dump (myRunbook.configDict, default_flow_style=False))
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     logging.getLogger("").addHandler(console)
 
     #unittest.main()
-    myTest = test_aioRunbook()
+    myTest = test_aioRunbookScheduler()
     myTest.test_schedulerForeground()
     myTest.test_schedulerBackground()
     #myTest.test_break()

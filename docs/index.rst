@@ -1044,7 +1044,10 @@ postProcessing
 aioPdfRender
 ------------
 
-This class provides the functionality to write the test results to PDF, by using a 
-Latex/Jinja2 template.
+This class provides the functionality to write the test results to PDF, by using 
+Latex/Jinja2 templates. 
+It is the responsibility of the users to create customized templates and the to use the
+the Jinja2 Variables to gather the results of the runbook execution. 
+An example is found in the test section.
 
 

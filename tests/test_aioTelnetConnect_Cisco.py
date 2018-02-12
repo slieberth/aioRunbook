@@ -22,7 +22,7 @@ import logging
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-from aioRunbook.aioRunbook import aioRunbook
+from aioRunbook.aioRunbookScheduler import aioRunbookScheduler
 import time
 
 import pprint
@@ -50,7 +50,7 @@ class test_aioRunbook(unittest.TestCase):
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbook("test.yml")
+        myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         #print(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['output'])
@@ -76,7 +76,7 @@ class test_aioRunbook(unittest.TestCase):
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbook("test.yml")
+        myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         #print(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['output'])

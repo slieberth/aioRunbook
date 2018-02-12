@@ -9,8 +9,8 @@ Overview
 ========
 
 
-aioRunbook
-==========
+aioRunbookScheduler
+===================
 
 
 .. currentmodule:: aioRunbook.aioRunbookScheduler

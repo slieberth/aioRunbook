@@ -1,0 +1,29 @@
+%version 0.0.2
+
+\documentclass[10pt,a4paper]{article}
+
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  frame=single,
+  breaklines=true,
+}
+
+\begin{document}
+
+configDict:
+
+\begin{lstlisting}[]]
+{'config': {'pdfOutput': {'author': 'SL', 'pdfResultDir': './results_pdfTests', 'template': 'templates/template2.tex'}, 'steps': [{'record': {'commands': ['pip3 freeze'], 'hostname': '', 'loopCounter': 1, 'method': 'local-shell', 'name': 'record test local-shell', 'output': [{'commandCounter': 1, 'commandOrig': 'pip3 freeze', 'elapsed': '0:00:00.556753', 'elapsedRaw': 0.556753, 'endTS': '2018-02-11 04:17:52.935360', 'loopCounter': 1, 'output': 'aiohttp==2.3.10', 'pass': True, 'skip': False, 'startTS': '2018-02-11 04:17:52.378607', 'stepCounter': 1, 'stepType': 'record'}], 'stepCounter': 1, 'stepIndex': 0}}]}, 'yamlConfigFile': 'test.yml'}
+\end{lstlisting}
+
+
+
+Iteration Example:
+
+      \begin{lstlisting}[]]
+aiohttp==2.3.10
+\end{lstlisting}
+      
+\end{document}

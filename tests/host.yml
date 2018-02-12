@@ -1,1 +1,1 @@
-DUT:  {'device': '192.168.56.11','port':'830','method':'netconf', 'ncclientVendor': 'junos', 'password': 'admin1', 'user': 'admin' }
+DUT:  {'device': '192.168.56.31','method':'ssh','vendor':'cisco',            'password': 'cisco', 'user': 'cisco'}

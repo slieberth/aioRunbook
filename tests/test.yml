@@ -1,4 +1,8 @@
 config:
+  hostfiles:
+    - ./host.yml
   steps:
-    - break:
-        name: "just a hit return test" 
+    - record:
+        name: "DUT - show version"
+        commands: 
+          - show version
