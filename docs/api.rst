@@ -23,6 +23,7 @@ aioRunbook
 
    .. automethod:: execSteps
 
+   .. automethod:: writeDiffSnapshotToFile
 
 Adaptors
 ========
@@ -118,7 +119,7 @@ textFsmCheck
    .. automethod:: checkCliOutputString
 
 jsonCheck
-------------
+---------
 
 .. currentmodule:: analyzers.jsonCheck
 
@@ -129,6 +130,20 @@ jsonCheck
    ================================== =
 
    .. automethod:: checkOutputData
+
+diffCheck
+---------
+
+.. currentmodule:: analyzers.diffCheck
+
+.. autoclass:: diffCheck
+
+   ================================== =
+   methods
+   ================================== =
+
+   .. automethod:: checkCliOutputString
+
 
 
 postProcessing

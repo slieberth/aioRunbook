@@ -36,7 +36,7 @@ import binascii
 
 class diffCheck:
 
-    """class for verification of CLI output (text), based on googles textfsm engine.
+    """class for verification of CLI output, based on googles textfsm engine.
 
     """
 
@@ -54,7 +54,17 @@ class diffCheck:
         """classmethod function for validatiting the CLI output of a stepdict with apreviously 
          recorded snapshot of the CLI output
 
+              :param stepDict: The specific test step dictionary, which has both CLI outout and textFSM template attributes.
+              :param stepDict["output"]: either a JSON or a YAML loadable string     
+              :param valueList: This list is used to substitude values, respectively store values. The list is derived from valueMatrix[loopCounter]
+              :param configDict: The config dictionary, required for access to the recorded snapshot section.
+              :type stepDict: python dict object
+              :type stepDict["output"]: either a JSON or a YAML loadable string
+              :type valueList: list
+              :type configDict: python dict object
+
         """
+
         checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1   
         diffInformationTag = ("loop_{}_step_{}".format(stepDict["loopCounter"],stepDict["stepCounter"])) 
         self.output = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]

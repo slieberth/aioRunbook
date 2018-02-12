@@ -164,12 +164,14 @@ class aioPdfRender:
                     logging.error('cannot load j2template, please verify syntax')  
                     raise
                 else:
-       
-                    latexString = j2template.render( configDict = self.processedConfigDict["config"],
+                    # change from self.processedConfigDict["config"] ...
+                    # to self.processedConfigDict for diffSnapshots
+                    # requires adaptation of all existing temlates!!!!!
+                    #latexString = j2template.render( configDict = self.processedConfigDict["config"],
+                    #                                 loopCheckResultList = self.loopCheckResult )
+                    latexString = j2template.render( configDict = self.processedConfigDict,
                                                      loopCheckResultList = self.loopCheckResult )
-                    #logging.debug('latexString:\n {0}'.format(latexString))
-                    #self.baseDir = os.getcwd()
-                    #os.chdir(self.pdfOutputDir)                            # please verify options FIXME
+            
                     try:
                         fo = open(self.texFileName, "w")
                         fo.write(latexString );

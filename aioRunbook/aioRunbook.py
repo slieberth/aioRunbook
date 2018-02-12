@@ -289,6 +289,12 @@ class aioRunbook():
         return True   
 
     def writeDiffSnapshotToFile (self):
+        """function to write the current output string to the diffSnapshot section of the YAML config file.
+
+        FIXME - change to coroutine, once aiohttp server can concur simultanously.
+
+        """
+
         logging.info('writing config file: {0}'.format(self.yamlConfigFile))
         diffStringYamlBlockLines = diffCheck.getDiffSnapshotYamlBlockLines(self.configDict)
         configBlockLines = aioRunbookYmlBlockParser.getConfigBlock(configFile=self.yamlConfigFile).split("\n")
@@ -307,6 +313,7 @@ class aioRunbook():
           :type loop: asyncio.event_loop
 
         """
+
         async def awaitOpenedTasksToBeDone(numberOfTasksBeforeStarted):
             while len([task for task in asyncio.Task.all_tasks() if not task.done()]) > numberOfTasksBeforeStarted:
                 await asyncio.sleep(0.001)
