@@ -969,13 +969,82 @@ jsonString ex.
             jsonString: '["returnCode"]'
             evalListElement: '[0] == 200' 
 
-Exporters
-=========
+diffCheck
+---------
 
-.. warning::
+verification method for comparing the step output with recorded snapshots, which have been
+by using the aioRunbook.writeDiffSnapshotToFile() function.
 
-    some exporters, used for output formatting need to be ported to the asyncio design:
+.. code-block:: yaml
 
-    * pdfRender
+    config:
+      description : ""
+      expected : ""
+      preparation : ""
+      workingDir: ./results_tests
+      steps:
+        - check:
+            name: record test local-shell
+            method: local-shell
+            device: local-shell
+            vendor: local-shell
+            commands:
+              - 'pip3 freeze'
+            checkMethod: diff
+        - check:
+            name: record test local-shell
+            method: local-shell
+            device: local-shell
+            vendor: local-shell
+            commands:
+              - 'pip3 freeze | tail -n 2'
+            checkMethod: diff
+    diffSnapshot:
+      created: '2018-02-10 17:40:03.933901'
+      loop_1_step_1: !!binary |
+        Nzg5YzRkNTVjYmFlZTMzNjBjZGRlYjVmNmNmODExZTdiMWYwYTI0MGRiNDUzMTgzMTllMDE2Mjhi
+        YTU0MjRkYWQxOGQyYzY5ZjRiODEzZGZhZjJmNDkyNTgzZWU0MjhhMjYwZjBmMGY5OTJiYzg5MmNk
+        NTI2Y2YyMjUxY2U2ZjlkMDFlZGE1ZTI4OTkxNzkzNmVmM2RjYTMzOTA4MDUxMTYzY2MzYzBmNWQ3
+        ZjZhZmJiZTlkODQ1YWM4ZWVkYjBiNDVkZjY0ZDQ5MGU3Nzk2Y2JiZjYyMDk0MzVlYTNlY2ZjN2Y2
+        MjQ5NGRmMzZlOTc0ZTM3YzZlMTY1ZjljOWVlN2FlMWQ4NThhN2JjODdlOGQzMmRjNzY0YTcyYTIy
+        NDI5MjViMGEwMzIzOWJhZWE0MDY0MzY1NTFiNDFlY2NhNDJhNDA0OTdiNjEzYmZjYjBjN2Y5YjBk
+        MDhmMTIwMzQyODFmNjVmNjkxY2NhZTNkYTI2M2ExZDg5ZTBkZDgyNGU3ZTlkYWE5ZWQyN2IxYzg5
+        NGMxNDE2NDRmNGZlZDJlNTZkZWUxNGNmODI3NGNmZGE3OTVlOWNlNmYwM2E2YmVlNWNkNGVkNjVj
+        YjlmMGU1MjI4Yzc2MTI4OWMwYjQyNjQ4YWQyM2E0MjdjMmZlOGM5ZTNkZGZiY2EzNjc0YTZiNzJk
+        MmQyYWQxMDdkZTE1YWMzNDFiYzZiMjUyZGM3OGJiZjhjN2I5NzAzYzU5ZWM1N2I4NjQ3NWVkMmM2
+        ZjRlMDk3MTYzZjJiNzI4NWE2NTJlMmI5NmQ3NDliZjU5NmY1ZDZhY2Y5ZGVhYzExMjA0M2M0ODg5
+        YzhkNWIxOWM0NDAzMThmY2RiZTNhZjkyYWUzYmQ4NDM3YjkwMDk3MWZjNTI2NzNiMDNlNzMzYjNk
+        YjEyMTM2YTVlNDk1OWY4ZjY0ODEyYmY4MTg4MTYwZjUzOGE5Y2RlM2U4YmMzMzhhZTJkMTJjNmJi
+        YWY5ZmM4MmU5MTRjZTFhNWNhZWQ0OGVjMjQxMjY0YWM4YzQ5MTVlODRmMzA5Zjg0Mzk0ODIyYjFi
+        M2M0MmFjZGM4YzY0MDY5ZTdkNGY1Yzc4NzdmNWE4YTFkYTAzOWEwMTVjZDgxZjk2ODI0N2IyNTE1
+        ZTExYjQzNjU1MWRiZDA4MjgyYTU5ZTc3NzYyMzNjYWNkZGM3ZDQ1OGQzNjg0ZjM0YjU3MDFhYmIy
+        YWEwZTBjZjliYmIxZDZmZjI0ODJiMDk0MDg3NmU3OWY5ZDA4OTE1NTQyYTIxOTZiMGU1NjFmNTky
+        NGIwOTBmNzEwYmRlMjYxNTNhZmU4ZDllYjc2OGMxOGJhY2JlNDdhYTYxODNiMGJiYmYyMWE1MmRl
+        MmQ1NGZjMTRhMDEwNjIwMmVlYmUzZjkxY2QxYmEwM2QwOTk4MmE0Y2U0MmIyMWQ1OTUzYTcxOTYx
+        MmIxZmNhOTNkMTAwMzYxNjc4ZGYyZmI5MWVkZDU1ZmRmYjlhZmIxMWQzYWY2MTgxYzk1NTlmNmJh
+        MjE0Nzc0N2M0MzFhZGZkZWJlMzA0ZDEzYzMyMDE0MjgxNjgyZDEzMWQ0YjRlNDUwODE1ZmM4ZGEw
+        YzA3NzM2YzcyNWJhOGFjMTFiODhjMWRiMTU2NWI4MjRmMmE2ZjY0YThkMzY4YmI2YmZmZjI2OTVj
+        Y2JjYWRiNTA3OTdiYmFlMTZhYTRhYmI5ODc1ZjA5ZDI4ZThiYjhlMWQ0MDcyNjMxN2YzZTBmMGMw
+        MTdiZTg5NTcxNGRlMmZiZmVlZjZmNWZiZmYwNTgwNjgxMmEzMDg5NTlhNGM1OGVmMGEzMjBhZWVh
+        MzhlM2U5NDljYTg0ZmQyOThiNGUyNDFjOTc0MWYxYmE5NGE1N2RkZTBlYTIyYTk5MmQ1ODU4ZTkw
+        NjkwYjAzYjZjYWE0N2U3ODNiYmUxODA3NDZiMzBjNmM3ZGMxODg0MzcyMTAzMTUyYjZlNWJmYzMw
+        MGFlYTE5Y2JmMjZhNjkyNDM4MDE2Yzk1MThmYWUzMDFhYWYwYmFmMmU1ZTk4NjVlNjQxZmJjZjVl
+        YjllMTQxMWYwM2Y3Nzc0NTI3YjNlNWY1OGJkNWM4YmNiYTVkMWQxN2NlMDYxNmFlODZlN2FmN2My
+        NWI5NjlmNWM3MDEyYzVjOThjYjc0YjgzNmU0YWMwZmJhOWExMmU4MTQwYWRlMGRlOGViYzQwODNm
+        ODMwMzExNzY5YzE3ZGEwNjNlMjZiZmEwZmM0ZmIyNzk0ZjVkNzVkN2JkYzRkN2UxNWY4YzQ4NTZi
+        OGRjMzczYjI0ODA1ZjU0ZjYwMTRmZjAxMWE1MGQ5NDA=
+      loop_1_step_2: !!binary |
+        Nzg5Y2FiYzhjZTJjYjFiNTM1ZDAwMzQyYWVhYWZjODI1NGJkY2NiYzkyZDRhMmI0YzRlNDU0NWI1
+        YjEzM2QxMzNkNjMyZTAwYmVkNjBhNDk=
+
+
+postProcessing
+==============
+
+aioPdfRender
+------------
+
+This class provides the functionality to write the test results to PDF, by using a 
+Latex/Jinja2 template.
 
 
