@@ -51,8 +51,7 @@ class diffCheck:
 
     @classmethod
     def checkCliOutputString (self,stepDict,valueList,configDict={}):
-        """classmethod function for validatiting the CLI output of a stepdict with apreviously 
-         recorded snapshot of the CLI output
+        """classmethod function for validatiting the CLI output with apreviously recorded snapshot of the CLI output
 
               :param stepDict: The specific test step dictionary, which has both CLI outout and textFSM template attributes.
               :param stepDict["output"]: either a JSON or a YAML loadable string     

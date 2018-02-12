@@ -13,7 +13,7 @@
 # Contributors:
 #     Stefan Lieberth - initial implementation, API, and documentation
 
-#  \version   0.2.1
+#  \version   0.1.11
 #  \date      09.02.2018
 
 #  \modification
@@ -27,7 +27,6 @@
 #  0.1.11 work on diff analyzer
 #         change to ...counter and ...index for loop, step, command
 #         index starts with 0, whereas counter starts with 1
-#  0.2.1 change naming aioRunbook to aioRunbookScheduler
 
 import asyncio
 import concurrent.futures
@@ -57,7 +56,7 @@ from aioRunbook.tools.aioRunbookYmlBlockParser import aioRunbookYmlBlockParser
 
 _GENENERIC_TIMEOUT = 60 #set generic timeout to 60 seconds
 
-class aioRunbookScheduler():
+class aioRunbook():
     """assyncio scheduler core, loads the config file and administers the step execution
 
           :param configFile: File location for the YAML File which contains the test step configuration. 

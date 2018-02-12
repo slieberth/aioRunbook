@@ -29,7 +29,7 @@ PREPEND_DATE = True
 
 class aioPdfRender:
 
-    def __init__(self,processedConfigDict,loopCheckResult,pdfOutputDir,keepTexFile):
+    def __init__(self,processedConfigDict,loopCheckResult,keepTexFile):
         logging.debug('init aioPdfRender pwd:{} '.format(os.getcwd()))
         self.blockingError = False
         self.processedConfigDict = processedConfigDict
@@ -53,7 +53,7 @@ class aioPdfRender:
                 except:
                     self.pdfResultDir = os.getcwd()
                     logging.warning('cannot locate pdfResultDir using pwd instead : {}'.format(self.pdfResultDir))
-            self.keepTexFile = _isInDictionary ("keepTexFile",self.processedConfigDict["config"]["pdfOutput"],False)
+            self.keepTexFile = _isInDictionary ("keepTexFile",self.processedConfigDict["config"]["pdfOutput"],keepTexFile)
             try:
                 self.template = self.processedConfigDict["config"]["pdfOutput"]["template"]
                 logging.debug('found template in configDict.pdfOutput: {}'.format(self.template))

@@ -15,4 +15,4 @@
 
 """An asynchronous Runbook library for Python"""
 
-from .aioRunbook import aioRunbook
+from .aioRunbookScheduler import aioRunbookScheduler

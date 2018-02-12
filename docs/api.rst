@@ -13,9 +13,9 @@ aioRunbook
 ==========
 
 
-.. currentmodule:: aioRunbook.aioRunbook
+.. currentmodule:: aioRunbook.aioRunbookScheduler
 
-.. autoclass:: aioRunbook
+.. autoclass:: aioRunbookScheduler
 
    ================================== =
    methods
@@ -130,6 +130,7 @@ jsonCheck
    ================================== =
 
    .. automethod:: checkOutputData
+
 
 diffCheck
 ---------
