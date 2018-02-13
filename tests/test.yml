@@ -2,7 +2,9 @@ config:
   hostfiles:
     - ./host.yml
   steps:
-    - record:
-        name: "DUT - show version"
-        commands: 
-          - show version
+    - sleep:
+        name: test sleep 1 sec
+        startInBackground: true
+    - sleep:
+        name: test sleep 2 sec
+        startInBackground: true

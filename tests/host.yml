@@ -1,1 +1,1 @@
-DUT:  {'device': '192.168.56.31','method':'ssh','vendor':'cisco',            'password': 'cisco', 'user': 'cisco'}
+DUT:  {'device': '192.168.56.11','method':'ssh','vendor':'juniper',            'password': 'admin1', 'user': 'admin'}

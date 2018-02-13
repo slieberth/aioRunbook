@@ -9,6 +9,21 @@ Overview
 ========
 
 
+aioRunbookHttpServer.py
+=======================
+
+
+.. currentmodule:: aioRunbook.aioRunbookHttpServer
+
+.. autoclass:: aioRunbookHttpServer
+
+   ================================== =
+   methods
+   ================================== =
+
+   .. automethod:: init
+
+
 aioRunbookScheduler
 ===================
 
@@ -24,6 +39,13 @@ aioRunbookScheduler
    .. automethod:: execSteps
 
    .. automethod:: writeDiffSnapshotToFile
+
+   .. automethod:: saveConfigDictToJsonFile
+
+   .. automethod:: updateConfigDictStepInJsonFile
+
+   .. automethod:: loadConfigDictFromJsonFile
+
 
 Adaptors
 ========

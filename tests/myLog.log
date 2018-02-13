@@ -1,0 +1,73 @@
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: []
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: ['./host.yml']
+INFO:root:reading config host file: ./host.yml
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: ['./host.yml']
+INFO:root:reading config host file: ./host.yml
+DEBUG:asyncio:Using selector: KqueueSelector
+INFO:root:start loop 1
+DEBUG:root:set stepRangeList Indexes to [0]
+DEBUG:root:async step: 1 started test sleep 1 sec
+INFO:root:step:1 test sleep 1 sec sleep: 1
+INFO:root:waiting for background tasks to be done
+INFO:root:background tasks done
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: ['./host.yml']
+INFO:root:reading config host file: ./host.yml
+INFO:root:start loop 1
+DEBUG:root:set stepRangeList Indexes to [0]
+DEBUG:root:async step: 1 started test sleep
+INFO:root:substitudeValue: 0.5 valuelist ['']
+INFO:root:step:1 test sleep sleep: 0.5
+INFO:root:waiting for background tasks to be done
+INFO:root:background tasks done
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: ['./host.yml']
+INFO:root:reading config host file: ./host.yml
+INFO:root:start loop 1
+DEBUG:root:set stepRangeList Indexes to [0, 1]
+DEBUG:root:async step: 1 started test sleep 1 sec
+INFO:root:step:1 test sleep 1 sec sleep: 1
+DEBUG:root:async step: 2 started test sleep 2 sec
+INFO:root:step:2 test sleep 2 sec sleep: 2
+INFO:root:waiting for background tasks to be done
+INFO:root:background tasks done
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: ['./host.yml']
+INFO:root:reading config host file: ./host.yml
+INFO:root:start loop 1
+DEBUG:root:set stepRangeList Indexes to [0, 1]
+DEBUG:root:adding background tasks test sleep 1 sec
+DEBUG:root:adding background tasks test sleep 2 sec
+INFO:root:waiting for background tasks to be done
+DEBUG:root:async step: 1 started test sleep 1 sec
+INFO:root:step:1 test sleep 1 sec sleep: 1
+DEBUG:root:async step: 2 started test sleep 2 sec
+INFO:root:step:2 test sleep 2 sec sleep: 2
+INFO:root:background tasks done
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: ['./host.yml']
+INFO:root:reading config host file: ./host.yml
+INFO:root:start loop 1
+DEBUG:root:set stepRangeList Indexes to [1]
+DEBUG:root:adding background tasks test sleep 2 sec
+INFO:root:waiting for background tasks to be done
+DEBUG:root:async step: 2 started test sleep 2 sec
+INFO:root:step:2 test sleep 2 sec sleep: 2
+INFO:root:background tasks done
+INFO:root:reading config file: test.yml
+DEBUG:root:configured hostfiles: ['./host.yml']
+INFO:root:reading config host file: ./host.yml
+INFO:root:start loop 1
+DEBUG:root:set stepRangeList Indexes to [0, 1]
+DEBUG:root:adding background tasks test sleep 1 sec
+DEBUG:root:adding background tasks test sleep 2 sec
+INFO:root:waiting for background tasks to be done
+DEBUG:root:async step: 1 started test sleep 1 sec
+INFO:root:step:1 test sleep 1 sec sleep: 1
+DEBUG:root:async step: 2 started test sleep 2 sec
+INFO:root:step:2 test sleep 2 sec sleep: 2
+INFO:root:background tasks done
+INFO:root:saving configDict to Json: test.json

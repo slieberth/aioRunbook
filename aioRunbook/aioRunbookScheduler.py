@@ -13,7 +13,7 @@
 # Contributors:
 #     Stefan Lieberth - initial implementation, API, and documentation
 
-#  \version   0.2.1
+#  \version   0.2.2
 #  \date      09.02.2018
 
 #  \modification
@@ -28,6 +28,7 @@
 #         change to ...counter and ...index for loop, step, command
 #         index starts with 0, whereas counter starts with 1
 #  0.2.1 change naming aioRunbook to aioRunbookScheduler
+#  0.2.2 added StepRange 
 
 import asyncio
 import concurrent.futures
@@ -38,6 +39,7 @@ from copy import deepcopy
 import pprint
 import re
 import datetime
+import json
 
 from aioRunbook.adaptors.aioError import aioError
 from aioRunbook.adaptors.aioStdin import aioStdin
@@ -105,7 +107,7 @@ class aioRunbookScheduler():
             stepDict["output"][0]["output"] = "error adpater selection ###"
             _addTimeStampsToStepDict(t1,stepDict)
 
-    async def _asyncTestStep(self,stepDict,eventLoop,threadExecutor):
+    async def _asyncTestStep(self,stepDict,eventLoop,threadExecutor,stepRange = []):
         """method asyncTestStep
 
 
@@ -307,27 +309,49 @@ class aioRunbookScheduler():
 
 
 
-    async def execSteps (self,eventLoop,threadExecutor=None): 
+    async def execSteps (self,eventLoop,threadExecutor=None,stepRange = []): 
         """coroutine to execute the testhost-dict lookup failed for step steps, which are defined in a YAML config file.
 
-          :param loop: defines the encpomassing asyncio event loop
-          :type loop: asyncio.event_loop
+          :param eventLoop: defines the encpomassing asyncio event loop
+          :type eventLoop: asyncio.event_loop
+          :param threadExecutor: required for blocking tasks
+          :type threadExecutor: concurrent.futures.ThreadPoolExecutor
+          :param stepRange: defines the list of steps (counter starts with 1) 
+          :type stepRange: list of int
 
         """
 
         async def awaitOpenedTasksToBeDone(numberOfTasksBeforeStarted):
             while len([task for task in asyncio.Task.all_tasks() if not task.done()]) > numberOfTasksBeforeStarted:
                 await asyncio.sleep(0.001)
+
         if self.configLoaded == False:
             logging.error("execSteps without loaded config")  
             return False            
+
         numberOfTasksBeforeStart =  len([task for task in asyncio.Task.all_tasks() if not task.done()])
         for self.loopCounter in range(1,self.loops+1):
+            logging.info('start loop {}'.format(self.loopCounter))
             self.loopIndex = self.loopCounter - 1
             bgList = []
-            logging.info('start loop {}'.format(self.loopCounter))
+            #
+            #  Begin Change to stepRange
+            #
+            #self.configDict["config"]["steps"] = deepcopy(origDict)    #reset the configDict as start of loops
+            stepRangeList = []
+            if stepRange == []:
+                for i in range(len(self.configDict["config"]["steps"])):
+                    stepRangeList.append([i,self.configDict["config"]["steps"][i]]) 
+            else:
+                for i in stepRange:
+                    stepRangeList.append([i-1,self.configDict["config"]["steps"][i-1]]) ###FIXME catch possible user errors
+            logging.debug('set stepRangeList Indexes to {}'.format([x[0] for x in stepRangeList]))
+            #
+            #  End Change to stepRange
+            #    
             self.valueMatrixLoopList = self.valueMatrix[self.loopCounter-1]
-            for stepIndex,stepListItem in enumerate(self.configDict["config"]["steps"]):
+            #for stepIndex,stepListItem in enumerate(self.configDict["config"]["steps"]):
+            for stepIndex,stepListItem  in stepRangeList:   
                 stepCounter = stepIndex + 1
                 stepId = list(stepListItem.keys())[0]
                 stepDict = stepListItem[list(stepListItem.keys())[0]]
@@ -345,3 +369,59 @@ class aioRunbookScheduler():
             await awaitOpenedTasksToBeDone(numberOfTasksBeforeStart)
             logging.info("background tasks done")   
         return True
+
+
+    async def saveConfigDictToJsonFile (self,*args):
+        """coroutine to save the current processed configDict to a JSON File.
+
+          :param jsonConfigFile: optional positional parameter at pos 0, which defines the 
+                target JSON file.
+          :type jsonConfigFile: string
+
+        """
+
+        if len(args) > 0:
+            jsonConfigFile = args[0]
+        else:
+            yamlConfigFile = self.yamlConfigFile
+            if yamlConfigFile.endswith(".yml"):
+                jsonConfigFile = yamlConfigFile[:-4] + ".json"
+            elif yamlConfigFile.endswith(".yaml"):
+                jsonConfigFile = yamlConfigFile[:-5] + ".json"
+            else:
+                logging.error('saving saveConfigDictToJsonFile cannot detect json file name')
+                return
+        logging.info('saving configDict to Json: {}'.format(jsonConfigFile))
+        with open(jsonConfigFile, 'w') as outfile:          ###FIXME potential error if file cannot be written
+            json.dump(self.configDict, outfile)
+
+    async def updateConfigDictStepInJsonFile (self,jsonConfigFile,stepListToBeUpdated):
+        """coroutine to update specifc parts of the configDict.
+
+          :param jsonConfigFile: defines the target JSON file.
+          :type jsonConfigFile: string
+          :param stepListToBeUpdated: defines the target JSON file, Step counter, starting with step 1
+          :type stepListToBeUpdated: list of int
+
+        """
+
+        logging.info('update configDict from Json: {}, step {}'.format(jsonConfigFile,stepListToBeUpdated))
+        with open(jsonConfigFile) as infile:                ###FIXME potential error if file cannot be read
+            tempConfigDict = json.load(infile)
+        for stepToBeUpdated in stepListToBeUpdated:
+            tempConfigDict["config"]["steps"][stepToBeUpdated-1] = self.configDict["config"]["steps"][stepToBeUpdated-1]
+        with open(jsonConfigFile, 'w') as outfile:          ###FIXME potential error if file cannot be written
+            json.dump(tempConfigDict, outfile)
+
+    async def loadConfigDictFromJsonFile (self,jsonConfigFile):
+        """coroutine to load an existing json file configDict into memory.
+
+          :param jsonConfigFile: defines the source JSON file.
+          :type jsonConfigFile: stringt
+
+        """
+
+        logging.info('loading configDict from Json: {}'.format(jsonConfigFile))
+        with open(jsonConfigFile) as infile:                ###FIXME potential error if file cannot be read
+            self.configDict = json.load(infile)
+
