@@ -47,7 +47,7 @@ aioRunbookScheduler
    .. automethod:: loadConfigDictFromJsonFile
 
 
-Adaptors
+adaptors
 ========
 
 aioStdin
@@ -124,7 +124,7 @@ aioSnmpConnect
 
 
 
-Analyzers
+analyzers
 =========
 
 .. currentmodule:: analyzers.textFsmCheck

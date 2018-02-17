@@ -97,10 +97,6 @@ Inline Variable Definitions
 .. code-block:: yaml
 
     config:
-      description : ""
-      expected : ""
-      preparation : ""
-      workingDir: ./results_tests
       vars:
         text1: "test for substituion in the name attribute"
         text2: freeze
@@ -118,10 +114,6 @@ Variable Files Definitions
 .. code-block:: yaml
 
     config:
-      description : ""
-      expected : ""
-      preparation : ""
-      workingDir: ./results_tests
       varFiles:
         - 'testParamaterFile.yml'
       steps:
@@ -138,6 +130,7 @@ with the contributing variable/parameter file testParamaterFile.yml:
     vars:
       text1: "test for substituion in the name attribute"
       text2: freeze
+
 
 Concept of Test Steps
 =====================
