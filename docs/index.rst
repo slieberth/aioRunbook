@@ -191,28 +191,6 @@ This an example of the aioRunbook steps:
             jsonOneLine: '[some] == "data"'
 
 
-Host Dictionary Files
-=====================
-
-The are two ways to define the connection parameters for device access:
-
-- inline for each step. 
-- Using a host dictionary file. The first word of the step name string is used as reference. 
-
-
-Variable Definitions
-====================
-
-aioRunbook supports variable definitions with Jinja2 string replacement. The variables which are used 
-by Jinja2 are either defined in the yaml runbook, respectively in associated parameters files in yaml.
-
-Variables can be used in a subset for following step attributes:
-
-- name 
-- command
-- check sub-attributes (textFSM, textFSMOneLine, evalListElement, evalResultCount)
-
-
 Step Scheduler
 ==============
 

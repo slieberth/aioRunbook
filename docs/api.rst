@@ -204,5 +204,11 @@ helperFunctions
 
 .. autofunction:: _isInDictionary
 
+.. autofunction:: _substitudeVarsInString
+
+.. autofunction:: _addTimeStampsToStepDict
+
+.. autofunction:: _setHostfileAttributes
+
 
 
