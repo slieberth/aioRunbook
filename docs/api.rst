@@ -182,6 +182,27 @@ postProcessing
 
    .. automethod:: writePdfFile
 
+cacheCheckResults
+=================
+
+.. currentmodule:: caching.cacheCheckResults
+
+.. autoclass:: cacheCheckResults
+
+   ================================== =
+   methods
+   ================================== =
+
+   .. automethod:: storeCheckResultToVarDict
+
+   .. automethod:: retrieveVarFromVarDict
+
+helperFunctions
+===============
+
+.. currentmodule:: tools.helperFunctions
+
+.. autofunction:: _isInDictionary
 
 
 
