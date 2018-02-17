@@ -115,7 +115,6 @@ class aioRunbookScheduler():
         """
         stepDict["name"] = _substitudeVarsInString(stepDict["name"],varDict=self.varDict)
         name = stepDict["name"]
-        print(name)
         stepCounter = stepDict["stepCounter"]
         stepIndex = stepDict["stepIndex"]
         logging.debug ("async step: {} started {}".format(stepCounter,name))
@@ -128,10 +127,11 @@ class aioRunbookScheduler():
             logging.debug ("sleep random delay {}".format(randomSleepTime))
             await asyncio.sleep(randomSleepTime)
         # FIX for variables
-        newCommandList = []
-        for command in stepDict["commands"]:
-            newCommandList.append(_substitudeVarsInString(command,varDict=self.varDict))
-        stepDict["commands"] = newCommandList
+        if "commands" in stepDict.keys():
+            newCommandList = []
+            for command in stepDict["commands"]:
+                newCommandList.append(_substitudeVarsInString(command,varDict=self.varDict))
+            stepDict["commands"] = newCommandList
         #
         vendor = _isInDictionary("vendor",stepDict,"")
         method = _isInDictionary("method",stepDict,"")

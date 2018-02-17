@@ -72,7 +72,7 @@ def _substitudeVarsInString (myObject,varDict={},loopIndex=0,stepIndex=0):
         logging.error("_substitudeValue jinja2 not yet implemented just for strings")
         return myObject
 
-def _retrieveVarFromVarDict (myObject,varDict={}):
+def _retrieveVarFromVarDict_Depr (myObject,varDict={}):     #Deprecated for cacheCheckResults._retrieveVarFromVarDict
     logging.debug ('substitudeValue: {} valueMatrix {} varDict {}'.format(myObject,valueMatrix,varDict))
     if isinstance(myObject,str):
         try:
