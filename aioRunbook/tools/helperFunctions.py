@@ -170,8 +170,7 @@ def _createOutputList(stepCounter,stepType,stepDict,loopCounter):
         enrichOutputContainer(0,"")
 
 def _setHostfileAttributes(stepDict,hostDict):
-    """searches for a host reference in the strpDict name and applies conditioanlly the attributes from
-        the host reference
+    """searches for a host reference in the strpDict name and applies conditioanlly attributes from the host reference
 
               :param stepCounter: stepCounter
               :type stepCounter: int
@@ -186,14 +185,6 @@ def _setHostfileAttributes(stepDict,hostDict):
     hostReferenceName = stepDict["name"].split(" ")[0]
     logging.debug('checking hostReferenceName {}'.format(hostReferenceName))
     hostDictEntry = _isInDictionary(hostReferenceName,hostDict,None)
-    #if hostDictEntry:
-    #    pass
-    #else:
-    #    if "device" in stepDict.keys():
-    #        if stepDict["device"] == "local-shell":
-    #            pass
-    #        else:
-    #            logging.warning ("host-dict lookup failed for step: {} device:{}".format(stepDict["name"],stepDict["device"]))
     stepDict["hostname"] = ""
     if hostDictEntry:
         stepDict["hostname"] = hostReferenceName
