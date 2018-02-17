@@ -27,12 +27,24 @@ import datetime
 from jinja2 import Template
 
 def _isInDictionary (searchKey,inDictionary,defaultValue):
+    """simple function to verify the presence of a dict attribute.
+
+              :param searchKey: attribute name to be checked
+              :type searchKey: string
+              :param inDictionary: the dictionary to be searched
+              :type inDictionary: dict
+              :param defaultValue: the default value, in case the attribute is not present
+              :type defaultValue: object
+
+              :return: either the dict attribute, respectively a default value in case that the attribute is not present.
+
+    """
     if searchKey in inDictionary.keys():
         return inDictionary[searchKey]
     else:
         return defaultValue 
 
-def _substitudeValueOld (myObject,valueList):
+def _substitudeValue_Depr (myObject,valueList):
     logging.info ('substitudeValue: {} valuelist {}'.format(myObject,valueList))
     if type(myObject) == str:
         reCurlyBracketPattern = re.compile(r'\{\{\d+\}\}')
