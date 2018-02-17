@@ -27,7 +27,7 @@ import datetime
 from jinja2 import Template
 
 def _isInDictionary (searchKey,inDictionary,defaultValue):
-    """simple function to verify the presence of a dict attribute.
+    """verify the presence of a dict key
 
               :param searchKey: attribute name to be checked
               :type searchKey: string
@@ -36,7 +36,7 @@ def _isInDictionary (searchKey,inDictionary,defaultValue):
               :param defaultValue: the default value, in case the attribute is not present
               :type defaultValue: object
 
-              :return: either the dict attribute, respectively a default value in case that the attribute is not present.
+              :return: either dict attribute object, respectively a default object.
 
     """
     if searchKey in inDictionary.keys():
@@ -70,6 +70,20 @@ def _substitudeValue_Depr (myObject,valueList):
         return myObject  
 
 def _substitudeVarsInString (myObject,varDict={},loopIndex=0,stepIndex=0):
+    """variable substitution with Jinja2
+
+              :param myObject: string which might contain Jinja2 variable patterns
+              :type myObject: string
+              :param varDict: dictionary which contains the variables. Could contain sub dicts and lists
+              :type varDict: dict
+              :param loopIndex: list iterator for loops. Will be set by aioRunbookScheduler.execSteps
+              :type loopIndex: int
+              :param stepIndex: list iterator for steps, Will be set by aioRunbookScheduler.execSteps
+              :type loopIndex: int
+
+              :return: possibly amended string, respctevely the original object
+
+    """
     #logging.debug ('substitudeValue: {} varDict {}'.format(myObject,varDict))
     if isinstance(myObject,str):
         try:
@@ -108,19 +122,41 @@ def _retrieveVarFromVarDict_Depr (myObject,varDict={}):     #Deprecated for cach
                 return renderedString
 
 def _addTimeStampsToStepDict(t1,stepDict,commandCounter=0):
+    """simple function, which adds the end timestamps to the output dict.
+
+              :param t1: timestamp for the start
+              :type t1: datetime.datetime
+              :param stepDict: applicable stepDict
+              :type stepDict: dict
+              :param commandCounter: provides the command index, in order to identify the proper output dict,
+              :type commandCounter: int
+
+    """
     t2=datetime.datetime.now()
     stepDict["output"][commandCounter]["endTS"] = t2.strftime('%Y-%m-%d %H:%M:%S.%f')   
     stepDict["output"][commandCounter]["elapsed"] = str((t2-t1))
     stepDict["output"][commandCounter]["elapsedRaw"] = (t2-t1).total_seconds()
 
-def _createOutputList(step,stepType,stepDict,loopCounter):
+def _createOutputList(stepCounter,stepType,stepDict,loopCounter):
+    """simple function which adds the output dict for each command of a specific step
+
+              :param stepCounter: stepCounter
+              :type stepCounter: int
+              :param stepType: copy of the stepId (=stepType)
+              :type stepType: string
+              :param stepDict: stepDict
+              :type stepDict: dict
+              :param loopCounter: loopCounter
+              :type loopCounter: int
+
+    """
     stepDict["output"] = []
     def enrichOutputContainer(i,command):
         outputContainer = {}
         if "device" in stepDict.keys():
             outputContainer["device"] = stepDict["device"]
         outputContainer["loopCounter"] = loopCounter
-        outputContainer["stepCounter"] = step
+        outputContainer["stepCounter"] = stepCounter
         outputContainer["commandCounter"] = i + 1
         outputContainer["stepType"] = stepType
         outputContainer["commandOrig"] = str(command).replace("+","")
@@ -134,6 +170,19 @@ def _createOutputList(step,stepType,stepDict,loopCounter):
         enrichOutputContainer(0,"")
 
 def _setHostfileAttributes(stepDict,hostDict):
+    """searches for a host reference in the strpDict name and applies conditioanlly the attributes from
+        the host reference
+
+              :param stepCounter: stepCounter
+              :type stepCounter: int
+              :param stepType: copy of the stepId (=stepType)
+              :type stepType: string
+              :param stepDict: stepDict
+              :type stepDict: dict
+              :param loopCounter: loopCounter
+              :type loopCounter: int
+
+    """
     hostReferenceName = stepDict["name"].split(" ")[0]
     logging.debug('checking hostReferenceName {}'.format(hostReferenceName))
     hostDictEntry = _isInDictionary(hostReferenceName,hostDict,None)
