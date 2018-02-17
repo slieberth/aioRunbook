@@ -17,11 +17,7 @@ network tests and network migrations using supporting libraries like asyncssh, n
 for interaction with the netwok elements.
 
 aioRunbook is designed to be controlled by either shell execution respectively an 
-aihttp web microservice. 
-
-.. warning::
-
-    the aiohttp based web control app is not yet included.
+aihttp web microservice (future). 
 
 Use cases for aioRunbook are:
 
@@ -44,10 +40,10 @@ structures, which can be exported as JSON file, for further processing like:
 YAML runbook configs
 ====================
 
-The aioRunbook configuration is defined in a main YAML file, which defines the order of
-the test steps. During the execution of the test the data structure is enriched with the output of the network interactions.
-The concept has the flexibility to add additional attributes on demand. Adapters, analyzers, or rendering 
-(PDF/HTML) can access those attributes as those have access to the complete data structure.
+The aioRunbook configuration is defined in a main YAML file. This YAML file defines the order and characteristic of all test steps. 
+The YAML structure is loaded in the beginning and during the execution of the test the data structure is enriched with the output of each test step.
+In the current design the YAML structure is open to open to add additional attributes. This concept has the flexibility that new additional attributes can be added on demand. 
+Adapters, analyzers, or postprocessing (PDF/HTML) can utilize those attributes.
 
 .. code-block:: yaml
     
@@ -56,23 +52,20 @@ The concept has the flexibility to add additional attributes on demand. Adapters
       <global attribute for host-file>
       <global attributes for the test/migration>
       steps:
-        - <step-type 1>
+        - <step-type #1>
             <step-type 1 attributes>
            commands:
               - <step-type 1 commands>
-        - <step-type n>
+        - <step-type #n>
             <step-type n attributes>
             commands:
               - <step-type n commands>
       pdfOutput:
           <attributes for PDF output>
 
-.. note::
 
-    In the future a web based editor for aioRunbook YAML config files might be available.
-
-Host Dictionary Files
----------------------
+Device Access Config
+--------------------
 
 The are two ways to define the connection parameters for device access:
 
@@ -82,17 +75,69 @@ The are two ways to define the connection parameters for device access:
 The later one is the recommended option.
 
 
-Variable Definitions
---------------------
+Variable Configs
+----------------
 
-aioRunbook supports variable definitions with Jinja2 string replacement. The variables which are used 
-by Jinja2 are either defined in the yaml runbook, respectively in associated parameters files in yaml.
+aioRunbook supports variable definitions using Jinja2 variable insertion. The variable dict structure used 
+by Jinja2 can be defined in the yaml runbook or in associated parameters files in yaml. Both options work
+in parallel.
 
 Variables can be used in a subset for following step attributes:
 
 - name 
 - command
-- sub-attributes used for checks.
+- attributes used in check/await steps.
+
+Jinja2 can process dict- and list-structures. aioRunbookScheduler provides
+two parameters ( loopIndex and stepIndex ) to iterate over variable lists, when executing steps/loops.  
+
+Inline Variable Definitions
++++++++++++++++++++++++++++
+
+.. code-block:: yaml
+
+    config:
+      description : ""
+      expected : ""
+      preparation : ""
+      workingDir: ./results_tests
+      vars:
+        text1: "test for substituion in the name attribute"
+        text2: freeze
+      steps:
+        - record:
+            name: '{{text1}}'
+            method: local-shell
+            commands:
+              - 'pip3 {{text2}}'
+
+
+Variable Files Definitions
+++++++++++++++++++++++++++
+
+.. code-block:: yaml
+
+    config:
+      description : ""
+      expected : ""
+      preparation : ""
+      workingDir: ./results_tests
+      varFiles:
+        - 'testParamaterFile.yml'
+      steps:
+        - record:
+            name: '{{text1}}'
+            method: local-shell
+            commands:
+              - 'pip3 {{text2}}'
+
+with the contributing variable/parameter file testParamaterFile.yml:
+
+.. code-block:: yaml
+
+    vars:
+      text1: "test for substituion in the name attribute"
+      text2: freeze
 
 Concept of Test Steps
 =====================
@@ -120,13 +165,6 @@ Following Step Types are implemented:
 * **break**: waits for a user input (return) before continuing with the next step
 * **comment**: includes text-comments, text-segments, pre-recorded screenshots and file attachments. The later is a handy tool to document
     complete router configurations in the PDF output.
-
-.. warning::
-
-    follwoing step types still need to be ported to asyncio:
-
-    * comment
-
 
 This an example of the aioRunbook steps:
 
