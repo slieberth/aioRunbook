@@ -57,8 +57,37 @@ def _substitudeValueOld (myObject,valueList):
     else:                    
         return myObject  
 
-def _substitudeVarsInString (myObject,varDict={},loopIndex=0,stepIndex=0):
-    #logging.debug ('substitudeValue: {} varDict {}'.format(myObject,varDict))
+def _substitudeValue (myObject,valueMatrix=[[]],varDict={},loopIndex=0,stepIndex=0):
+    logging.debug ('substitudeValue: {} valueMatrix {} varDict {}'.format(myObject,valueMatrix,varDict))
+#     if varDict == {}:
+#         if type(myObject) == str:
+#             reCurlyBracketPattern = re.compile(r'\{\{\d+\}\}')
+#             substitudeList = reCurlyBracketPattern.findall(myObject)
+#             if len(substitudeList) > 0:
+#                 if len(substitudeList) == 1:
+#                     try:
+#                         substitudeValue = valueMatrix[loopIndex][int(substitudeList[0][2:-2])]
+#                     except:
+#                         substitudeValue = "substitudeValueERROR"
+#                     if myObject == substitudeList[0]:
+#                         return substitudeValue
+#                     else:
+#                         return myObject.replace(substitudeList[0],str(substitudeValue))
+#                 else:
+#                     returnString = myObject
+#                     for substitudeCurlyBracketParameterString in substitudeList:
+#                         try:
+#                             substitudeValue = valueMatrix[loopIndex][int(substitudeCurlyBracketParameterString[2:-2])]
+#                         except:
+#                             substitudeValue = "substitudeValueERROR"
+#                         returnString = returnString.replace(substitudeCurlyBracketParameterString,str(substitudeValue))
+#                         #print (returnString)
+#                     return returnString        
+#             else:
+#                 return myObject
+#         else:                    
+#             return myObject
+#     else:
     if isinstance(myObject,str):
         try:
             template = Template(myObject) 
@@ -72,28 +101,6 @@ def _substitudeVarsInString (myObject,varDict={},loopIndex=0,stepIndex=0):
         logging.error("_substitudeValue jinja2 not yet implemented just for strings")
         return myObject
 
-def _retrieveVarFromVarDict (myObject,varDict={}):
-    logging.debug ('substitudeValue: {} valueMatrix {} varDict {}'.format(myObject,valueMatrix,varDict))
-    if isinstance(myObject,str):
-        try:
-            template = Template(myObject) 
-            renderedString = template.render(varDict,loopIndex=loopIndex,stepIndex=stepIndex) 
-        except:
-            logging.error("_substitudeValue jinja2 rendering error")
-            return myObject
-        else:
-            return renderedString
-    else:
-        try:
-            template = Template(myObject) 
-            renderedString = template.render(varDict,loopIndex=loopIndex,stepIndex=stepIndex) 
-        except:
-            return myObject
-        else:
-            try:
-                return eval(renderedString) #convert numbers to python type
-            except:
-                return renderedString
 
 def _addTimeStampsToStepDict(t1,stepDict,commandCounter=0):
     t2=datetime.datetime.now()

@@ -28,8 +28,8 @@ import re
 import csv
 import jtextfsm as textfsm
 from six import StringIO
-from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeValue
-
+from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeVarsInString
+from aioRunbook.caching.cacheCheckResults import cacheCheckResults
 
 class textFsmCheck:
 
@@ -42,7 +42,7 @@ class textFsmCheck:
 
 
     @classmethod
-    def checkCliOutputString (self,stepDict,valueList,configDict={}):
+    def checkCliOutputString (self,stepDict,varDict={},configDict={}):
         """classmethod function for validatiting the CLI output of a stepdict.
 
               :param stepDict: The specific test step dictionary, which has both CLI outout and textFSM template attributes.
@@ -66,7 +66,6 @@ class textFsmCheck:
               :type valueList: list
 
         """
-
         checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1        
         if "textFSMOneLine" in stepDict.keys():
             parameterString = " ".join(stepDict["textFSMOneLine"].split(" ")[:-1])
@@ -79,27 +78,11 @@ class textFsmCheck:
             return False,'check: analyzer without textFSM attribute (textFSM is the default analyzer)'        
         #textFSMString = substitudeValue (stepDict["textFSM"],valueList)
         re_table = textfsm.TextFSM(StringIO(textFSMString))
-        logging.debug('before TextFSMOutput: offset {} relevant output {}'.format(checkCommandOffsetFromLastCommand,
-                                               stepDict["output"][checkCommandOffsetFromLastCommand]["output"]))
-
+        #logging.debug('before TextFSMOutput: offset {} relevant output {}'.format(checkCommandOffsetFromLastCommand,
+        #                                       stepDict["output"][checkCommandOffsetFromLastCommand]["output"]))
         self.TextFSMOutput = re_table.ParseText(stepDict["output"][checkCommandOffsetFromLastCommand]["output"])
         logging.info('textfsmoutput: {0}'.format(self.TextFSMOutput))
-        outerList = []
-        if "storeListElementInValueMatrix" in stepDict:
-            textFsmIndex = int(stepDict["storeListElementInValueMatrix"].split("->")[0])
-            valueMatrixIndex = int(stepDict["storeListElementInValueMatrix"].split("->")[1])
-            logging.debug('storeListElementInValueMatrix textFsmIndex:{} valueMatrixIndex:{} '.format(textFsmIndex,valueMatrixIndex)) 
-            logging.debug('storeListElementInValueMatrix valuelist:'.format(valueList))
-            if len(self.TextFSMOutput) > 0:
-                if len(self.TextFSMOutput[0]) > textFsmIndex:
-                    valueList[valueMatrixIndex] = self.TextFSMOutput[0][textFsmIndex]
-                else:
-                    logging.error ("errenous storeListElementInValueMatrix: " + stepDict["storeListElementInValueMatrix"])
-                    valueList[valueMatrixIndex] = ""
-            else:
-                logging.error ("errenous storeListElementInValueMatrix: " + stepDict["storeListElementInValueMatrix"])
-                valueList[valueMatrixIndex] = ""
-            #print (self.valueMatrix[self.loopCounter][valueMatrixIndex])
+
         if "evalListElement" in stepDict:
             evalString = stepDict["evalListElement"].strip()
             posOpeningBracket = evalString.find("[")
@@ -108,18 +91,16 @@ class textFsmCheck:
             if len (self.TextFSMOutput) > 0:
                 if len (self.TextFSMOutput[0]) > 0:
                     if posOpeningBracket > 0:
-                        evalString1 = evalString[:posOpeningBracket-1].strip()
-                        evalString1 = substitudeValue(evalString1,valueList)               
+                        evalString1 = evalString[:posOpeningBracket-1].strip()      
+                        evalString1 = _substitudeVarsInString(evalString1,varDict=varDict)     
                         result1 =  eval(evalString1 + " " + self.TextFSMOutput[0][textFsmIndex])
-                        #print (evalString1 + " " + self.TextFSMOutput[0][textFsmIndex],result1)
                     else:
                         result1 = True
 
                     if posClosingBracket < len(evalString) - 1:
                         evalString2 = evalString[posClosingBracket+1:].strip()
-                        evalString2 = _substitudeValue(evalString2,valueList)      
+                        evalString2 = _substitudeVarsInString(evalString2,varDict=varDict) 
                         result2 =  eval(self.TextFSMOutput[0][textFsmIndex] + " " + evalString2)
-                        #print (self.TextFSMOutput[0][textFsmIndex] + " " + evalString2,result2)
                     else:
                         result2 = True
 
@@ -142,17 +123,15 @@ class textFsmCheck:
             countTextFsmRecordsAsString = str(len(self.TextFSMOutput))
             if posOpeningBracket > 0:
                 evalString1 = evalString[:posOpeningBracket-1].strip()
-                evalString1 = substitudeValue(evalString1,valueList)     
+                evalString1 = _substitudeVarsInString(evalString1,varDict=varDict)    
                 result1 =  eval(evalString1 + " " + countTextFsmRecordsAsString)
-                #print (evalString1 + " " + countTextFsmRecordsAsString,result1)
             else:
                 result1 = True
 
             if posClosingBracket < len(evalString) - 1:
                 evalString2 = evalString[posClosingBracket+1:].strip()
-                evalString2 = substitudeValue(evalString2,valueList)      
+                evalString2 = _substitudeVarsInString(evalString2,varDict=varDict) 
                 result2 =  eval(countTextFsmRecordsAsString + " " + evalString2)
-                #print (countTextFsmRecordsAsString + " " + evalString2,result2)
             else:
                 result2 = True
 

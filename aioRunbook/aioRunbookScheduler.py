@@ -53,7 +53,8 @@ from aioRunbook.adaptors.aioNetconfConnect import aioNetconfConnect
 from aioRunbook.analyzers.textFsmCheck import textFsmCheck
 from aioRunbook.analyzers.jsonCheck import jsonCheck
 from aioRunbook.analyzers.diffCheck import diffCheck
-from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeValue, _addTimeStampsToStepDict
+from aioRunbook.caching.cacheCheckResults import cacheCheckResults
+from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeVarsInString, _addTimeStampsToStepDict
 from aioRunbook.tools.helperFunctions import _createOutputList, _setHostfileAttributes
 from aioRunbook.tools.aioRunbookYmlBlockParser import aioRunbookYmlBlockParser
 
@@ -112,7 +113,9 @@ class aioRunbookScheduler():
 
 
         """
+        stepDict["name"] = _substitudeVarsInString(stepDict["name"],varDict=self.varDict)
         name = stepDict["name"]
+        print(name)
         stepCounter = stepDict["stepCounter"]
         stepIndex = stepDict["stepIndex"]
         logging.debug ("async step: {} started {}".format(stepCounter,name))
@@ -124,6 +127,12 @@ class aioRunbookScheduler():
             randomSleepTime = random.random() * stepDict["randomStartDelay"]
             logging.debug ("sleep random delay {}".format(randomSleepTime))
             await asyncio.sleep(randomSleepTime)
+        # FIX for variables
+        newCommandList = []
+        for command in stepDict["commands"]:
+            newCommandList.append(_substitudeVarsInString(command,varDict=self.varDict))
+        stepDict["commands"] = newCommandList
+        #
         vendor = _isInDictionary("vendor",stepDict,"")
         method = _isInDictionary("method",stepDict,"")
         timeout = _GENENERIC_TIMEOUT
@@ -184,11 +193,11 @@ class aioRunbookScheduler():
                 checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1
                 logging.debug(' checkCommandOffsetFromLastCommand set to {0}'.format(checkCommandOffsetFromLastCommand))
                 #valueList = self.configDict["config"]["valueMatrix"][self.loopCounter-1]  ###FIXME###
-                valueList = self.valueMatrix[self.loopCounter-1]
+                #valueList = self.valueMatrix[self.loopCounter-1]                          ### valueMatrix is deprecated
                 try:
                     (stepDict["output"][checkCommandOffsetFromLastCommand]["pass"],
                     stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"]) = \
-                                analyserFunction(stepDict,valueList,configDict = self.configDict)           
+                                analyserFunction(stepDict,varDict=self.varDict,configDict = self.configDict)           
                 except Exception as errmsg:
                     logging.error(errmsg) 
                     stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = False
@@ -208,7 +217,7 @@ class aioRunbookScheduler():
                         try:
                             (stepDict["output"][checkCommandOffsetFromLastCommand]["pass"],
                             stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"]) = \
-                                        analyserFunction(stepDict,valueList,configDict = self.configDict)           
+                                        analyserFunction(stepDict,varDict=self.varDict,configDict = self.configDict)           
                         except Exception as errmsg:
                             logging.error(errmsg) 
                             stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = False
@@ -218,6 +227,7 @@ class aioRunbookScheduler():
                     if self.disconnectFunction != None and stepId in ["await"] :
                         self.disconnectFunction()
                     _addTimeStampsToStepDict(t1,stepDict)
+            cacheCheckResults.storeCheckResultToVarDict (stepDict,varDict=self.varDict)
         elif stepId == "sleep":
             #stepDict["output"][0]["startTS"] = t1.strftime('%Y-%m-%d %H:%M:%S.%f')   
             if "seconds" not in stepDict.keys():
@@ -227,7 +237,8 @@ class aioRunbookScheduler():
                 else:
                     logging.error('step:{} unable to identify sleep timer {}'.format(stepCounter,stepDict["name"]))
             else:
-                timer = _substitudeValue (stepDict["seconds"],self.valueMatrix[self.loopCounter-1])   ###FIXME###
+                #timer = _substitudeVarsInString (stepDict["seconds"],self.valueMatrix[self.loopCounter-1])   ###FIXME###
+                timer = _substitudeVarsInString (stepDict["seconds"],varDict=self.varDict,loopIndex=self.loopIndex)
             logging.info('step:{0} {1} sleep: {2}'.format(stepCounter,stepDict["name"],timer))
             await asyncio.sleep(timer)
             _addTimeStampsToStepDict(t1,stepDict)
@@ -239,9 +250,9 @@ class aioRunbookScheduler():
             _addTimeStampsToStepDict(t1,stepDict)
         elif stepId == "copy":
             if "remote" in stepDict.keys():
-                stepDict["remote"] = _substitudeValue (stepDict["remote"],self.valueMatrixLoopList)
+                stepDict["remote"] = _substitudeVarsInString (stepDict["remote"],varDict=self.varDict,loopIndex=self.loopIndex)
             if "local" in stepDict.keys():
-                stepDict["local"] = _substitudeValue (stepDict["local"],self.valueMatrixLoopList)
+                stepDict["local"] = _substitudeVarsInString (stepDict["local"],varDict=self.varDict,loopIndex=self.loopIndex)
             mySftpClient = aioSftp(stepDict)         
             await mySftpClient.execCopy()
             _addTimeStampsToStepDict(t1,stepDict)
@@ -288,7 +299,27 @@ class aioRunbookScheduler():
         #
         #   FIXME End Host Dict Reader
         #
-        self.valueMatrix = _isInDictionary("valueMatrix",self.configDict["config"],[[""]])
+        # self.valueMatrix = _isInDictionary("valueMatrix",self.configDict["config"],[[""]])  #deprecated
+        self.varDict = {}
+        self.varFiles = _isInDictionary("varFiles",self.configDict["config"],[])
+        logging.info('configured varFiles: {0}'.format(self.varFiles))
+        if len(self.varFiles) > 0:
+            for varFile in self.varFiles:
+                try:
+                    with open(varFile) as fh:
+                        YamlDictString = fh.read ()
+                        fh.close ()
+                    newVarDict = yaml.load(YamlDictString)
+                    tempVarDict = {**self.varDict,**newVarDict}
+                    self.varDict = deepcopy(tempVarDict)
+                except:
+                    logging.error('error importing varFile: {0}'.format(varFile))
+                else:
+                    logging.info('imported varFile: {0}'.format(varFile))
+        newVarDict = _isInDictionary("vars",self.configDict["config"],{})
+        tempVarDict = {**self.varDict,**newVarDict}
+        self.varDict = deepcopy(tempVarDict)
+        #logging.debug('final varDict:\n{0}'.format(yaml.dump(self.varDict,default_flow_style=False)))
         return True   
 
     def writeDiffSnapshotToFile (self):
@@ -349,7 +380,7 @@ class aioRunbookScheduler():
             #
             #  End Change to stepRange
             #    
-            self.valueMatrixLoopList = self.valueMatrix[self.loopCounter-1]
+            #self.valueMatrixLoopList = self.valueMatrix[self.loopCounter-1]    #deprecated
             #for stepIndex,stepListItem in enumerate(self.configDict["config"]["steps"]):
             for stepIndex,stepListItem  in stepRangeList:   
                 stepCounter = stepIndex + 1

@@ -27,7 +27,7 @@ import re
 import csv
 import json
 import yaml
-from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeValue
+from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeVarsInString
 
 
 class jsonCheck:

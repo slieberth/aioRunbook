@@ -1,10 +1,18 @@
+#
 config:
-  hostfiles:
-    - ./host.yml
+  description : ""
+  expected : ""
+  preparation : ""
+  workingDir: ./results_tests
+  vars:
+    text1: varTest
+    text2: freeze
   steps:
-    - sleep:
-        name: test sleep 1 sec
-        startInBackground: true
-    - sleep:
-        name: test sleep 2 sec
-        startInBackground: true
+    - record:
+        name: '{{text1}}'
+        method: local-shell
+        commands:
+          - 'pip3 {{text2}}'
+  pdfOutput:
+    template: "./template_v3.tex"
+    author: SL 

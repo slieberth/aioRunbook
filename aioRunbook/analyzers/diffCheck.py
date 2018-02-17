@@ -28,7 +28,7 @@ import re
 import csv
 import jtextfsm as textfsm
 from six import StringIO
-from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeValue
+from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeVarsInString
 import difflib
 import zlib
 import binascii
@@ -50,16 +50,16 @@ class diffCheck:
         return zlib.decompress(binascii.unhexlify(compressedDiffStringInHex)).decode()
 
     @classmethod
-    def checkCliOutputString (self,stepDict,valueList,configDict={}):
+    def checkCliOutputString (self,stepDict,varDict={},configDict={}):
         """classmethod function for validatiting the CLI output with apreviously recorded snapshot of the CLI output
 
               :param stepDict: The specific test step dictionary, which has both CLI outout and textFSM template attributes.
               :param stepDict["output"]: either a JSON or a YAML loadable string     
-              :param valueList: This list is used to substitude values, respectively store values. The list is derived from valueMatrix[loopCounter]
+              :param varDict: Dictionary containing the variable definitions
               :param configDict: The config dictionary, required for access to the recorded snapshot section.
               :type stepDict: python dict object
               :type stepDict["output"]: either a JSON or a YAML loadable string
-              :type valueList: list
+              :type varDict: dict
               :type configDict: python dict object
 
         """

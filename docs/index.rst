@@ -41,13 +41,12 @@ structures, which can be exported as JSON file, for further processing like:
 * rendering to PDF documents
 * dispatching the results in a web app
 
-Concept of a YAML config
-========================
+YAML runbook configs
+====================
 
-The aioRunbook configuration is defined in a single YAML file. During the execution of the test/migration,
-the data structure is enriched with the output of the network interactions.
-
-The concept allows the flexibility to add additional attributes on demand. Adapters, analyzers, or rendering 
+The aioRunbook configuration is defined in a main YAML file, which defines the order of
+the test steps. During the execution of the test the data structure is enriched with the output of the network interactions.
+The concept has the flexibility to add additional attributes on demand. Adapters, analyzers, or rendering 
 (PDF/HTML) can access those attributes as those have access to the complete data structure.
 
 .. code-block:: yaml
@@ -71,6 +70,29 @@ The concept allows the flexibility to add additional attributes on demand. Adapt
 .. note::
 
     In the future a web based editor for aioRunbook YAML config files might be available.
+
+Host Dictionary Files
+---------------------
+
+The are two ways to define the connection parameters for device access:
+
+- inline for each step. 
+- Using a host dictionary file. The first word of the step name string is used as reference. 
+
+The later one is the recommended option.
+
+
+Variable Definitions
+--------------------
+
+aioRunbook supports variable definitions with Jinja2 string replacement. The variables which are used 
+by Jinja2 are either defined in the yaml runbook, respectively in associated parameters files in yaml.
+
+Variables can be used in a subset for following step attributes:
+
+- name 
+- command
+- sub-attributes used for checks.
 
 Concept of Test Steps
 =====================
@@ -136,6 +158,28 @@ This an example of the aioRunbook steps:
             textFSMOneLine: '(.*Hostname\: MX1.*) 1'
             # option for JSON output verification
             jsonOneLine: '[some] == "data"'
+
+
+Host Dictionary Files
+=====================
+
+The are two ways to define the connection parameters for device access:
+
+- inline for each step. 
+- Using a host dictionary file. The first word of the step name string is used as reference. 
+
+
+Variable Definitions
+====================
+
+aioRunbook supports variable definitions with Jinja2 string replacement. The variables which are used 
+by Jinja2 are either defined in the yaml runbook, respectively in associated parameters files in yaml.
+
+Variables can be used in a subset for following step attributes:
+
+- name 
+- command
+- check sub-attributes (textFSM, textFSMOneLine, evalListElement, evalResultCount)
 
 
 Step Scheduler
