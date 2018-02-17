@@ -46,16 +46,16 @@ class cacheCheckResults:
     def storeCheckResultToVarDict (self,stepDict,varDict={},configDict={}):
         """function to store the results of checks in named variables.
 
-              :param stepDict: The specific test step dictionary, which has both CLI outout and textFSM template attributes.
-              :param stepDict["output"]: either a JSON or a YAML loadable string     
-              :param varDict: Dictionary containing the variable definitions
-              :param configDict: optional for further use.
-              :type stepDict: python dict object
-              :type stepDict["output"]: either a JSON or a YAML loadable string
-              :type varDict: dict
-              :type configDict: python dict object
+          :param stepDict: The specific test step dictionary, which has both CLI outout and textFSM template attributes.
+          :param stepDict["output"]: either a JSON or a YAML loadable string     
+          :param varDict: Dictionary containing the variable definitions
+          :param configDict: optional for further use.
+          :type stepDict: python dict object
+          :type stepDict["output"]: either a JSON or a YAML loadable string
+          :type varDict: dict
+          :type configDict: python dict object
 
-            if the relevant filed contains a number, then this number is converted to python int/float type
+          if the relevant filed contains a number, then this number is converted to python int/float type
 
         """
         checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1  
@@ -88,14 +88,14 @@ class cacheCheckResults:
     def retrieveVarFromVarDict (self,inObject,varDict={},loopIndex=0,stepIndex=0):
         """function to retrieve values from the valueDict via Jinja2 and conversion for numbers. 
 
-              :param stepDict: The specific test step dictionary, which has both CLI outout and textFSM template attributes.
-              :param stepDict["output"]: either a JSON or a YAML loadable string     
-              :param varDict: Dictionary containing the variable definitions
-              :param configDict: The config dictionary, required for access to the recorded snapshot section.
-              :type stepDict: python dict object
-              :type stepDict["output"]: either a JSON or a YAML loadable string
-              :type varDict: dict
-              :type configDict: python dict object
+          :param stepDict: The specific test step dictionary, which has both CLI outout and textFSM template attributes.
+          :param stepDict["output"]: either a JSON or a YAML loadable string     
+          :param varDict: Dictionary containing the variable definitions
+          :param configDict: The config dictionary, required for access to the recorded snapshot section.
+          :type stepDict: python dict object
+          :type stepDict["output"]: either a JSON or a YAML loadable string
+          :type varDict: dict
+          :type configDict: dict
 
         """
         if isinstance(inObject,str):
