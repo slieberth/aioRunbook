@@ -36,10 +36,6 @@ class test_diff_analyzer(unittest.TestCase):
 
         ymlConfigString = """#
 config:
-  description : ""
-  expected : ""
-  preparation : ""
-  workingDir: ./results_tests
   steps:
     - check:
         name: record test local-shell
@@ -56,10 +52,7 @@ config:
         vendor: local-shell
         commands:
           - 'pip3 freeze | tail -n 2'
-        checkMethod: diff
-  pdfOutput:
-    template: "./template_v3.tex"
-    author: SL """
+        checkMethod: diff"""
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
@@ -84,10 +77,6 @@ config:
 
         ymlConfigString = """#
 config:
-  description : ""
-  expected : ""
-  preparation : ""
-  workingDir: ./results_tests
   steps:
     - check:
         name: record test local-shell
@@ -106,10 +95,7 @@ config:
         commands:
           - 'pip3 freeze | tail -n 2'
         checkMethod: diff
-        diffZip: true
-  pdfOutput:
-    template: "./template_v3.tex"
-    author: SL """
+        diffZip: true"""
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
@@ -133,10 +119,6 @@ config:
 
         ymlConfigString = """#
 config:
-  description : ""
-  expected : ""
-  preparation : ""
-  workingDir: ./results_tests
   steps:
     - check:
         name: record test local-shell
@@ -152,10 +134,7 @@ config:
           Start
             ^${P0} -> Record
         
-          End
-  pdfOutput:
-    template: "./template_v3.tex"
-    author: SL """
+          End"""
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
@@ -171,6 +150,122 @@ config:
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
 
+
+    def test_diff7(self):
+
+        """setting the diffSnapshot"""
+
+        ymlConfigString = """#
+config:
+  steps:
+    - record:
+        name: record test local-shell
+        method: local-shell
+        commands:
+          - 'pip3 freeze'
+    - check:
+        name: check previous step 
+        method: local-shell
+        commands:
+          - 'pip3 freeze'
+        checkMethod: diff
+        diffSource: outputFromStep 1 """
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['pass'],True)
+        self.assertEqual(myRunbook.configDict["config"]["steps"][1]['check']['output'][0]['pass'],True)
+
+    def test_diff8(self):
+
+        """setting the diffSnapshot"""
+
+        ymlConfigString = """#
+config:
+  steps:
+    - record:
+        name: record test local-shell
+        method: local-shell
+        commands:
+          - 'pip3 freeze'
+    - check:
+        name: check previous step 
+        method: local-shell
+        commands:
+          - 'pip3 freeze'
+        checkMethod: diff
+        diffSource: outputFromStep 1
+        diffTextFSMFilter: | 
+          Value P0 (.*y.*)
+  
+          Start
+            ^${P0} -> Record
+        
+          End"""
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['pass'],True)
+        self.assertEqual(myRunbook.configDict["config"]["steps"][1]['check']['output'][0]['pass'],True)
+
+    def test_diff9(self):
+
+        """setting the diffSnapshot"""
+
+        ymlConfigString = """#
+config:
+  loops: 2
+  steps:
+    - check:
+        name: check previous step 
+        method: local-shell
+        commands:
+          - 'pip3 freeze'
+        checkMethod: diff
+        diffSource: previousLoop"""
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop))
+
+    def test_diff10(self):
+
+        """setting the diffSnapshot"""
+
+        ymlConfigString = """#
+config:
+  loops: 2
+  steps:
+    - check:
+        name: check previous step 
+        method: local-shell
+        commands:
+          - 'pip3 freeze'
+        checkMethod: diff
+        diffSource: previousLoop
+        diffTextFSMFilter: | 
+          Value P0 (.*y.*)
+  
+          Start
+            ^${P0} -> Record
+        
+          End"""
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+
+
 if __name__ == '__main__':
     logLevel = logging.DEBUG
     #logLevel = logging.ERROR
@@ -183,7 +278,9 @@ if __name__ == '__main__':
     console.setFormatter(formatter)
     logging.getLogger("").addHandler(console)
 
-    unittest.main()
+    #unittest.main()
+    myTester = test_diff_analyzer()
+    myTester.test_diff9()
 
 
 

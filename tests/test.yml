@@ -1,11 +1,11 @@
 #
 config:
+  loops: 2
   steps:
-    - record:
-        name: record test local-shell
+    - check:
+        name: check previous step 
         method: local-shell
         commands:
           - 'pip3 freeze'
-  pdfOutput:
-    template: "templates/template2.tex"
-    author: SL 
+        checkMethod: diff
+        diffSource: previousLoop

@@ -1059,8 +1059,8 @@ outputs of previous steps or loops. Recorded snapshots can be stored either in c
 
     relative diffChecks to steps and loops will be added in future.
 
-setDiffSnapshot
-+++++++++++++++
+diffSnapshot
+++++++++++++
 
 setting the diffSnapshot requires a flag in the execSteps function and a subsequent function call:
 
@@ -1071,11 +1071,81 @@ setting the diffSnapshot requires a flag in the execSteps function and a subsequ
         loop.run_until_complete(myRunbook.execSteps(loop,setDiffSnapshot = True)) 
         myRunbook.writeDiffSnapshotToFile()
 
+
+diffSnapshot is the default diff source, diffSource attribute can be omitted.
+
+.. code-block:: yaml
+
+    config:
+      steps:
+        - check:
+            name: record test local-shell
+            method: local-shell
+            device: local-shell
+            vendor: local-shell
+            commands:
+              - 'pip3 freeze | tail -n 3'
+            checkMethod: diff
+            diffTextFSMFilter: | 
+              Value P0 (.*y.*)
+  
+              Start
+                ^${P0} -> Record
+        
+              End
+    diffSnapshot:
+      created: '2018-02-18 11:45:48.086652'
+      loop_1_step_1:
+      - pysnmp==4.4.4
+      - PyYAML==3.12
+      - yarl==1.1.0
+
+
+outputFromStep
+++++++++++++++
+
+.. code-block:: yaml
+
+    config:
+      steps:
+        - record:
+            name: record test local-shell
+            method: local-shell
+            commands:
+              - 'pip3 freeze'
+        - check:
+            name: comapre againt previous step 
+            method: local-shell
+            commands:
+              - 'pip3 freeze'
+            checkMethod: diff
+            diffSource: outputFromStep 1
+
+
+previousLoop
+++++++++++++
+
+.. code-block:: yaml
+
+    config:
+      loops: 2
+      steps:
+        - check:
+            name: check previous step 
+            method: local-shell
+            commands:
+              - 'pip3 freeze'
+            checkMethod: diff
+            diffSource: previousLoop
+
+
 diffTextFSMFilter
 +++++++++++++++++
 
 To filter important lines and exclude dynamic lines (timers, counters ... ) the text output can be filtered by use of an
 textFSM filter. This is a white-list mechanism.
+
+The diffTextFSMFilter can be applied to all three diffSources: diffSnapshot, outputFromStep and previousLoop
 
 the example below filters pip3 packages which have the character "y" in the name.
 
@@ -1089,7 +1159,7 @@ the example below filters pip3 packages which have the character "y" in the name
             device: local-shell
             vendor: local-shell
             commands:
-              - 'pip3 freeze'
+              - 'pip3 freeze | tail -n 3'
             checkMethod: diff
             diffTextFSMFilter: | 
               Value P0 (.*y.*)
@@ -1101,21 +1171,6 @@ the example below filters pip3 packages which have the character "y" in the name
     diffSnapshot:
       created: '2018-02-18 11:45:48.086652'
       loop_1_step_1:
-      - aiohttp-security==0.2.0
-      - asn1crypto==0.24.0
-      - async-timeout==2.0.0
-      - asyncssh==1.11.1
-      - bcrypt==3.1.4
-      - cryptography==2.1.4
-      - keyring==11.0.0
-      - ply==3.10
-      - ptyprocess==0.5.2
-      - pyasn1==0.4.2
-      - pycparser==2.18
-      - pycryptodomex==3.4.7
-      - PyNaCl==1.2.1
-      - pysftp==0.2.9
-      - pysmi==0.2.2
       - pysnmp==4.4.4
       - PyYAML==3.12
       - yarl==1.1.0

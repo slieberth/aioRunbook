@@ -93,7 +93,8 @@ class diffCheck:
         diffTextFSMFilterFlag = _isInDictionary("diffTextFSMFilter",stepDict,False)
         setDiffSnapshotFlag = _isInDictionary("setDiffSnapshot",kwargs,False)  
         outputString = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
-
+        diffSource = _isInDictionary("diffSource",stepDict,"recordedSnapshot")  
+        logging.debug("diffSource  {} ".format(diffSource))
         if setDiffSnapshotFlag == True:
             configDict["diffSnapshot"] = _isInDictionary("diffSnapshot",configDict,{}) 
             logging.warning ('setting diffSnapshot for {} in ConfigDict'.format(diffInformationTag)) 
@@ -111,36 +112,100 @@ class diffCheck:
             logging.debug("setting diff for {} to {}".format(diffInformationTag,compressedStringInHex))
             configDict["diffSnapshot"][diffInformationTag] = compressedStringInHex                  
             return True, "setDiffSnapshot"
-        else:    
-            if "diffSnapshot" in configDict:
-                logging.debug ('existing diffSnapshot in ConfigDict'.format(stepCounter)) 
-                compressedDiffStringInHex = configDict["diffSnapshot"][diffInformationTag]
-                if diffInformationTag  in configDict["diffSnapshot"].keys():
+        else:
+            if diffSource == "recordedSnapshot":
+                if "diffSnapshot" in configDict:
+                    logging.debug ('existing diffSnapshot in ConfigDict'.format(stepCounter)) 
+                    compressedDiffStringInHex = configDict["diffSnapshot"][diffInformationTag]
+                    if diffInformationTag  in configDict["diffSnapshot"].keys():
+                        if diffTextFSMFilterFlag:
+                            existingTemplateString = stepDict["diffTextFSMFilter"]
+                            newTemplateString= _substitudeVarsInString(existingTemplateString,varDict=varDict)
+                            re_table = textfsm.TextFSM(StringIO(newTemplateString))
+                            textFSMMatrix = re_table.ParseText(outputString)
+                            logging.debug("new textFSMMatrix:{}".format(textFSMMatrix))
+                            outputString  = str(textFSMMatrix)
+                            logging.debug("new outputString x:{}".format(outputString))
+                            outputStringList  = [ str(x) for sublist in textFSMMatrix for x in sublist ]
+                            logging.debug("new outputStringList x:{}".format(outputStringList))
+                            diffStringList = self._diffDecode(compressedDiffStringInHex,compressFlag,diffTextFSMFilterFlag)
+                        else:
+                            outputStringList = outputString.split("\n")
+                            diffStringList = self._diffDecode(compressedDiffStringInHex,compressFlag,diffTextFSMFilterFlag).split("\n")  
+                        diffResultList = list(difflib.unified_diff(diffStringList,outputStringList))
+                        if len(diffResultList) == 0:
+                            return True, ""
+                        else:
+                            return False, "\n".join(diffResultList)
+                    else:
+                        logging.error ('missing diffSnapshot in ConfigDict'.format(stepCounter)) 
+                        return False, "missingStepDiffSnapshop-{}".format(diffInformationTag)
+                else:
+                    logging.error ('missing diffSnapshot in ConfigDict'.format(stepDict["stepCounter"])) 
+                    return False, "missingGlobalDiffSnapshot"
+            elif diffSource.startswith("outputFromStep"):
+                match = re.search(r'\d+', diffSource)
+                if match:                      
+                    sourceStep = int(match.group())
+                else:
+                    logging.error('step:{} unable to identify diffSource {}'.format(stepCounter,diffSource))
+                    return False, "unable to identify outputFromStep diffSource "
+                if sourceStep >= stepCounter:
+                    return False, "outputFromStep diffSource must less than stepCounter"
+                else:
+                    sourceStepId = list(configDict["config"]["steps"][sourceStep-1].keys())[0]
+                    diffSourceString = configDict["config"]["steps"][sourceStep-1][sourceStepId]['output'][checkCommandOffsetFromLastCommand]['output'] 
+                logging.debug('step:{} set outputFromStep to step {}'.format(stepCounter,sourceStep))
+                if diffTextFSMFilterFlag:
+                    existingTemplateString = stepDict["diffTextFSMFilter"]
+                    newTemplateString= _substitudeVarsInString(existingTemplateString,varDict=varDict)
+                    re_table = textfsm.TextFSM(StringIO(newTemplateString))
+                    textFSMMatrix = re_table.ParseText(outputString)
+                    #logging.debug("new textFSMMatrix:{}".format(textFSMMatrix))
+                    outputStringList  = [ str(x) for sublist in textFSMMatrix for x in sublist ]
+                    #logging.debug("new outputStringList x:{}".format(outputStringList))
+                    re_table = textfsm.TextFSM(StringIO(newTemplateString))
+                    textFSMMatrix = re_table.ParseText(diffSourceString)
+                    diffStringList  = [ str(x) for sublist in textFSMMatrix for x in sublist ]   
+                    #logging.debug("diffStringList x:{}".format(diffStringList))                
+                else:
+                    outputStringList = outputString.split("\n")
+                    diffStringList = diffSourceString.split("\n") 
+                diffResultList = list(difflib.unified_diff(diffStringList,outputStringList))
+                if len(diffResultList) == 0:
+                    return True, ""
+                else:
+                    return False, "\n".join(diffResultList)
+            elif diffSource.startswith("previousLoop"):
+                if loopCounter == 1:
+                    return True, "initial Loop" 
+                else:       
+                    sourceStepId = list(configDict["config"]["steps"][stepCounter-1].keys())[0]
+                    diffSourceString = configDict["config"]["steps"][stepCounter-1][sourceStepId]['output'][checkCommandOffsetFromLastCommand]['output']
+                    #print ( diffSourceString )  
                     if diffTextFSMFilterFlag:
                         existingTemplateString = stepDict["diffTextFSMFilter"]
                         newTemplateString= _substitudeVarsInString(existingTemplateString,varDict=varDict)
                         re_table = textfsm.TextFSM(StringIO(newTemplateString))
                         textFSMMatrix = re_table.ParseText(outputString)
-                        logging.debug("new textFSMMatrix:{}".format(textFSMMatrix))
-                        outputString  = str(textFSMMatrix)
-                        logging.debug("new outputString x:{}".format(outputString))
+                        #logging.debug("new textFSMMatrix:{}".format(textFSMMatrix))
                         outputStringList  = [ str(x) for sublist in textFSMMatrix for x in sublist ]
-                        logging.debug("new outputStringList x:{}".format(outputStringList))
-                        diffStringList = self._diffDecode(compressedDiffStringInHex,compressFlag,diffTextFSMFilterFlag)
+                        #logging.debug("new outputStringList x:{}".format(outputStringList))
+                        re_table = textfsm.TextFSM(StringIO(newTemplateString))
+                        textFSMMatrix = re_table.ParseText(diffSourceString)
+                        diffStringList  = [ str(x) for sublist in textFSMMatrix for x in sublist ]   
+                        #logging.debug("diffStringList x:{}".format(diffStringList))                
                     else:
                         outputStringList = outputString.split("\n")
-                        diffStringList = self._diffDecode(compressedDiffStringInHex,compressFlag,diffTextFSMFilterFlag).split("\n")  
+                        diffStringList = diffSourceString.split("\n") 
                     diffResultList = list(difflib.unified_diff(diffStringList,outputStringList))
                     if len(diffResultList) == 0:
                         return True, ""
                     else:
                         return False, "\n".join(diffResultList)
-                else:
-                    logging.error ('missing diffSnapshot in ConfigDict'.format(stepCounter)) 
-                    return False, "missingStepDiffSnapshop-{}".format(diffInformationTag)
-            else:
-                logging.error ('missing diffSnapshot in ConfigDict'.format(stepDict["stepCounter"])) 
-                return False, "missingGlobalDiffSnapshot"
+            else: 
+                return False, "incorrect diffsource attribute"
+
 
 #     @classmethod
 #     def setModificationFlag (self,stepDict):

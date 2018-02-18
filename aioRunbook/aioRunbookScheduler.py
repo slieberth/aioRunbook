@@ -100,7 +100,7 @@ class aioRunbookScheduler():
     def __init__(self,configFile):    
         self.errorCounter = 0
         self.configLoaded = self._readYamlFile(configFile)
-        self.loops = 1
+        #self.loops = 1
 
     @classmethod
     def errorAdaptor(self,stepDict):
@@ -321,7 +321,7 @@ class aioRunbookScheduler():
         newVarDict = _isInDictionary("vars",self.configDict["config"],{})
         tempVarDict = {**self.varDict,**newVarDict}
         self.varDict = deepcopy(tempVarDict)
-        #logging.debug('final varDict:\n{0}'.format(yaml.dump(self.varDict,default_flow_style=False)))
+        self.loops = _isInDictionary("loops",self.configDict["config"],1)
         return True   
 
     def writeDiffSnapshotToFile (self):

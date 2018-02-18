@@ -1,93 +1,27 @@
-DEBUG:root:init aioPdfRender pwd:/Users/slieberth/git/aioRunbook/tests 
-DEBUG:root:found pdfOutput in configDict
-DEBUG:root:found pdfResultDir in configDict.pdfOutput: ./results_pdfTests
-DEBUG:root:found template in configDict.pdfOutput: ./templates/template.tex
-DEBUG:root:templateDir: ./templates
-DEBUG:root:set tex file to: test.tex
-DEBUG:root:set subcategory to: tests
-INFO:root:set pdfOutputDir  to: ./results_pdfTests/2018-02-18/tests/
-DEBUG:asyncio:Using selector: KqueueSelector
-DEBUG:root:init aioPdfRender pwd:/Users/slieberth/git/aioRunbook/tests 
-ERROR:root:cannot locate pdfOutput block in configDict, please check input yml
-DEBUG:root:init aioPdfRender pwd:/Users/slieberth/git/aioRunbook/tests 
-DEBUG:root:found pdfOutput in configDict
-DEBUG:root:found pdfResultDir in configDict.pdfOutput: ./results_pdfTests
-DEBUG:root:found template in configDict.pdfOutput: templates/template2.tex
-DEBUG:root:templateDir: templates
-DEBUG:root:set tex file to: test.tex
-DEBUG:root:set subcategory to: tests
-INFO:root:set pdfOutputDir  to: ./results_pdfTests/2018-02-18/tests/
-DEBUG:root:try to open template file: templates/template2.tex
-DEBUG:root:j2template loaded
-DEBUG:root:latexString written: lines:994 option w
-DEBUG:root:pdfLatex run2 stdout: This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex)
- restricted \write18 enabled.
-entering extended mode
-(./test.tex
-LaTeX2e <2016/03/31>
-Babel <3.9r> and hyphenation patterns for 83 language(s) loaded.
-(/usr/local/texlive/2016/texmf-dist/tex/latex/base/article.cls
-Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
-(/usr/local/texlive/2016/texmf-dist/tex/latex/base/size10.clo))
-(/usr/local/texlive/2016/texmf-dist/tex/latex/listings/listings.sty
-(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/keyval.sty)
-(/usr/local/texlive/2016/texmf-dist/tex/latex/listings/lstmisc.sty)
-(/usr/local/texlive/2016/texmf-dist/tex/latex/listings/listings.cfg))
-(./test.aux) [1{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdfte
-x.map}] (./test.aux) )</usr/local/texlive/2016/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmr10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsf
-onts/cm/cmtt10.pfb>
-Output written on test.pdf (1 page, 31562 bytes).
-Transcript written on test.log.
-
-DEBUG:root:pdfLatex run2 stderr: 
-DEBUG:root:delete file test.aux
-DEBUG:root:delete file test.log
-DEBUG:root:copying file test.pdf to ./results_pdfTests/2018-02-18/tests/
 INFO:root:reading config file: test.yml
 DEBUG:root:configured hostfiles: []
 INFO:root:configured varFiles: []
+DEBUG:asyncio:Using selector: KqueueSelector
 INFO:root:execSteps kwargs:{}
 INFO:root:start loop 1
 DEBUG:root:set stepRangeList Indexes to [0]
 DEBUG:root:_asyncTestStep kwargs: {}
-DEBUG:root:async step: 1 started record test local-shell
-DEBUG:root:checking hostReferenceName record
+DEBUG:root:async step: 1 started check previous step
+DEBUG:root:checking hostReferenceName check
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:diffSource  previousLoop 
+INFO:root:check/await analyserfuntion returns: True
 INFO:root:waiting for background tasks to be done
 INFO:root:background tasks done
-DEBUG:root:init aioPdfRender pwd:/Users/slieberth/git/aioRunbook/tests 
-DEBUG:root:found pdfOutput in configDict
-WARNING:root:cannot locate pdfResultDir using pwd instead : /Users/slieberth/git/aioRunbook/tests
-DEBUG:root:found template in configDict.pdfOutput: templates/template2.tex
-DEBUG:root:templateDir: templates
-DEBUG:root:set tex file to: test.tex
-DEBUG:root:set subcategory to: tests
-INFO:root:set pdfOutputDir  to: /Users/slieberth/git/aioRunbook/tests/2018-02-18/tests/
-DEBUG:root:try to open template file: templates/template2.tex
-DEBUG:root:j2template loaded
-DEBUG:root:latexString written: lines:2413 option w
-DEBUG:root:pdfLatex run2 stdout: This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex)
- restricted \write18 enabled.
-entering extended mode
-(./test.tex
-LaTeX2e <2016/03/31>
-Babel <3.9r> and hyphenation patterns for 83 language(s) loaded.
-(/usr/local/texlive/2016/texmf-dist/tex/latex/base/article.cls
-Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
-(/usr/local/texlive/2016/texmf-dist/tex/latex/base/size10.clo))
-(/usr/local/texlive/2016/texmf-dist/tex/latex/listings/listings.sty
-(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/keyval.sty)
-(/usr/local/texlive/2016/texmf-dist/tex/latex/listings/lstmisc.sty)
-(/usr/local/texlive/2016/texmf-dist/tex/latex/listings/listings.cfg))
-(./test.aux) [1{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdfte
-x.map}] [2] (./test.aux) )</usr/local/texlive/2016/texmf-dist/fonts/type1/publi
-c/amsfonts/cm/cmr10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/
-amsfonts/cm/cmtt10.pfb>
-Output written on test.pdf (2 pages, 35304 bytes).
-Transcript written on test.log.
-
-DEBUG:root:pdfLatex run2 stderr: 
-DEBUG:root:delete file test.aux
-DEBUG:root:delete file test.log
-DEBUG:root:creating dir /Users/slieberth/git/aioRunbook/tests/2018-02-18/tests/
-DEBUG:root:copying file test.pdf to /Users/slieberth/git/aioRunbook/tests/2018-02-18/tests/
+INFO:root:start loop 2
+DEBUG:root:set stepRangeList Indexes to [0]
+DEBUG:root:_asyncTestStep kwargs: {}
+DEBUG:root:async step: 1 started check previous step
+DEBUG:root:checking hostReferenceName check
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:diffSource  previousLoop 
+INFO:root:check/await analyserfuntion returns: True
+INFO:root:waiting for background tasks to be done
+INFO:root:background tasks done
