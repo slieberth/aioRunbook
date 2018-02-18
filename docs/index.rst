@@ -93,7 +93,12 @@ The are two ways to define the connection parameters for device access:
 
 .. code-block:: yaml
 
-    lo0_SSH:  {'device': '127.0.0.1','method':'ssh','vendor':'ubuntu','password': 'tbd', 'user': 'tbd'}
+    lo0_SSH
+      device: 127.0.0.1
+      method: ssh
+      vendor: ubuntu
+      password: testPassword
+      user: testUser
 
 
 Variable Configs
