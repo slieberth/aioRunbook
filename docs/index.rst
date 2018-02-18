@@ -69,9 +69,7 @@ Device Access Config
 The are two ways to define the connection parameters for device access:
 
 - inline for each step. 
-- Using a host dictionary file. The first word of the step name string is used as reference. 
-
-* YAML host file example:
+- Using a host dictionary file. The first word of the step name string is used as reference. YAML host file example:
 
 .. code-block:: yaml
 
@@ -82,18 +80,18 @@ The are two ways to define the connection parameters for device access:
         - <step-type #1>
            name: lo0_SSH headline1
            commands:
-              - <step-type 1 commands>
+             - <step-type 1 commands>
         - <step-type #n>
            name: lo0_SSH headline2
-            commands:
-              - <step-type n commands>
+           commands:
+             - <step-type n commands>
 
 
 * testHost.yml hostfile definitions:
 
 .. code-block:: yaml
 
-    lo0_SSH
+    lo0_SSH:
       device: 127.0.0.1
       method: ssh
       vendor: ubuntu
