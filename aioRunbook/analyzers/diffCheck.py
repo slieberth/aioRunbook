@@ -100,7 +100,7 @@ class diffCheck:
             if diffTextFSMFilterFlag:
                 logging.debug('stepDict["diffTextFSMFilter"]{}'.format(stepDict["diffTextFSMFilter"]))
                 existingTemplateString = stepDict["diffTextFSMFilter"]
-                newTemplateString= jinja2Replacer.substitudeVarsInString(existingTemplateString,varDict=varDict)
+                newTemplateString= _substitudeVarsInString(existingTemplateString,varDict=varDict)
                 re_table = textfsm.TextFSM(StringIO(newTemplateString))
                 textFSMMatrix = re_table.ParseText(outputString)
                 textFSMOutputString  = [ str(x) for sublist in textFSMMatrix for x in sublist ]
@@ -118,7 +118,7 @@ class diffCheck:
                 if diffInformationTag  in configDict["diffSnapshot"].keys():
                     if diffTextFSMFilterFlag:
                         existingTemplateString = stepDict["diffTextFSMFilter"]
-                        newTemplateString= jinja2Replacer.substitudeVarsInString(existingTemplateString,varDict=varDict)
+                        newTemplateString= _substitudeVarsInString(existingTemplateString,varDict=varDict)
                         re_table = textfsm.TextFSM(StringIO(newTemplateString))
                         textFSMMatrix = re_table.ParseText(outputString)
                         logging.debug("new textFSMMatrix:{}".format(textFSMMatrix))
