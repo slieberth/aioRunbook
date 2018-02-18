@@ -127,6 +127,49 @@ config:
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
         self.assertEqual(myRunbook.configDict["config"]["steps"][1]['check']['output'][0]['pass'],True)
 
+    def test_diff5(self):
+
+        """setting the diffSnapshot"""
+
+        ymlConfigString = """#
+config:
+  description : ""
+  expected : ""
+  preparation : ""
+  workingDir: ./results_tests
+  steps:
+    - check:
+        name: record test local-shell
+        method: local-shell
+        device: local-shell
+        vendor: local-shell
+        commands:
+          - 'pip3 freeze'
+        checkMethod: diff
+        diffTextFSMFilter: | 
+          Value P0 (.*y.*)
+  
+          Start
+            ^${P0} -> Record
+        
+          End
+  pdfOutput:
+    template: "./template_v3.tex"
+    author: SL """
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop,setDiffSnapshot = True)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
+        myRunbook.writeDiffSnapshotToFile()
+
+    def test_diff6(self):
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
 
 if __name__ == '__main__':
     logLevel = logging.DEBUG

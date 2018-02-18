@@ -1052,7 +1052,7 @@ diffCheck
 This analyzer compares the current output with previously recorded outputs(snapshots), respectively with corresponding
 outputs of previous steps or loops. Recorded snapshots can be stored either in clear-text or zipped format.
 
-.. figure::  images/diffCheck.jpg
+.. figure::  images/diffcheck.jpg
    :align:   center
 
 .. note::
@@ -1082,10 +1082,6 @@ the example below filters pip3 packages which have the character "y" in the name
 .. code-block:: yaml
 
     config:
-      description : ""
-      expected : ""
-      preparation : ""
-      workingDir: ./results_tests
       steps:
         - check:
             name: record test local-shell
@@ -1102,9 +1098,6 @@ the example below filters pip3 packages which have the character "y" in the name
                 ^${P0} -> Record
         
               End
-      pdfOutput:
-        template: "./template_v3.tex"
-        author: SL 
     diffSnapshot:
       created: '2018-02-18 11:45:48.086652'
       loop_1_step_1:
@@ -1138,6 +1131,15 @@ This class provides the functionality to write the test results to PDF, by using
 Latex/Jinja2 templates. 
 It is the responsibility of the users to create customized templates and the to use the
 the Jinja2 Variables to gather the results of the runbook execution. 
-An example is found in the test section.
+An example is found in the tests folder.
 
+.. code-block:: python
+
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop))
+ 
+        threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=3,)
+        myAioPdfRender = aioPdfRender(myRunbook.configDict,{},True)
+        loop.run_until_complete( myAioPdfRender.writePdfFile(threadExecutor)) 
 

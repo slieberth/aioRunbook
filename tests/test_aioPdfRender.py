@@ -25,7 +25,7 @@ import yaml
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-#from aioRunbook.aioRunbookScheduler import aioRunbookScheduler
+from aioRunbook.aioRunbookScheduler import aioRunbookScheduler
 sys.path.insert(0, os.path.abspath('../aioRunbook/postProcessing/'))
 from aioPdfRender import aioPdfRender
 
@@ -137,6 +137,31 @@ yamlConfigFile: test.yml"""
         except Exception:
             print("exception consumed")
             raise
+
+
+    def test_pdfRender4(self):
+        ymlConfigString = """#
+config:
+  steps:
+    - record:
+        name: record test local-shell
+        method: local-shell
+        commands:
+          - 'pip3 freeze'
+  pdfOutput:
+    template: "templates/template2.tex"
+    author: SL """
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop))
+ 
+        threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=3,)
+        myAioPdfRender = aioPdfRender(myRunbook.configDict,{},True)
+        loop.run_until_complete( myAioPdfRender.writePdfFile(threadExecutor)) 
 
 
 if __name__ == '__main__':

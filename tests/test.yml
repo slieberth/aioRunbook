@@ -1,11 +1,11 @@
+#
 config:
-  hostfiles:
-    - ./host.yml
   steps:
     - record:
-        name: "DUT - get SNMP OID "
-        startInBackground: true
-        blockingAdapter: true
+        name: record test local-shell
+        method: local-shell
         commands:
-          - get iso.3.6.1.2.1.1.1.0
-          - get iso.3.6.1.2.1.1.1.0
+          - 'pip3 freeze'
+  pdfOutput:
+    template: "templates/template2.tex"
+    author: SL 
