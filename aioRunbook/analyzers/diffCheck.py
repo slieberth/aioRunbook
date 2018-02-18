@@ -93,7 +93,7 @@ class diffCheck:
         diffTextFSMFilterFlag = _isInDictionary("diffTextFSMFilter",stepDict,False)
         setDiffSnapshotFlag = _isInDictionary("setDiffSnapshot",kwargs,False)  
         outputString = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
-        diffSource = _isInDictionary("diffSource",stepDict,"recordedSnapshot")  
+        diffSource = _isInDictionary("diffSource",stepDict,"diffSnapshot")  
         logging.debug("diffSource  {} ".format(diffSource))
         if setDiffSnapshotFlag == True:
             configDict["diffSnapshot"] = _isInDictionary("diffSnapshot",configDict,{}) 
@@ -113,7 +113,7 @@ class diffCheck:
             configDict["diffSnapshot"][diffInformationTag] = compressedStringInHex                  
             return True, "setDiffSnapshot"
         else:
-            if diffSource == "recordedSnapshot":
+            if diffSource == "diffSnapshot":
                 if "diffSnapshot" in configDict:
                     logging.debug ('existing diffSnapshot in ConfigDict'.format(stepCounter)) 
                     compressedDiffStringInHex = configDict["diffSnapshot"][diffInformationTag]

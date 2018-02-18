@@ -1072,7 +1072,7 @@ setting the diffSnapshot requires a flag in the execSteps function and a subsequ
         myRunbook.writeDiffSnapshotToFile()
 
 
-diffSnapshot is the default diff source, diffSource attribute can be omitted.
+diffSnapshot is the default diff source, diffSource attribute can be omitted in this case
 
 .. code-block:: yaml
 
@@ -1086,13 +1086,6 @@ diffSnapshot is the default diff source, diffSource attribute can be omitted.
             commands:
               - 'pip3 freeze | tail -n 3'
             checkMethod: diff
-            diffTextFSMFilter: | 
-              Value P0 (.*y.*)
-  
-              Start
-                ^${P0} -> Record
-        
-              End
     diffSnapshot:
       created: '2018-02-18 11:45:48.086652'
       loop_1_step_1:
@@ -1171,7 +1164,6 @@ the example below filters pip3 packages which have the character "y" in the name
     diffSnapshot:
       created: '2018-02-18 11:45:48.086652'
       loop_1_step_1:
-      - pysnmp==4.4.4
       - PyYAML==3.12
       - yarl==1.1.0
 
