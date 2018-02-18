@@ -48,9 +48,8 @@ Adapters, analyzers, or postprocessing (PDF/HTML) can utilize those attributes.
 .. code-block:: yaml
     
     config:
-      <global variables in the valueMatrix>
-      <global attribute for host-file>
-      <global attributes for the test/migration>
+      <opt. variable definitions/file reference>
+      <opt. host file reference>
       steps:
         - <step-type #1>
             <step-type 1 attributes>
@@ -72,7 +71,29 @@ The are two ways to define the connection parameters for device access:
 - inline for each step. 
 - Using a host dictionary file. The first word of the step name string is used as reference. 
 
-The later one is the recommended option.
+* YAML host file example:
+
+.. code-block:: yaml
+
+    config:
+      hostfiles:
+      - ./testHost.yml
+      steps:
+        - <step-type #1>
+           name: lo0_SSH headline1
+           commands:
+              - <step-type 1 commands>
+        - <step-type #n>
+           name: lo0_SSH headline2
+            commands:
+              - <step-type n commands>
+
+
+* testHost.yml hostfile definitions:
+
+.. code-block:: yaml
+
+    lo0_SSH:  {'device': '127.0.0.1','method':'ssh','vendor':'ubuntu','password': 'tbd', 'user': 'tbd'}
 
 
 Variable Configs
