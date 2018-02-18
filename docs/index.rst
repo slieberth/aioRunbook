@@ -1049,8 +1049,35 @@ jsonString ex.
 diffCheck
 ---------
 
-verification method for comparing the step output with recorded snapshots, which have been
-by using the aioRunbook.writeDiffSnapshotToFile() function.
+This analyzer compares the current output with previously recorded outputs(snapshots), respectively with corresponding
+outputs of previous steps or loops. Recorded snapshots can be stored either in clear-text or zipped format.
+
+.. figure::  images/diffCheck.jpg
+   :align:   center
+
+.. note::
+
+    relative diffChecks to steps and loops will be added in future.
+
+setDiffSnapshot
++++++++++++++++
+
+setting the diffSnapshot requires a flag in the execSteps function and a subsequent function call:
+
+.. code-block:: python
+
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop,setDiffSnapshot = True)) 
+        myRunbook.writeDiffSnapshotToFile()
+
+diffTextFSMFilter
++++++++++++++++++
+
+To filter important lines and exclude dynamic lines (timers, counters ... ) the text output can be filtered by use of an
+textFSM filter. This is a white-list mechanism.
+
+the example below filters pip3 packages which have the character "y" in the name.
 
 .. code-block:: yaml
 
@@ -1068,51 +1095,37 @@ by using the aioRunbook.writeDiffSnapshotToFile() function.
             commands:
               - 'pip3 freeze'
             checkMethod: diff
-        - check:
-            name: record test local-shell
-            method: local-shell
-            device: local-shell
-            vendor: local-shell
-            commands:
-              - 'pip3 freeze | tail -n 2'
-            checkMethod: diff
+            diffTextFSMFilter: | 
+              Value P0 (.*y.*)
+  
+              Start
+                ^${P0} -> Record
+        
+              End
+      pdfOutput:
+        template: "./template_v3.tex"
+        author: SL 
     diffSnapshot:
-      created: '2018-02-10 17:40:03.933901'
-      loop_1_step_1: !!binary |
-        Nzg5YzRkNTVjYmFlZTMzNjBjZGRlYjVmNmNmODExZTdiMWYwYTI0MGRiNDUzMTgzMTllMDE2Mjhi
-        YTU0MjRkYWQxOGQyYzY5ZjRiODEzZGZhZjJmNDkyNTgzZWU0MjhhMjYwZjBmMGY5OTJiYzg5MmNk
-        NTI2Y2YyMjUxY2U2ZjlkMDFlZGE1ZTI4OTkxNzkzNmVmM2RjYTMzOTA4MDUxMTYzY2MzYzBmNWQ3
-        ZjZhZmJiZTlkODQ1YWM4ZWVkYjBiNDVkZjY0ZDQ5MGU3Nzk2Y2JiZjYyMDk0MzVlYTNlY2ZjN2Y2
-        MjQ5NGRmMzZlOTc0ZTM3YzZlMTY1ZjljOWVlN2FlMWQ4NThhN2JjODdlOGQzMmRjNzY0YTcyYTIy
-        NDI5MjViMGEwMzIzOWJhZWE0MDY0MzY1NTFiNDFlY2NhNDJhNDA0OTdiNjEzYmZjYjBjN2Y5YjBk
-        MDhmMTIwMzQyODFmNjVmNjkxY2NhZTNkYTI2M2ExZDg5ZTBkZDgyNGU3ZTlkYWE5ZWQyN2IxYzg5
-        NGMxNDE2NDRmNGZlZDJlNTZkZWUxNGNmODI3NGNmZGE3OTVlOWNlNmYwM2E2YmVlNWNkNGVkNjVj
-        YjlmMGU1MjI4Yzc2MTI4OWMwYjQyNjQ4YWQyM2E0MjdjMmZlOGM5ZTNkZGZiY2EzNjc0YTZiNzJk
-        MmQyYWQxMDdkZTE1YWMzNDFiYzZiMjUyZGM3OGJiZjhjN2I5NzAzYzU5ZWM1N2I4NjQ3NWVkMmM2
-        ZjRlMDk3MTYzZjJiNzI4NWE2NTJlMmI5NmQ3NDliZjU5NmY1ZDZhY2Y5ZGVhYzExMjA0M2M0ODg5
-        YzhkNWIxOWM0NDAzMThmY2RiZTNhZjkyYWUzYmQ4NDM3YjkwMDk3MWZjNTI2NzNiMDNlNzMzYjNk
-        YjEyMTM2YTVlNDk1OWY4ZjY0ODEyYmY4MTg4MTYwZjUzOGE5Y2RlM2U4YmMzMzhhZTJkMTJjNmJi
-        YWY5ZmM4MmU5MTRjZTFhNWNhZWQ0OGVjMjQxMjY0YWM4YzQ5MTVlODRmMzA5Zjg0Mzk0ODIyYjFi
-        M2M0MmFjZGM4YzY0MDY5ZTdkNGY1Yzc4NzdmNWE4YTFkYTAzOWEwMTVjZDgxZjk2ODI0N2IyNTE1
-        ZTExYjQzNjU1MWRiZDA4MjgyYTU5ZTc3NzYyMzNjYWNkZGM3ZDQ1OGQzNjg0ZjM0YjU3MDFhYmIy
-        YWEwZTBjZjliYmIxZDZmZjI0ODJiMDk0MDg3NmU3OWY5ZDA4OTE1NTQyYTIxOTZiMGU1NjFmNTky
-        NGIwOTBmNzEwYmRlMjYxNTNhZmU4ZDllYjc2OGMxOGJhY2JlNDdhYTYxODNiMGJiYmYyMWE1MmRl
-        MmQ1NGZjMTRhMDEwNjIwMmVlYmUzZjkxY2QxYmEwM2QwOTk4MmE0Y2U0MmIyMWQ1OTUzYTcxOTYx
-        MmIxZmNhOTNkMTAwMzYxNjc4ZGYyZmI5MWVkZDU1ZmRmYjlhZmIxMWQzYWY2MTgxYzk1NTlmNmJh
-        MjE0Nzc0N2M0MzFhZGZkZWJlMzA0ZDEzYzMyMDE0MjgxNjgyZDEzMWQ0YjRlNDUwODE1ZmM4ZGEw
-        YzA3NzM2YzcyNWJhOGFjMTFiODhjMWRiMTU2NWI4MjRmMmE2ZjY0YThkMzY4YmI2YmZmZjI2OTVj
-        Y2JjYWRiNTA3OTdiYmFlMTZhYTRhYmI5ODc1ZjA5ZDI4ZThiYjhlMWQ0MDcyNjMxN2YzZTBmMGMw
-        MTdiZTg5NTcxNGRlMmZiZmVlZjZmNWZiZmYwNTgwNjgxMmEzMDg5NTlhNGM1OGVmMGEzMjBhZWVh
-        MzhlM2U5NDljYTg0ZmQyOThiNGUyNDFjOTc0MWYxYmE5NGE1N2RkZTBlYTIyYTk5MmQ1ODU4ZTkw
-        NjkwYjAzYjZjYWE0N2U3ODNiYmUxODA3NDZiMzBjNmM3ZGMxODg0MzcyMTAzMTUyYjZlNWJmYzMw
-        MGFlYTE5Y2JmMjZhNjkyNDM4MDE2Yzk1MThmYWUzMDFhYWYwYmFmMmU1ZTk4NjVlNjQxZmJjZjVl
-        YjllMTQxMWYwM2Y3Nzc0NTI3YjNlNWY1OGJkNWM4YmNiYTVkMWQxN2NlMDYxNmFlODZlN2FmN2My
-        NWI5NjlmNWM3MDEyYzVjOThjYjc0YjgzNmU0YWMwZmJhOWExMmU4MTQwYWRlMGRlOGViYzQwODNm
-        ODMwMzExNzY5YzE3ZGEwNjNlMjZiZmEwZmM0ZmIyNzk0ZjVkNzVkN2JkYzRkN2UxNWY4YzQ4NTZi
-        OGRjMzczYjI0ODA1ZjU0ZjYwMTRmZjAxMWE1MGQ5NDA=
-      loop_1_step_2: !!binary |
-        Nzg5Y2FiYzhjZTJjYjFiNTM1ZDAwMzQyYWVhYWZjODI1NGJkY2NiYzkyZDRhMmI0YzRlNDU0NWI1
-        YjEzM2QxMzNkNjMyZTAwYmVkNjBhNDk=
+      created: '2018-02-18 11:45:48.086652'
+      loop_1_step_1:
+      - aiohttp-security==0.2.0
+      - asn1crypto==0.24.0
+      - async-timeout==2.0.0
+      - asyncssh==1.11.1
+      - bcrypt==3.1.4
+      - cryptography==2.1.4
+      - keyring==11.0.0
+      - ply==3.10
+      - ptyprocess==0.5.2
+      - pyasn1==0.4.2
+      - pycparser==2.18
+      - pycryptodomex==3.4.7
+      - PyNaCl==1.2.1
+      - pysftp==0.2.9
+      - pysmi==0.2.2
+      - pysnmp==4.4.4
+      - PyYAML==3.12
+      - yarl==1.1.0
 
 
 postProcessing
