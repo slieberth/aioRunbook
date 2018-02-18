@@ -91,8 +91,8 @@ Variables can be used in a subset for following step attributes:
 Jinja2 can process dict- and list-structures. aioRunbookScheduler provides
 two parameters ( loopIndex and stepIndex ) to iterate over variable lists, when executing steps/loops.  
 
-Inline Variable Definitions
-+++++++++++++++++++++++++++
+Var Defs Inline
++++++++++++++++
 
 .. code-block:: yaml
 
@@ -108,8 +108,8 @@ Inline Variable Definitions
               - 'pip3 {{text2}}'
 
 
-Variable Files Definitions
-++++++++++++++++++++++++++
+Var Defs via Files
+++++++++++++++++++
 
 .. code-block:: yaml
 
