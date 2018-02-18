@@ -37,7 +37,7 @@ class jsonCheck:
     """
 
     @classmethod
-    def checkOutputData (self,stepDict,valueList,configDict={}):
+    def checkOutputData (self,stepDict,valueList,configDict={},**kwargs):
 
         """classmethod function for validatiting the CLI output of a stepdict.
 

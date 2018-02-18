@@ -108,11 +108,13 @@ class aioRunbookScheduler():
             stepDict["output"][0]["output"] = "error adpater selection ###"
             _addTimeStampsToStepDict(t1,stepDict)
 
-    async def _asyncTestStep(self,stepDict,eventLoop,threadExecutor,stepRange = []):
+    #async def _asyncTestStep(self,stepDict,eventLoop,threadExecutor,stepRange = [],**kwargs):
+    async def _asyncTestStep(self,stepDict,eventLoop,threadExecutor,**kwargs):
         """method asyncTestStep
 
 
         """
+        logging.debug("_asyncTestStep kwargs: {}".format(kwargs))
         stepDict["name"] = _substitudeVarsInString(stepDict["name"],varDict=self.varDict)
         name = stepDict["name"]
         stepCounter = stepDict["stepCounter"]
@@ -142,38 +144,38 @@ class aioRunbookScheduler():
         if stepId in  [ "check", "await","config","record"]:
             self.disconnectFunction = None
             if method in ["ssh"]: 
-                self.adaptor = aioSshConnect(stepDict)
+                self.adaptor = aioSshConnect(stepDict,**kwargs)
                 await self.adaptor.connect()
                 self.commandFunction =  self.adaptor.runCommands        
                 await self.commandFunction()
                 self.disconnectFunction = self.adaptor.disconnect
                 await self.disconnectFunction()
             elif method in ["telnet"]: 
-                self.adaptor = aioTelnetConnect(stepDict,eventLoop=eventLoop)      
+                self.adaptor = aioTelnetConnect(stepDict,eventLoop=eventLoop,**kwargs)      
                 await self.adaptor.connect()
                 self.commandFunction =  self.adaptor.runCommands        
                 await self.commandFunction()
                 self.disconnectFunction = self.adaptor.disconnect
                 await self.disconnectFunction()   
             elif method in ["rest"] and vendor in ["rtbrick"]: 
-                self.adaptor = aioRtbRestConnect(stepDict)      
+                self.adaptor = aioRtbRestConnect(stepDict,**kwargs)      
                 self.commandFunction =  self.adaptor.runCommands     
                 await self.commandFunction()
-            elif method in ["local-shell"]: 
-                self.adaptor = aioLocalShellConnect(stepDict,eventLoop=eventLoop)      
+            elif method in ["local-shell"]:                
+                self.adaptor = aioLocalShellConnect(stepDict,eventLoop=eventLoop,**kwargs)      
                 self.commandFunction =  self.adaptor.runCommands     
                 await self.commandFunction()
             elif method in ["snmp"]:            ### TESTME ####
-                self.adaptor = aioSnmpConnect(stepDict)      
+                self.adaptor = aioSnmpConnect(stepDict,**kwargs)      
                 self.commandFunction =  self.adaptor.sendSnmpRequests   
                 await self.commandFunction(threadExecutor) #this is a blocking function call
             elif method in ["netconf"]:            ### TESTME ####
-                self.adaptor = aioNetconfConnect(stepDict)      
+                self.adaptor = aioNetconfConnect(stepDict,**kwargs)      
                 self.commandFunction =  self.adaptor.sendNetconfRequests   
                 await self.commandFunction(threadExecutor) #this is a blocking function call
             else: 
                 logging.error('###error adpater selection step {}###'.format(stepCounter))
-                self.adaptor = aioError(stepDict)      
+                self.adaptor = aioError(stepDict,**kwargs)      
                 self.commandFunction =  self.adaptor.runCommands     
                 await self.commandFunction()
             if stepId in  [ "check", "await"]:
@@ -197,7 +199,7 @@ class aioRunbookScheduler():
                 try:
                     (stepDict["output"][checkCommandOffsetFromLastCommand]["pass"],
                     stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"]) = \
-                                analyserFunction(stepDict,varDict=self.varDict,configDict = self.configDict)           
+                                analyserFunction(stepDict,varDict=self.varDict,configDict = self.configDict,**kwargs)           
                 except Exception as errmsg:
                     logging.error(errmsg) 
                     stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = False
@@ -217,7 +219,7 @@ class aioRunbookScheduler():
                         try:
                             (stepDict["output"][checkCommandOffsetFromLastCommand]["pass"],
                             stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"]) = \
-                                        analyserFunction(stepDict,varDict=self.varDict,configDict = self.configDict)           
+                                        analyserFunction(stepDict,varDict=self.varDict,configDict = self.configDict,**kwargs)           
                         except Exception as errmsg:
                             logging.error(errmsg) 
                             stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = False
@@ -340,7 +342,7 @@ class aioRunbookScheduler():
 
 
 
-    async def execSteps (self,eventLoop,threadExecutor=None,stepRange = []): 
+    async def execSteps (self,eventLoop,threadExecutor=None,stepRange = [],**kwargs): 
         """coroutine to execute the testhost-dict lookup failed for step steps, which are defined in a YAML config file.
 
           :param eventLoop: defines the encpomassing asyncio event loop
@@ -359,7 +361,7 @@ class aioRunbookScheduler():
         if self.configLoaded == False:
             logging.error("execSteps without loaded config")  
             return False            
-
+        logging.info ("execSteps kwargs:{}".format(kwargs))
         numberOfTasksBeforeStart =  len([task for task in asyncio.Task.all_tasks() if not task.done()])
         for self.loopCounter in range(1,self.loops+1):
             logging.info('start loop {}'.format(self.loopCounter))
@@ -395,7 +397,7 @@ class aioRunbookScheduler():
                     bgTask = eventLoop.create_task(self._asyncTestStep(stepDict,eventLoop,threadExecutor))
                     bgList.append(bgTask)
                 else:
-                    await self._asyncTestStep(stepDict,eventLoop,threadExecutor)  
+                    await self._asyncTestStep(stepDict,eventLoop,threadExecutor,**kwargs)  
             logging.info("waiting for background tasks to be done")   
             await awaitOpenedTasksToBeDone(numberOfTasksBeforeStart)
             logging.info("background tasks done")   

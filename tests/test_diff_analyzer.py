@@ -34,144 +34,103 @@ class test_diff_analyzer(unittest.TestCase):
 
         """setting the diffSnapshot"""
 
-        ymlConfigString = """# diff test 1 runbook
+        ymlConfigString = """#
 config:
+  description : ""
+  expected : ""
+  preparation : ""
+  workingDir: ./results_tests
   steps:
     - check:
         name: record test local-shell
         method: local-shell
+        device: local-shell
+        vendor: local-shell
         commands:
           - 'pip3 freeze'
         checkMethod: diff
     - check:
         name: record test local-shell
         method: local-shell
+        device: local-shell
+        vendor: local-shell
         commands:
           - 'pip3 freeze | tail -n 2'
-        checkMethod: diff """
+        checkMethod: diff
+  pdfOutput:
+    template: "./template_v3.tex"
+    author: SL """
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
         myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(myRunbook.execSteps(loop)) 
-        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],False)
-        self.assertEqual(myRunbook.configDict["config"]["steps"][1]['check']['output'][0]['pass'],False)
-        #pprint.pprint(myRunbook.configDict)
+        loop.run_until_complete(myRunbook.execSteps(loop,setDiffSnapshot = True)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
+        self.assertEqual(myRunbook.configDict["config"]["steps"][1]['check']['output'][0]['pass'],True)
         myRunbook.writeDiffSnapshotToFile()
-        time.sleep(1)
+
 
     def test_diff2(self):
-
-        """using the diffSnapshot, must match"""
-
         myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
-        #pprint.pprint(myRunbook.configDict)
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
         self.assertEqual(myRunbook.configDict["config"]["steps"][1]['check']['output'][0]['pass'],True)
 
     def test_diff3(self):
 
-        """setting the diffSnapshot, different command in step 2, -> missmatch"""
+        """setting the diffSnapshot"""
 
-        ymlConfigString = """# diff test 1 runbook
+        ymlConfigString = """#
 config:
+  description : ""
+  expected : ""
+  preparation : ""
+  workingDir: ./results_tests
   steps:
     - check:
         name: record test local-shell
         method: local-shell
+        device: local-shell
+        vendor: local-shell
         commands:
           - 'pip3 freeze'
         checkMethod: diff
+        diffZip: true
     - check:
         name: record test local-shell
         method: local-shell
+        device: local-shell
+        vendor: local-shell
         commands:
-          - 'pip3 freeze | tail -n 3'
-        checkMethod: diff 
-diffSnapshot:
-  created: '2018-02-10 06:46:07.495384'
-  loop_1_step_1: !!binary |
-    Nzg5YzM1NTFjYjhlZGIzMDBjYmNlYjVmNjIzODhlYjc0ZDBlM2UxNGJkMTVkZGEyNjg0ZjNkMmEz
-    MjlkNzBhZGQ3OGEzNDZhZmQ3ZDQ1YmE4YmY4OTBhMTY2ODZhMzkxYzVmNDY0Y2VkMzM0NzQ5N2Vl
-    ZGMxYjdiZTAxMzgxZGIwYTcyOWRhNmJlMWIzYTlkZmZkYWUyM2RhNTU1MjY2N2E1NTIzY2JiNTIz
-    MzI3MjU4ZGMyYTIxYWRkODkzMTQwZGE1ODNjZmI4ZjIxZDE3MzlhOWFhYzdkZTZhZWFhNjk2YTBi
-    YmJkMTM4Mjg4YzBiMzY3NjdmYmU4YWYzZDViODQ1YjBiMmRiZjlkMzk2MTk5NGRlMGJkNDhkOGY2
-    MmYzYjNjYTA2YTEyYzk2MTgyMjE0ZDI2YzYzNWI4MTczYjQ3MmZhNDlmZjlkODhiY2Y4NDk5YTZm
-    MThkZmVjYTBjYWRlYmMzMWVjYmM1MDEwNWQ0YjYzNTZhODA1ZTNhMzcxMGZiMmRmNDMxMzhlOTJj
-    YWJjZGFiMjZlZjliNzVkNDBhZDRjNDgzMTcxOGFlODA0OGUyNjZjOWU3MTQ2YzdjMjE3NmQ3NGNl
-    MjM0NDE2ZWY5N2VlNjJiMjJkMzZlMDlhNjRiNTc0OTU2MWNmNzBkMDY1NzU1ZTFmMTg5N2E0NjYw
-    MjdkZDU4MjFhOGY2YjJlYzkwMWQxZTEzNDk4NWNhNTdhNDFhMzIyZDdhYzA5OGFkZWU5MmE1ODJi
-    OWE1MzgwNWQzY2M2ZWViM2Y5NTk3ZmQ4YWZkYWMxMjBlNjk1MTY3OTczNzlkYTliYTA4MDA3MTAz
-    NzhhMjE0YmE4ZjY2YmIyM2Y1ZjVlYmY2YjkwYzExNDc4ZGY4MDk4OGUzZGVkZjQ2MzcwZTI5NGZj
-    MWRiYzVlZjVkYWFlNDZiOGZmN2ZiZWRlZjBmYjFjYjRjMjViZjc2MmY4MmY0NmFkZWZkNjUyNmNj
-    NTdiYmM1ZjM0ZDQ2MGFhMmQ5YWFmNjlmZTAxMjA1N2MzZjU=
-  loop_1_step_2: !!binary |
-    Nzg5YzJiMmRjYWM5Yzk0YzMyYjZiNTM1ZDQzMzMyZTJhYTRjMmNjYTAxMzEwZGY1MGMwMDY3NWIw
-    NzI1'"""
+          - 'pip3 freeze | tail -n 2'
+        checkMethod: diff
+        diffZip: true
+  pdfOutput:
+    template: "./template_v3.tex"
+    author: SL """
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop,setDiffSnapshot = True)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
+        self.assertEqual(myRunbook.configDict["config"]["steps"][1]['check']['output'][0]['pass'],True)
+        myRunbook.writeDiffSnapshotToFile()
+
+    def test_diff4(self):
         myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
-        self.assertEqual(myRunbook.configDict["config"]["steps"][1]['check']['output'][0]['pass'],False)
-
-    def test_diff4(self):
-
-        """setting the diffSnapshot with errenaous zip/binary data"""
-
-        ymlConfigString = """# diff test 4 runbook
-config:
-  steps:
-    - check:
-        name: record test local-shell
-        method: local-shell
-        commands:
-          - 'pip3 freeze'
-        checkMethod: diff
-    - check:
-        name: record test local-shell
-        method: local-shell
-        commands:
-          - 'pip3 freeze | tail -n 3'
-        checkMethod: diff 
-diffSnapshot:
-  created: '2018-02-10 06:46:07.495384'
-  loop_1_step_1: !!binary |
-    Nzg5YzM1NTFjYjhlZGIzMDBjYmNlYjVmNjIzODhlYjc0ZDBlM2UxNGJkMTVkZGEyNjg0ZjNkMmEz
-    MjlkNzBhZGQ3OGEzNDZhZmQ3ZDQ1YmE4YmY4OTBhMTY2ODZhMzkxYzVmNDY0Y2VkMzM0NzQ5N2Vl
-    ZGMxYjdiZTAxMzgxZGIwYTcyOWRhNmJlMWIzYTlkZmZkYWUyM2RhNTU1MjY2N2E1NTIzY2JiNTIz
-    MzI3MjU4ZGMyYTIxYWRkODkzMTQwZGE1ODNjZmI4ZjIxZDE3MzlhOWFhYzdkZTZhZWFhNjk2YTBi
-    YmJkMTM4Mjg4YzBiMzY3NjdmYmU4YWYzZDViODQ1YjBiMmRiZjlkMzk2MTk5NGRlMGJkNDhkOGY2
-    MmYzYjNjYTA2YTEyYzk2MTgyMjE0ZDI2YzYzNWI4MTczYjQ3MmZhNDlmZjlkODhiY2Y4NDk5YTZm
-    MThkZmVjYTBjYWRlYmMzMWVjYmM1MDEwNWQ0YjYzNTZhODA1ZTNhMzcxMGZiMmRmNDMxMzhlOTJj
-    YWJjZGFiMjZlZjliNzVkNDBhZDRjNDgzMTcxOGFlODA0OGUyNjZjOWU3MTQ2YzdjMjE3NmQ3NGNl
-    MjM0NDE2ZWY5N2VlNjJiMjJkMzZlMDlhNjRiNTc0OTU2MWNmNzBkMDY1NzU1ZTFmMTg5N2E0NjYw
-    MjdkZDU4MjFhOGY2YjJlYzkwMWQxZTEzNDk4NWNhNTdhNDFhMzIyZDdhYzA5OGFkZWU5MmE1ODJi
-    OWE1MzgwNWQzY2M2ZWViM2Y5NTk3ZmQ4YWZkYWMxMjBlNjk1MTY3OTczNzlkYTliYTA4MDA3MTAz
-    NzhhMjE0YmE4ZjY2YmIyM2Y1ZjVlYmY2YjkwYzExNDc4ZGY4MDk4OGUzZGVkZjQ2MzcwZTI5NGZj
-    MWRiYzVlZjVkYWFlNDZiOGZmN2ZiZWRlZjBmYjFjYjRjMjViZjc2MmY4MmY0NmFkZWZkNjUyNmNj
-    NTdiYmM1ZjM0ZDQ2MGFhMmQ5YWFmNjlmZTAxMjA1N2MzZjU=
-  loop_1_step_2: !!binary |
-    Nzg5YzJiMmRjYWM5Yzk0YzMyYjZiNTM1ZDQzMzMyZTJhYTRjMmNjYTAxMzEwZGY1MGMwMDY3NWIx
-    NzI1'"""
-        fh = open("test.yml",'w')
-        fh.write(ymlConfigString)
-        fh.close()
-        myRunbook = aioRunbookScheduler("test.yml")
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(myRunbook.execSteps(loop))
-        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
-        self.assertEqual(myRunbook.configDict["config"]["steps"][1]['check']['output'][0]['pass'],False)
+        self.assertEqual(myRunbook.configDict["config"]["steps"][1]['check']['output'][0]['pass'],True)
 
 
 if __name__ == '__main__':
-    #logLevel = logging.DEBUG
-    logLevel = logging.ERROR
+    logLevel = logging.DEBUG
+    #logLevel = logging.ERROR
     logging.basicConfig(filename="myLog.log", filemode='w', level=logLevel)
     logging.getLogger().setLevel(logLevel)
     console = logging.StreamHandler()

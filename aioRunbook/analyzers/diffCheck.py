@@ -32,25 +32,45 @@ from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeVarsInS
 import difflib
 import zlib
 import binascii
+import textwrap
 
 
 class diffCheck:
 
-    """class for verification of CLI output, based on googles textfsm engine.
+    """class for verification of CLI output, based on diff comaprision to existing results.
 
     """
 
     def __init__(self):
         pass    
 
-    def _compress(clearTestString):
-        return binascii.hexlify(zlib.compress(clearTestString.encode()))
 
-    def _deCompress(compressedDiffStringInHex):
-        return zlib.decompress(binascii.unhexlify(compressedDiffStringInHex)).decode()
+
+    def _diffEncode(clearTextObject,compressFlag,diffTextFSMFilterFlag ):
+        #return binascii.hexlify(zlib.compress(clearTestString.encode())).decode()
+        if compressFlag:
+            if not diffTextFSMFilterFlag:
+                compressedObject = binascii.hexlify(zlib.compress(clearTextObject.encode())).decode()
+            else:
+                #compressedObject = binascii.hexlify(zlib.compress(clearTestObject)).decode()
+                compressedObject = binascii.hexlify(zlib.compress("\n".join(clearTextObject).encode())).decode()
+            wrappedList = textwrap.wrap(compressedObject)
+            return wrappedList
+        else:
+            return clearTextObject
+
+    def _diffDecode(listObj,compressFlag,diffTextFSMFilterFlag ):
+        if compressFlag:
+            if not diffTextFSMFilterFlag:
+                return zlib.decompress(binascii.unhexlify("".join(listObj).encode())).decode()
+            else:
+                return zlib.decompress(binascii.unhexlify("".join(listObj).encode())).decode().split("\n")
+        else:
+            return listObj
 
     @classmethod
-    def checkCliOutputString (self,stepDict,varDict={},configDict={}):
+    #def checkCliOutputString (self,stepDict,varDict={},configDict={}):
+    def checkCliOutputString (self,stepDict,configDict={},varDict={},**kwargs):
         """classmethod function for validatiting the CLI output with apreviously recorded snapshot of the CLI output
 
               :param stepDict: The specific test step dictionary, which has both CLI outout and textFSM template attributes.
@@ -62,52 +82,80 @@ class diffCheck:
               :type varDict: dict
               :type configDict: python dict object
 
+
         """
-
+        #pprint.pprint(stepDict)
         checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1   
-        diffInformationTag = ("loop_{}_step_{}".format(stepDict["loopCounter"],stepDict["stepCounter"])) 
-        self.output = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
-        if "diffSnapshot" in configDict:
-            logging.debug ('existing diffSnapshot in ConfigDict'.format(stepDict["stepCounter"])) 
-            if diffInformationTag  in configDict["diffSnapshot"].keys():
-                outputStringList = self.output.split("\n")
-                #diffStringList = configDict["diffStrings"][diffInformationTag].split("\n")
-                compressedDiffStringInHex = configDict["diffSnapshot"][diffInformationTag]
-                diffStringList = self._deCompress(compressedDiffStringInHex).split("\n")
-                diffResultList = list(difflib.unified_diff(diffStringList,outputStringList))
-                if len(diffResultList) == 0:
-                    return True, ""
-                else:
-                    return False, "\n".join(diffResultList)
-            else:
-                logging.debug ('missing diffSnapshot for {} in ConfigDict'.format(diffInformationTag)) 
-                #configDict["diffStrings"][diffInformationTag] = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
-                outputString = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
-                compressedStringInHex = self._compress(outputString)
-                #compressedStringInHex = binascii.hexlify(zlib.compress(outputString.encode()))
-                configDict["diffSnapshot"][diffInformationTag] = compressedStringInHex 
-                return False, "diffSnapshotModified"
-        else:
-            logging.debug ('missing diffSnapshot in ConfigDict'.format(stepDict["stepCounter"])) 
-            outputString = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
-            compressedStringInHex = self._compress(outputString)
-            #diffStringsDict = {diffInformationTag:stepDict["output"][checkCommandOffsetFromLastCommand]["output"]}
-            diffStringsDict = {diffInformationTag:compressedStringInHex}
-            configDict["diffSnapshot"] = diffStringsDict
-            return False, "diffSnapshotInitalized"
+        loopCounter = stepDict["output"][checkCommandOffsetFromLastCommand]["loopCounter"]
+        stepCounter = stepDict["output"][checkCommandOffsetFromLastCommand]["stepCounter"]
+        diffInformationTag = ("loop_{}_step_{}".format(loopCounter,stepCounter)) 
+        compressFlag = _isInDictionary("diffZip",stepDict,False) 
+        diffTextFSMFilterFlag = _isInDictionary("diffTextFSMFilter",stepDict,False)
+        setDiffSnapshotFlag = _isInDictionary("setDiffSnapshot",kwargs,False)  
+        outputString = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
 
-    @classmethod
-    def setModificationFlag (self,stepDict):
-        checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1  
-        if stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffSnapshotModified") or \
-           stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffSnapshotInitalized"):
-            return True
-        else:
-            return False
+        if setDiffSnapshotFlag == True:
+            configDict["diffSnapshot"] = _isInDictionary("diffSnapshot",configDict,{}) 
+            logging.warning ('setting diffSnapshot for {} in ConfigDict'.format(diffInformationTag)) 
+            if diffTextFSMFilterFlag:
+                logging.debug('stepDict["diffTextFSMFilter"]{}'.format(stepDict["diffTextFSMFilter"]))
+                existingTemplateString = stepDict["diffTextFSMFilter"]
+                newTemplateString= jinja2Replacer.substitudeVarsInString(existingTemplateString,varDict=varDict)
+                re_table = textfsm.TextFSM(StringIO(newTemplateString))
+                textFSMMatrix = re_table.ParseText(outputString)
+                textFSMOutputString  = [ str(x) for sublist in textFSMMatrix for x in sublist ]
+                compressedStringInHex = self._diffEncode(textFSMOutputString,compressFlag,diffTextFSMFilterFlag )
+            else:
+                compressedStringInHex = self._diffEncode(outputString,compressFlag,diffTextFSMFilterFlag)
+                print(compressedStringInHex)
+            logging.debug("setting diff for {} to {}".format(diffInformationTag,compressedStringInHex))
+            configDict["diffSnapshot"][diffInformationTag] = compressedStringInHex                  
+            return True, "setDiffSnapshot"
+        else:    
+            if "diffSnapshot" in configDict:
+                logging.debug ('existing diffSnapshot in ConfigDict'.format(stepCounter)) 
+                compressedDiffStringInHex = configDict["diffSnapshot"][diffInformationTag]
+                if diffInformationTag  in configDict["diffSnapshot"].keys():
+                    if diffTextFSMFilterFlag:
+                        existingTemplateString = stepDict["diffTextFSMFilter"]
+                        newTemplateString= jinja2Replacer.substitudeVarsInString(existingTemplateString,varDict=varDict)
+                        re_table = textfsm.TextFSM(StringIO(newTemplateString))
+                        textFSMMatrix = re_table.ParseText(outputString)
+                        logging.debug("new textFSMMatrix:{}".format(textFSMMatrix))
+                        outputString  = str(textFSMMatrix)
+                        logging.debug("new outputString x:{}".format(outputString))
+                        outputStringList  = [ str(x) for sublist in textFSMMatrix for x in sublist ]
+                        logging.debug("new outputStringList x:{}".format(outputStringList))
+                        diffStringList = self._diffDecode(compressedDiffStringInHex,compressFlag,diffTextFSMFilterFlag)
+                    else:
+                        outputStringList = outputString.split("\n")
+                        diffStringList = self._diffDecode(compressedDiffStringInHex,compressFlag,diffTextFSMFilterFlag).split("\n")  
+                    diffResultList = list(difflib.unified_diff(diffStringList,outputStringList))
+                    if len(diffResultList) == 0:
+                        return True, ""
+                    else:
+                        return False, "\n".join(diffResultList)
+                else:
+                    logging.error ('missing diffSnapshot in ConfigDict'.format(stepCounter)) 
+                    return False, "missingStepDiffSnapshop-{}".format(diffInformationTag)
+            else:
+                logging.error ('missing diffSnapshot in ConfigDict'.format(stepDict["stepCounter"])) 
+                return False, "missingGlobalDiffSnapshot"
+
+#     @classmethod
+#     def setModificationFlag (self,stepDict):
+#         checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1  
+#         if stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffSnapshotModified") or \
+#            stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffSnapshotInitalized"):
+#             return True
+#         else:
+#             return False
 
     @classmethod
     def getDiffSnapshotYamlBlockLines (self,configDict):
         configDict["diffSnapshot"]["created"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') 
         return yaml.dump({"diffSnapshot":configDict["diffSnapshot"]},default_flow_style = False).split("\n")
+
+
         
 

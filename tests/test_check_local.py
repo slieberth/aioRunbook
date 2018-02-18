@@ -22,7 +22,7 @@ from unittest.mock import patch
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 from aioRunbook.aioRunbookScheduler import aioRunbookScheduler
-from aioRunbook.tools.helperFunctions import _substitudeVarsInString, _retrieveVarFromVarDict
+from aioRunbook.tools.helperFunctions import _substitudeVarsInString
 import logging
 import pprint
 

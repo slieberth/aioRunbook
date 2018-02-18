@@ -38,7 +38,7 @@ class aioLocalShellConnect:
 
     """
 
-    def __init__(self,stepDict,configDict = {"config":{}},eventLoop=None): 
+    def __init__(self,stepDict,configDict = {"config":{}},eventLoop=None,**kwargs): 
         self.stepDict = stepDict
         self.timeout = _isInDictionary ("timeout",configDict["config"],60)
         self.timeout = _isInDictionary ("timeout",stepDict,self.timeout)

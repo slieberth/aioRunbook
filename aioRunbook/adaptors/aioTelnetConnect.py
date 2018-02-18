@@ -180,7 +180,7 @@ class aioTelnetConnect():
 
     """
 
-    def __init__(self,stepDict,configDict = {"config":{}},port=23,eventLoop=None):
+    def __init__(self,stepDict,configDict = {"config":{}},port=23,eventLoop=None,**kwargs):
     #def __init__(self,stepDict,configDict = {"config":{}},port=23,loop=None):
         """Constructor.
 

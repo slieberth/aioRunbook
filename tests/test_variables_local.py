@@ -161,7 +161,7 @@ config:
   preparation : ""
   workingDir: ./results_tests
   vars:
-    text1: varTest
+    text1: "test for substituion in the name attribute"
     text2: freeze
   steps:
     - record:
@@ -179,7 +179,7 @@ config:
         myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
-        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['record']['name'],'varTest')
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['record']['name'],'test for substituion in the name attribute')
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['commandOrig'],'pip3 freeze')
         #pprint.pprint(myRunbook.configDict)
 

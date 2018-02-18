@@ -80,7 +80,7 @@ class aioRtbRestConnect:
 
     """
 
-    def __init__(self,stepDict):
+    def __init__(self,stepDict,**kwargs):
         self.stepDict = stepDict
         self.hostname = stepDict["device"]
         #self.vendor= stepDict["vendor"]

@@ -1,18 +1,11 @@
-#
 config:
-  description : ""
-  expected : ""
-  preparation : ""
-  workingDir: ./results_tests
-  vars:
-    text1: varTest
-    text2: freeze
+  hostfiles:
+    - ./host.yml
   steps:
     - record:
-        name: '{{text1}}'
-        method: local-shell
+        name: "DUT - get SNMP OID "
+        startInBackground: true
+        blockingAdapter: true
         commands:
-          - 'pip3 {{text2}}'
-  pdfOutput:
-    template: "./template_v3.tex"
-    author: SL 
+          - get iso.3.6.1.2.1.1.1.0
+          - get iso.3.6.1.2.1.1.1.0

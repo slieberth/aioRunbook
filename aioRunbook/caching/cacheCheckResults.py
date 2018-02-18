@@ -34,7 +34,9 @@ from jinja2 import Template
 
 class cacheCheckResults:
 
-    """class for storing/retrieving the results of check/await in named variables
+    """class for storing/retrieving the results of check/await in named variables. 
+
+    The objective is to save/retrieve the values as integers, respectively floats, if possible.
 
     """
 

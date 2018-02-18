@@ -42,7 +42,7 @@ class textFsmCheck:
 
 
     @classmethod
-    def checkCliOutputString (self,stepDict,varDict={},configDict={}):
+    def checkCliOutputString (self,stepDict,varDict={},configDict={},**kwargs):
         """classmethod function for validatiting the CLI output of a stepdict.
 
               :param stepDict: The specific test step dictionary, which has both CLI outout and textFSM template attributes.

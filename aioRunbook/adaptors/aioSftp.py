@@ -63,7 +63,7 @@ class aioSftp:
 
     """
 
-    def __init__(self,stepDict,configDict = {"config":{}},port=22,eventLoop=None): 
+    def __init__(self,stepDict,configDict = {"config":{}},port=22,eventLoop=None,**kwargs): 
         self.stepDict = stepDict
         self.hostname = stepDict["device"]
         self.port = _isInDictionary ("port",stepDict,port)

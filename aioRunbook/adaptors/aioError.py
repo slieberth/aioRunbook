@@ -24,7 +24,7 @@ class aioError:
 
     """
 
-    def __init__(self,stepDict,configDict = {"config":{}},port=22,loop=None): 
+    def __init__(self,stepDict,configDict = {"config":{}},port=22,loop=None,**kwargs): 
         self.stepDict = stepDict
 
     async def runCommands (self):

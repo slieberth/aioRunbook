@@ -38,7 +38,7 @@ from aioRunbook.tools.helperFunctions import _isInDictionary
 
 class aioSnmpConnect:
 
-    def __init__(self,stepDict,method="snmp",port=161,configDict={}):
+    def __init__(self,stepDict,method="snmp",port=161,configDict={},**kwargs):
         #logging.info ("snmpConnect stepDict: {}".format(stepDict))   
         self.stepDict = stepDict
         self.configDict = configDict

@@ -97,7 +97,7 @@ class aioSshConnect():
 
     """
 
-    def __init__(self,stepDict,configDict = {"config":{}},port=22,eventLoop=None): 
+    def __init__(self,stepDict,configDict = {"config":{}},port=22,eventLoop=None,**kwargs): 
 
         #def __init__(self,configDict,stepDict,method="ssh",port=22):
         self.hostname = stepDict["device"]
