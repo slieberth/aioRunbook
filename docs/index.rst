@@ -16,6 +16,9 @@ Python package providing an orchestration framework for automated
 network tests and network migrations using supporting libraries like asyncssh, netconf and snmp 
 for interaction with the netwok elements.
 
+.. figure::  images/aioRunbook.jpg
+   :align:   center
+
 aioRunbook is designed to be controlled by either shell execution respectively an 
 aihttp web microservice (future). 
 
@@ -1052,7 +1055,7 @@ diffCheck
 This analyzer compares the current output with previously recorded outputs(snapshots), respectively with corresponding
 outputs of previous steps or loops. Recorded snapshots can be stored either in clear-text or zipped format.
 
-.. figure::  images/diffcheck.jpg
+.. figure::  images/diffCheck.jpg
    :align:   center
 
 .. note::
