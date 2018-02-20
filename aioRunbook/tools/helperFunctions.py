@@ -153,6 +153,7 @@ def _createOutputList(stepCounter,stepType,stepDict,loopCounter):
     stepDict["output"] = []
     def enrichOutputContainer(i,command):
         outputContainer = {}
+        outputContainer["name"] = stepDict["name"]
         if "device" in stepDict.keys():
             outputContainer["device"] = stepDict["device"]
         outputContainer["loopCounter"] = loopCounter
