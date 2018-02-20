@@ -207,15 +207,6 @@ class diffCheck:
                 return False, "incorrect diffsource attribute"
 
 
-#     @classmethod
-#     def setModificationFlag (self,stepDict):
-#         checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1  
-#         if stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffSnapshotModified") or \
-#            stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"].startswith("diffSnapshotInitalized"):
-#             return True
-#         else:
-#             return False
-
     @classmethod
     def getDiffSnapshotYamlBlockLines (self,configDict):
         configDict["diffSnapshot"]["created"] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f') 
