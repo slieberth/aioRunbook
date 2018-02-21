@@ -35,8 +35,8 @@ from aioRunbook.tools.helperFunctions import _isInDictionary, _addTimeStampsToSt
 
 COMMAND_DICT = {"setObjectsFromJsonFile"    : { "urlSuffix": "/bds/object/add", "httpCommand": "POST" },
                 "delObjectsFromJsonFile"    : { "urlSuffix": "/bds/object/delete", "httpCommand": "POST" },
-                "setTableFromJsonFile"      : { "urlSuffix": "/bds/table", "httpCommand": "POST" },
-                "delTableFromJsonFile"      : { "urlSuffix": "/bds/table", "httpCommand": "POST" },
+                "setTableFromJsonFile"      : { "urlSuffix": "/bds/table/create", "httpCommand": "POST" },
+                "delTableFromJsonFile"      : { "urlSuffix": "/bds/table/delete", "httpCommand": "POST" },
                 "set"                       : { "urlSuffix": "/bds/object/add", "httpCommand": "POST" },
                 "setTable"                  : { "urlSuffix": "/bds/table/create", "httpCommand": "POST" },
                 "setObject"                 : { "urlSuffix": "/bds/object/add", "httpCommand": "POST" },
@@ -46,7 +46,7 @@ COMMAND_DICT = {"setObjectsFromJsonFile"    : { "urlSuffix": "/bds/object/add", 
                 "delTable"                  : { "urlSuffix": "/bds/table/delete", "httpCommand": "POST" },
                 "show"                      : { "urlSuffix": "/bds/object/get", "httpCommand": "POST" },
                 "get"                       : { "urlSuffix": "/bds/object/get", "httpCommand": "POST" },
-                "["                         : {},           #List comprehensen ... will be set below ... 
+                "["                         : {},           #List comprehension ... will be set below ... 
                 "cmd"                       : { "urlSuffix": "/bds/object/get", "httpCommand": "POST" },
                 "dump"                      : { "urlSuffix": "/bds/object/walk", "httpCommand": "POST" },      
                 "walk"                      : { "urlSuffix": "/bds/object/walk", "httpCommand": "POST" }}        
@@ -125,13 +125,19 @@ class aioRtbRestConnect:
                         requestData["objects"] =  []
                         for execCommand in commandChunk:            
                             _cmdInCommandStr, _bdsTableString, _attributeDict = self._splitCommandLine(execCommand)
-                            #print(_cmdInCommandStr, _bdsTableString, _attributeDict)
+                            #print(execCommand,_cmdInCommandStr, _bdsTableString, _attributeDict)
                             requestData["objects"].append({})
                             requestData["objects"][-1]["attribute"] = _attributeDict
                             headers = {'Content-Type': 'application/json'}  
                             urlSuffix = COMMAND_DICT[_cmdInCommandStr]["urlSuffix"]  
                             httpCommand = COMMAND_DICT[_cmdInCommandStr]["httpCommand"] 
                             url = 'http://'+self.hostname+":"+str(self.port)+urlSuffix
+                            if _cmdInCommandStr in ["setObjectsFromJsonFile","delObjectsFromJsonFile",
+                                               "setTableFromJsonFile","delTableFromJsonFile"]:
+                                jsonFileName = _bdsTableString
+                                jsonFh = open(jsonFileName,"r")
+                                requestData = json.load(jsonFh)
+                                print (requestData)
                             try:       
                                 async with session.post(url,
                                                 data=json.dumps(requestData),
@@ -139,11 +145,6 @@ class aioRtbRestConnect:
                                     jsonResponse = await self.response.json()
                             except:
                                 self.response = None
-
-                    #t2=datetime.datetime.now()
-                    #self.stepDict["output"][i]["endTS"] = t2.strftime('%Y-%m-%d %H:%M:%S.%f')   
-                    #self.stepDict["output"][i]["elapsed"] = str((t2-t1))
-                    #self.stepDict["output"][i]["elapsedRaw"] = (t2-t1).total_seconds()
                     _addTimeStampsToStepDict(t1,self.stepDict,i)
 
                     responseDict = {}

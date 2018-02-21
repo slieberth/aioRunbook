@@ -34,6 +34,11 @@ class test_aioRestRtbrick(unittest.TestCase):
 
     def test_1(self):
 
+        jsonString = '{"objects": [{"attribute": {"peer_ipv4_address": "1.1.1.1"}}]}'
+        fh = open("jsonObjects.json",'w')
+        fh.write(jsonString)
+        fh.close()
+
         ymlConfigString = """config:
   steps:
     - record:
@@ -48,6 +53,7 @@ class test_aioRestRtbrick(unittest.TestCase):
           - set global.interface.logical.config interface_name ifl-0/0/1/1/100 interface_description "Interface 0000:24:00.0" admin_status up
           - setTable default.bgp.1.peer-group.iBGP_1.ipv4.unicast table_type bgp.pg type 1
           - '[ "set default.bgp.1.peer-group.iBGP_1.ipv4.unicast prefix4 {}.{}.{}.0/24".format(P1,P2,P3) for P1 in range(89,90) for P2 in range(0,1) for P3 in range(0,2)]'
+          - setObjectsFromJsonFile jsonObjects.json
 """
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
@@ -59,6 +65,7 @@ class test_aioRestRtbrick(unittest.TestCase):
         print(yaml.load(myRunbook.configDict["config"]["steps"][0]['record']['output'][1]['output'])['request'])
         print(yaml.load(myRunbook.configDict["config"]["steps"][0]['record']['output'][2]['output'])['request'])
         print(yaml.load(myRunbook.configDict["config"]["steps"][0]['record']['output'][3]['output'])['request'])
+        print(yaml.load(myRunbook.configDict["config"]["steps"][0]['record']['output'][4]['output'])['request'])
 
 
 

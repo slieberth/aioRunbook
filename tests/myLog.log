@@ -15,5 +15,7 @@ INFO:root:200
 DEBUG:root:commandList: ['setTable default.bgp.1.peer-group.iBGP_1.ipv4.unicast table_type bgp.pg type 1']
 DEBUG:root:commandList: ['set default.bgp.1.peer-group.iBGP_1.ipv4.unicast prefix4 89.0.0.0/24', 'set default.bgp.1.peer-group.iBGP_1.ipv4.unicast prefix4 89.0.1.0/24']
 INFO:root:200
+DEBUG:root:commandList: ['setObjectsFromJsonFile jsonObjects.json']
+INFO:root:200
 INFO:root:waiting for background tasks to be done
 INFO:root:background tasks done
