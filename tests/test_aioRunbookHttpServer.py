@@ -10,7 +10,6 @@
 # Contributors:
 #     Stefan Lieberth - initial implementation, API, and documentation
 
-"""Unit tests for aioRunbookScheduler connection API"""
 
 import asyncio
 from copy import copy
@@ -23,22 +22,30 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 from aioRunbook.aioRunbookHttpServer import aioRunbookHttpServer
-#import aioRunbook
 import pprint
 import yaml
 from aiohttp.web import Application, Response, StreamResponse, run_app
 
-from six import StringIO
 
-
-class test_aioRunbookScheduler(unittest.TestCase):
+class test_aioRunbookHttpServer(unittest.TestCase):
 
     def test_app1(self):
-        myHttpServer = aioRunbookHttpServer()
-
+        ymlConfigString = """#
+runbookDirs:
+  - "./testDir1"
+  - "./testDir2"
+  - "./testDir3"
+httpPort: 4711  
+user: test
+password: test"""
+        fh = open("aioServerConfig.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        myHttpServer = aioRunbookHttpServer("aioServerConfig.yml")
         loop = asyncio.get_event_loop()
-        app = loop.run_until_complete(myHttpServer.init(loop))
-        run_app(app)
+        app = myHttpServer.init(loop)
+        if app != None:
+            loop.run_until_complete(run_app(app,port=myHttpServer.httpPort))
 
 if __name__ == '__main__':
     logLevel = logging.ERROR
@@ -47,12 +54,11 @@ if __name__ == '__main__':
     logging.getLogger().setLevel(logLevel)
     console = logging.StreamHandler()
     console.setLevel(logLevel)
-    # set a format which is simpler for console use
     formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
     console.setFormatter(formatter)
     logging.getLogger("").addHandler(console)
-
-    unittest.main()
-
+    #unittest.main()
+    myTest = test_aioRunbookHttpServer()
+    myTest.test_app1()
 
 

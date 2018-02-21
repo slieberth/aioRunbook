@@ -1,21 +1,7 @@
-INFO:root:reading config file: test.yml
-DEBUG:root:configured hostfiles: []
-INFO:root:configured varFiles: []
+INFO:root:reading config file: aioServerConfig.yml
 DEBUG:asyncio:Using selector: KqueueSelector
-INFO:root:execSteps kwargs:{}
-INFO:root:start loop 1
-DEBUG:root:set stepRangeList Indexes to [0]
-DEBUG:root:_asyncTestStep kwargs: {}
-DEBUG:root:async step: 1 started test conversation to JSON
-DEBUG:root:checking hostReferenceName test
-DEBUG:root:commandList: ['get default.bgp.peer peer_ipv4_address 1.1.1.1']
-INFO:root:200
-DEBUG:root:commandList: ['set global.interface.logical.config interface_name ifl-0/0/1/1/100 interface_description "Interface 0000:24:00.0" admin_status up']
-INFO:root:200
-DEBUG:root:commandList: ['setTable default.bgp.1.peer-group.iBGP_1.ipv4.unicast table_type bgp.pg type 1']
-DEBUG:root:commandList: ['set default.bgp.1.peer-group.iBGP_1.ipv4.unicast prefix4 89.0.0.0/24', 'set default.bgp.1.peer-group.iBGP_1.ipv4.unicast prefix4 89.0.1.0/24']
-INFO:root:200
-DEBUG:root:commandList: ['setObjectsFromJsonFile jsonObjects.json']
-INFO:root:200
-INFO:root:waiting for background tasks to be done
-INFO:root:background tasks done
+INFO:aiohttp.access:127.0.0.1 [21/Feb/2018:20:17:23 +0000] "GET / HTTP/1.1" 200 1456 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [21/Feb/2018:20:17:24 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 2911 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [21/Feb/2018:20:17:31 +0000] "GET /viewYamlFile?file=test11.yml&dir=testDir1 HTTP/1.1" 404 172 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [21/Feb/2018:20:18:54 +0000] "GET /execYamlFile?file=test11.yml&dir=testDir1 HTTP/1.1" 404 172 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [21/Feb/2018:20:18:58 +0000] "GET /viewResultDict?file=test11.yml&dir=testDir1 HTTP/1.1" 404 172 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"

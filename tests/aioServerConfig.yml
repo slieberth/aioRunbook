@@ -1,0 +1,8 @@
+#
+runbookDirs:
+  - "./testDir1"
+  - "./testDir2"
+  - "./testDir3"
+httpPort: 4711  
+user: test
+password: test

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ioRunbook.listDir</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<style>
+body {margin:0;}
+
+.topnav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href={{root}}>home</a>
+   {% for NavDir in runbookDirSplitDirs|sort %}
+  <a href={{root}}/listDir?dir={{NavDir}}>{{NavDir}}</a>
+   {% endfor %}
+</div>
+
+
+<div class="container-fluid">
+   
+<h4> list of runbooks in {{yamlDir}}  </h4> 
+
+   {% for filename in fileList|sort %}
+   <div class="row">
+      <div class="col-sm-4" style="background-color:#eeeeee;">{{filename}}</div>
+      <div class="col-sm-1" style="background-color:#eeeeee;">edit
+        <a href="{{root}}/viewYamlFile?file={{filename}}&dir={{yamlDir}}"><span class="glyphicon glyphicon-pencil"></span></a>
+        </div>
+      <div class="col-sm-1" style="background-color:#eeeeee;">
+        <a href="{{root}}/execYamlFile?file={{filename}}&dir={{yamlDir}}"><span class="glyphicon glyphicon-play"></span></a>
+        </div>
+      <div class="col-sm-2" style="background-color:#eeeeee;">{{jsonDateDict[filename]}}
+        <a href="{{root}}/viewResultDict?file={{filename}}&dir={{yamlDir}}"><span class="glyphicon glyphicon-list"></span></a>
+        </div>
+   </div>
+   {% endfor %}
+
+</body>
+</html>
+
+
