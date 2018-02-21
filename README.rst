@@ -14,8 +14,8 @@ Installation
     pip3 install git+https://github.com/slieberth/aioRunbook.git
 
 
-Hello-World
-===========
+Hello-World aioRunbookScheduler
+===============================
 
 .. code-block:: python
 
@@ -37,5 +37,30 @@ Hello-World
     loop = asyncio.get_event_loop()
     loop.run_until_complete(myRunbook.execSteps(loop))
     print(myRunbook.configDict["config"]["steps"][0]['record']['output'])
+
+Hello-World aioRunbookHttpServer
+================================
+
+.. code-block:: python
+
+    from aioRunbook.aioRunbookHttpServer import aioRunbookHttpServer
+    from aiohttp.web import Application, Response, StreamResponse, run_app
+
+    ymlConfigString = """#
+    runbookDirs:
+      - "./testDir1"
+      - "./testDir2"
+      - "./testDir3"
+    httpPort: 4711  
+    user: test
+    password: test"""
+    fh = open("aioServerConfig.yml",'w')
+    fh.write(ymlConfigString)
+    fh.close()
+    myHttpServer = aioRunbookHttpServer("aioServerConfig.yml")
+    loop = asyncio.get_event_loop()
+    app = myHttpServer.init(loop)
+    if app != None:
+        loop.run_until_complete(run_app(app,port=myHttpServer.httpPort))
 
 

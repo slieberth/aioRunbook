@@ -29,6 +29,7 @@ import re
 import datetime
 from aiohttp import web
 import os
+import time
 
 from .aioRunbookScheduler import aioRunbookScheduler
 #from .views import index
@@ -60,6 +61,7 @@ class aioRunbookHttpServer():
         #aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('/Users/slieberth/git/aioRunbook/aioRunbook/templates'))
         app.router.add_get('/', self.index)
         app.router.add_get('/listDir', self.listDir)
+        app.router.add_get('/execYamlFile', self.execYamlFile)
         if self.configLoaded:
             return app
         else:
@@ -91,6 +93,53 @@ class aioRunbookHttpServer():
         fileList = self.runbookDict[yamlDir]
         jsonDateDict = self._upDateJsonDateDict(yamlDir)
         print(jsonDateDict)
+        return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
+                "jsonDateDict":jsonDateDict}
+
+    @aiohttp_jinja2.template('listDir.html')
+    async def execYamlFile(self,request):
+        root="http://"+request.host
+        all_args = request.query
+        print(all_args)
+        if "dir" in all_args.keys():
+            yamlDir = all_args["dir"]
+        else:
+            yamlDir = None 
+        yamFileName  = None
+        if "file" in all_args.keys():
+            yamFileName = all_args["file"]
+        if yamlDir != None and yamFileName  != None:
+            yamlFilePath = os.sep.join([yamlDir,yamFileName])
+            print (yamlFilePath)
+            try:
+                with open(yamlFilePath) as fh:
+                    YamlDictString = fh.read ()
+                    fh.close ()
+            except:
+                logging.error('cannot open configFile {}'.format(yamlFilePath))
+                return 'cannot open configFile {}'.format(yamlFilePath)
+            else:
+                try:
+                    myRunbook = aioRunbookScheduler(yamlFilePath)
+                    loop = asyncio.get_event_loop()
+                    threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,) 
+                    #loop.run_until_complete(myRunbook.execSteps(loop,threadExecutor)) 
+                    await myRunbook.execSteps(loop,threadExecutor)
+                    #pprint.pprint(myRunbook.configDict)
+                    #logging.debug("adding background tasks {}".format(stepDict["name"]))  
+                    #threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,)                      
+                    #bgTask = eventLoop.create_task(myRunbook.execSteps(loop,threadExecutor))
+                except:
+                    logging.error('cannot run  aioRunbookScheduler {}'.format(yamlFilePath))
+                    return 'cannot run  aioRunbookScheduler {}'.format(yamlFilePath)
+                else:
+                    #pprint.pprint(myRunbook.configDict)
+                    await myRunbook.saveConfigDictToJsonFile()
+                    pass
+        fileList = self.runbookDict[yamlDir]
+        jsonDateDict = self._upDateJsonDateDict(yamlDir)
+        print(jsonDateDict)
+
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
                 "jsonDateDict":jsonDateDict}
 
@@ -126,11 +175,12 @@ class aioRunbookHttpServer():
         fileList = self.runbookDict[yamlDir]
         jsonDateDict = {}
         dateList  = []
-        for x in fileList:
-            #print(x)
-            #print(os.sep.join([yamlDir,x]))
+        for yamFileName in fileList:
+            yamlFilePath = os.sep.join([yamlDir,yamFileName])
+            #print(yamlFilePath)
+            #print(os.path.getmtime(yamlFilePath[:-4]+".json"))
             try: 
-                modTime = time.strftime("%d.%m.%Y %H:%M:%S",time.localtime(os.path.getmtime(x[:-4]+".json")))
+                modTime = time.strftime("%d.%m.%Y %H:%M:%S",time.localtime(os.path.getmtime(yamlFilePath[:-4]+".json")))
             except:
                 modTime = "n/a"
             dateList.append(modTime)
