@@ -45,6 +45,7 @@ Hello-World aioRunbookHttpServer
 
     from aioRunbook.aioRunbookHttpServer import aioRunbookHttpServer
     from aiohttp.web import Application, Response, StreamResponse, run_app
+    import asyncio
 
     ymlConfigString = """#
     runbookDirs:
