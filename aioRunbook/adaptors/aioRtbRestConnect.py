@@ -13,7 +13,8 @@
 #  \version   0.1.3
 #  \date      01.02.2018
 #  \modification:
-#  0.1.1 - get started
+#  0.1.2 - get started
+#  0.1.2 - completed COMMAND_DICT
 
 
  #  \modification
@@ -32,22 +33,23 @@ import sys
 import aiohttp
 from aioRunbook.tools.helperFunctions import _isInDictionary, _addTimeStampsToStepDict
 
-COMMAND_DICT = {"setObjectsFromJsonFile"    : {},
-                "delObjectsFromJsonFile"    : {},
-                "setTableFromJsonFile"      : {},
-                "delTableFromJsonFile"      : {},
+COMMAND_DICT = {"setObjectsFromJsonFile"    : { "urlSuffix": "/bds/object/add", "httpCommand": "POST" },
+                "delObjectsFromJsonFile"    : { "urlSuffix": "/bds/object/delete", "httpCommand": "POST" },
+                "setTableFromJsonFile"      : { "urlSuffix": "/bds/table", "httpCommand": "POST" },
+                "delTableFromJsonFile"      : { "urlSuffix": "/bds/table", "httpCommand": "POST" },
                 "set"                       : { "urlSuffix": "/bds/object/add", "httpCommand": "POST" },
-                "setTable"                  : {},
+                "setTable"                  : { "urlSuffix": "/bds/table/create", "httpCommand": "POST" },
                 "setObject"                 : { "urlSuffix": "/bds/object/add", "httpCommand": "POST" },
-                "delete"                    : {},
-                "del"                       : {},
-                "delObject"                 : {},
-                "delTable"                  : {},
-                "show"                      : {},
-                "get"                       : {},
-                "["                         : {},
-                "cmd"                       : {},
-                "dump"                      : {} }           
+                "delete"                    : { "urlSuffix": "/bds/object/delete", "httpCommand": "POST" },
+                "del"                       : { "urlSuffix": "/bds/object/delete", "httpCommand": "POST" },
+                "delObject"                 : { "urlSuffix": "/bds/object/delete", "httpCommand": "POST" },
+                "delTable"                  : { "urlSuffix": "/bds/table/delete", "httpCommand": "POST" },
+                "show"                      : { "urlSuffix": "/bds/object/get", "httpCommand": "POST" },
+                "get"                       : { "urlSuffix": "/bds/object/get", "httpCommand": "POST" },
+                "["                         : {},           #List comprehensen ... will be set below ... 
+                "cmd"                       : { "urlSuffix": "/bds/object/get", "httpCommand": "POST" },
+                "dump"                      : { "urlSuffix": "/bds/object/walk", "httpCommand": "POST" },      
+                "walk"                      : { "urlSuffix": "/bds/object/walk", "httpCommand": "POST" }}        
 
 
 class aioRtbRestConnect:
@@ -123,11 +125,12 @@ class aioRtbRestConnect:
                         requestData["objects"] =  []
                         for execCommand in commandChunk:            
                             _cmdInCommandStr, _bdsTableString, _attributeDict = self._splitCommandLine(execCommand)
+                            #print(_cmdInCommandStr, _bdsTableString, _attributeDict)
                             requestData["objects"].append({})
                             requestData["objects"][-1]["attribute"] = _attributeDict
                             headers = {'Content-Type': 'application/json'}  
-                            urlSuffix = COMMAND_DICT["set"]["urlSuffix"]  
-                            httpCommand = COMMAND_DICT["set"]["httpCommand"] 
+                            urlSuffix = COMMAND_DICT[_cmdInCommandStr]["urlSuffix"]  
+                            httpCommand = COMMAND_DICT[_cmdInCommandStr]["httpCommand"] 
                             url = 'http://'+self.hostname+":"+str(self.port)+urlSuffix
                             try:       
                                 async with session.post(url,

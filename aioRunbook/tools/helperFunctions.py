@@ -193,3 +193,21 @@ def _setHostfileAttributes(stepDict,hostDict):
         for dictKey in hostDictEntry.keys():
             if dictKey not in stepDict:
                 if dictKey in hostDictEntry.keys(): stepDict[dictKey] = hostDictEntry[dictKey]
+
+
+def _getOutputInformationTag(stepCommandOutput):
+        return "loop_{}_step_{}_command_{}".format\
+               (stepCommandOutput["loopCounter"],
+                stepCommandOutput["stepCounter"], 
+                stepCommandOutput["commandCounter"])
+
+def _decomposeOutputInformationTag(outputInformationTag):
+        splitList = outputInformationTag.split("_")
+        if len(splitList) == 4:
+            return int(splitList[1]),int(splitList[3]),None
+        elif len(splitList) == 6:
+            return int(splitList[1]),int(splitList[3]),int(splitList[5])
+        else:
+            logging.error("error _decomposeOutputInformationTag: {}".format(outputInformationTag))
+            return None,None,None
+

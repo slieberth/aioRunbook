@@ -6,22 +6,14 @@ INFO:root:execSteps kwargs:{}
 INFO:root:start loop 1
 DEBUG:root:set stepRangeList Indexes to [0]
 DEBUG:root:_asyncTestStep kwargs: {}
-DEBUG:root:async step: 1 started check previous step
-DEBUG:root:checking hostReferenceName check
-DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
-DEBUG:root: checkCommandOffsetFromLastCommand set to -1
-DEBUG:root:diffSource  previousLoop 
-INFO:root:check/await analyserfuntion returns: True
-INFO:root:waiting for background tasks to be done
-INFO:root:background tasks done
-INFO:root:start loop 2
-DEBUG:root:set stepRangeList Indexes to [0]
-DEBUG:root:_asyncTestStep kwargs: {}
-DEBUG:root:async step: 1 started check previous step
-DEBUG:root:checking hostReferenceName check
-DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
-DEBUG:root: checkCommandOffsetFromLastCommand set to -1
-DEBUG:root:diffSource  previousLoop 
-INFO:root:check/await analyserfuntion returns: True
+DEBUG:root:async step: 1 started test conversation to JSON
+DEBUG:root:checking hostReferenceName test
+DEBUG:root:commandList: ['get default.bgp.peer peer_ipv4_address 1.1.1.1']
+INFO:root:200
+DEBUG:root:commandList: ['set global.interface.logical.config interface_name ifl-0/0/1/1/100 interface_description "Interface 0000:24:00.0" admin_status up']
+INFO:root:200
+DEBUG:root:commandList: ['setTable default.bgp.1.peer-group.iBGP_1.ipv4.unicast table_type bgp.pg type 1']
+DEBUG:root:commandList: ['set default.bgp.1.peer-group.iBGP_1.ipv4.unicast prefix4 89.0.0.0/24', 'set default.bgp.1.peer-group.iBGP_1.ipv4.unicast prefix4 89.0.1.0/24']
+INFO:root:200
 INFO:root:waiting for background tasks to be done
 INFO:root:background tasks done

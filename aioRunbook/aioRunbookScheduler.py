@@ -56,6 +56,7 @@ from aioRunbook.analyzers.diffCheck import diffCheck
 from aioRunbook.caching.cacheCheckResults import cacheCheckResults
 from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeVarsInString, _addTimeStampsToStepDict
 from aioRunbook.tools.helperFunctions import _createOutputList, _setHostfileAttributes
+from aioRunbook.tools.helperFunctions import _getOutputInformationTag,_decomposeOutputInformationTag
 from aioRunbook.tools.aioRunbookYmlBlockParser import aioRunbookYmlBlockParser
 
 _GENENERIC_TIMEOUT = 60 #set generic timeout to 60 seconds
@@ -100,7 +101,7 @@ class aioRunbookScheduler():
     def __init__(self,configFile):    
         self.errorCounter = 0
         self.configLoaded = self._readYamlFile(configFile)
-        #self.loops = 1
+        self.resultDict = {}
 
     @classmethod
     def errorAdaptor(self,stepDict):
@@ -400,7 +401,18 @@ class aioRunbookScheduler():
                     await self._asyncTestStep(stepDict,eventLoop,threadExecutor,**kwargs)  
             logging.info("waiting for background tasks to be done")   
             await awaitOpenedTasksToBeDone(numberOfTasksBeforeStart)
-            logging.info("background tasks done")   
+            logging.info("background tasks done")
+            # copy result output containers to resultList
+            for stepContainer in self.configDict["config"]["steps"]:
+                stepId = list(stepContainer.keys())[0]
+                if "output" in stepContainer[stepId].keys():
+                    for stepCommandOutput in stepContainer[stepId]["output"]:
+                        outputInformationTag = _getOutputInformationTag(stepCommandOutput)
+                        #outputInformationTag = ("loop_{}_step_{}_command_{}".format\
+                        #       (stepCommandOutput["loopCounter"],
+                        #        stepCommandOutput["stepCounter"], 
+                        #        stepCommandOutput["commandCounter"]))
+                        self.resultDict[outputInformationTag]=stepCommandOutput 
         return True
 
 

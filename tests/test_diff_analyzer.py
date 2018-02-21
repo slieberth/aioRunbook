@@ -164,7 +164,7 @@ config:
         commands:
           - 'pip3 freeze'
     - check:
-        name: check previous step 
+        name: comapre againt previous step 
         method: local-shell
         commands:
           - 'pip3 freeze'

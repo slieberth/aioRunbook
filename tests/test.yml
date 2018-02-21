@@ -1,11 +1,14 @@
-#
 config:
-  loops: 2
   steps:
-    - check:
-        name: check previous step 
-        method: local-shell
-        commands:
-          - 'pip3 freeze'
-        checkMethod: diff
-        diffSource: previousLoop
+    - record:
+        name: "test conversation to JSON"
+        method: rest
+        vendor: rtbrick 
+        device: 127.0.0.1
+        port: 8080
+        includeRequestInOutput: true
+        commands: 
+          - get default.bgp.peer peer_ipv4_address 1.1.1.1
+          - set global.interface.logical.config interface_name ifl-0/0/1/1/100 interface_description "Interface 0000:24:00.0" admin_status up
+          - setTable default.bgp.1.peer-group.iBGP_1.ipv4.unicast table_type bgp.pg type 1
+          - '[ "set default.bgp.1.peer-group.iBGP_1.ipv4.unicast prefix4 {}.{}.{}.0/24".format(P1,P2,P3) for P1 in range(89,90) for P2 in range(0,1) for P3 in range(0,2)]'
