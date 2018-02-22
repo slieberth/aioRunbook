@@ -408,10 +408,6 @@ class aioRunbookScheduler():
                 if "output" in stepContainer[stepId].keys():
                     for stepCommandOutput in stepContainer[stepId]["output"]:
                         outputInformationTag = _getOutputInformationTag(stepCommandOutput)
-                        #outputInformationTag = ("loop_{}_step_{}_command_{}".format\
-                        #       (stepCommandOutput["loopCounter"],
-                        #        stepCommandOutput["stepCounter"], 
-                        #        stepCommandOutput["commandCounter"]))
                         self.resultDict[outputInformationTag]=stepCommandOutput 
         return True
 
@@ -439,6 +435,47 @@ class aioRunbookScheduler():
         logging.info('saving configDict to Json: {}'.format(jsonConfigFile))
         with open(jsonConfigFile, 'w') as outfile:          ###FIXME potential error if file cannot be written
             json.dump(self.configDict, outfile)
+
+    async def saveResultDictToJsonFile (self,*args):
+        if len(args) > 0:
+            jsonConfigFile = args[0]
+        else:
+            yamlConfigFile = self.yamlConfigFile
+            if yamlConfigFile.endswith(".yml"):
+                jsonConfigFile = yamlConfigFile[:-4] + "_outputs.json"
+            elif yamlConfigFile.endswith(".yaml"):
+                jsonConfigFile = yamlConfigFile[:-5] + "_outputs.json"
+            else:
+                logging.error('saveResultDictToJsonFile cannot detect json file name')
+                return
+        logging.info('saving resultDict to Json: {}'.format(jsonConfigFile))
+        try:
+            with open(jsonConfigFile, 'w') as outfile:     
+                json.dump(self.resultDict, outfile)
+        except:
+            error.logging("error writing saveResultDictToJsonFile {}".format(jsonConfigFile))
+
+    async def getResultFileContent (self,*args):
+        print(args)
+        if len(args) > 1:  # has loop as first attr
+            jsonConfigFile = args[1]
+        else:
+            yamlConfigFile = self.yamlConfigFile
+            if yamlConfigFile.endswith(".yml"):
+                jsonConfigFile = yamlConfigFile[:-4] + "_outputs.json"
+            elif yamlConfigFile.endswith(".yaml"):
+                jsonConfigFile = yamlConfigFile[:-5] + "_outputs.json"
+            else:
+                logging.error('getResultFileContent cannot detect json file name')
+                return
+        logging.info('getResultFileContent Json: {}'.format(jsonConfigFile))
+        try:
+            with open(jsonConfigFile, 'r') as infile:     
+                resultDict = json.load(infile)
+                return resultDict
+        except:
+            error.logging("error reading getResultFileContent {}".format(jsonConfigFile))
+            return {}
 
     async def updateConfigDictStepInJsonFile (self,jsonConfigFile,stepListToBeUpdated):
         """coroutine to update specifc parts of the configDict.
@@ -469,4 +506,7 @@ class aioRunbookScheduler():
         logging.info('loading configDict from Json: {}'.format(jsonConfigFile))
         with open(jsonConfigFile) as infile:                ###FIXME potential error if file cannot be read
             self.configDict = json.load(infile)
+
+
+
 

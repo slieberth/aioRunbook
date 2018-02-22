@@ -27,12 +27,32 @@ from copy import deepcopy
 import pprint
 import re
 import datetime
+from textwrap import dedent
+
+import base64
+from cryptography import fernet
 from aiohttp import web
+from aiohttp_session import setup as setup_session
+from aiohttp_session.cookie_storage import EncryptedCookieStorage
+from aiohttp_security import setup as setup_security
+from aiohttp_security import SessionIdentityPolicy
+
+from aiohttp_security import (
+    remember, forget, authorized_userid,
+    has_permission, login_required,
+)
+
+from .auth.authz import DictionaryAuthorizationPolicy, check_credentials
+from .auth.handlers import configure_handlers
+#from demo.dictionary_auth.users import user_map
+
 import os
 import time
+from collections import namedtuple
+
 
 from .aioRunbookScheduler import aioRunbookScheduler
-#from .views import index
+from aioRunbook.tools.helperFunctions import _getOutputInformationTag,_decomposeOutputInformationTag
 import textwrap
 
 from aiohttp.web import Application, Response, StreamResponse, run_app
@@ -60,15 +80,33 @@ class aioRunbookHttpServer():
         aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('../aioRunbook/templates'))
         #aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('/Users/slieberth/git/aioRunbook/aioRunbook/templates'))
         app.router.add_get('/', self.index)
+        app.router.add_get('/login', self.login)
+        app.router.add_get('/logout', self.logout)
+        app.router.add_get('/home', self.home)
         app.router.add_get('/listDir', self.listDir)
         app.router.add_get('/execYamlFile', self.execYamlFile)
+        app.router.add_get('/viewResultFile', self.viewResultFile)
+        app.user_map = self.user_map
+        configure_handlers(app)
+
+        # secret_key must be 32 url-safe base64-encoded bytes
+        fernet_key = fernet.Fernet.generate_key()
+        secret_key = base64.urlsafe_b64decode(fernet_key)
+
+        storage = EncryptedCookieStorage(secret_key, cookie_name='API_SESSION')
+        setup_session(app, storage)
+
+        policy = SessionIdentityPolicy()
+        setup_security(app, policy, DictionaryAuthorizationPolicy(self.user_map))
+
         if self.configLoaded:
             return app
         else:
             return None
 
+    @has_permission('protected')
     @aiohttp_jinja2.template('index.html')
-    async def index(self,request):
+    async def home(self,request):
         root="http://"+request.host
         #print (self.runbookDirs)
         self.runbookDirSplitDirs = []
@@ -80,8 +118,64 @@ class aioRunbookHttpServer():
         #print(self.runbookDict)
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs}
 
-#    @aiohttp_jinja2.template('listDir.html')
+    #@has_permission('protected')
+    @aiohttp_jinja2.template('index.html')
+    async def index(self,request):
+        username = await authorized_userid(request)
+        root="http://"+request.host
+        if username:
+            #print (self.runbookDirs)
+            self.runbookDirSplitDirs = []
+            self.runbookDict = {}
+            for runbookDir in self.runbookDirs:
+                runbookDirSplitDir = os.path.abspath(runbookDir).split(os.sep)[-1]
+                self.runbookDirSplitDirs.append(runbookDirSplitDir)
+                self.runbookDict[runbookDirSplitDir] = [f for f in os.listdir(runbookDir) if f.endswith('.yml')]
+                #template = index_template.format(
+                #message='Hello, {username}!'.format(username=username))
+            return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"username":username}
+        else:
+            index_template = dedent("""
+                <!doctype html>
+                    <head></head>
+                    <body>
+                        <form action="/login" method="post">
+                            <input type="text" name="username">
+                            <input type="password" name="password">
+                            <input type="submit" value="Login">
+                        </form>
+                    </body>
+            """)
+            template = index_template.format()
+            return {"root":root,"username":None}
+            #return web.Response(text=template,content_type='text/html',)
 
+
+    async def login(self,request):
+        response = web.HTTPFound('/')
+        form = await request.post()
+        username = form.get('username')
+        password = form.get('password')
+        verified = await check_credentials(
+            request.app.user_map, username, password)
+        if verified:
+            await remember(request, response, username)
+            return response
+        return web.HTTPUnauthorized(body='Invalid username / password combination')
+
+    @aiohttp_jinja2.template('index.html')
+    async def logout(self,request):
+        root="http://"+request.host
+        response = web.Response(
+            text='You have been logged out',
+            content_type='text/html',
+        )
+        await forget(request, response)
+        #template = index_template.format()
+        #return web.Response(text=template,content_type='text/html',)
+        return {"root":root,"username":None}
+
+    @has_permission('protected')
     @aiohttp_jinja2.template('listDir.html')
     async def listDir(self,request):
         root="http://"+request.host
@@ -96,6 +190,7 @@ class aioRunbookHttpServer():
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
                 "jsonDateDict":jsonDateDict}
 
+    @has_permission('protected')
     @aiohttp_jinja2.template('listDir.html')
     async def execYamlFile(self,request):
         root="http://"+request.host
@@ -135,13 +230,68 @@ class aioRunbookHttpServer():
                 else:
                     #pprint.pprint(myRunbook.configDict)
                     await myRunbook.saveConfigDictToJsonFile()
+                    await myRunbook.saveResultDictToJsonFile()
                     pass
         fileList = self.runbookDict[yamlDir]
         jsonDateDict = self._upDateJsonDateDict(yamlDir)
-        print(jsonDateDict)
+        #print(jsonDateDict)
 
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
                 "jsonDateDict":jsonDateDict}
+
+    @has_permission('protected')
+    @aiohttp_jinja2.template('viewResultFile.html')
+    async def viewResultFile(self,request):
+        root="http://"+request.host
+        all_args = request.query
+        #print(all_args)
+        if "dir" in all_args.keys():
+            yamlDir = all_args["dir"]
+        else:
+            yamlDir = None 
+        yamFileName  = None
+        if "file" in all_args.keys():
+            yamFileName = all_args["file"]
+        if yamlDir != None and yamFileName  != None:
+            yamlFilePath = os.sep.join([yamlDir,yamFileName])
+            #print (yamlFilePath)
+            try:
+                with open(yamlFilePath) as fh:
+                    YamlDictString = fh.read ()
+                    fh.close ()
+            except:
+                logging.error('cannot open configFile {}'.format(yamlFilePath))
+                return 'cannot open configFile {}'.format(yamlFilePath)
+            else:
+                try:
+                    myRunbook = aioRunbookScheduler(yamlFilePath)
+                    loop = asyncio.get_event_loop()
+                    resultDict = await myRunbook.getResultFileContent(loop)
+                except:
+                    resultDict = None
+                    logging.error('cannot load resultDict aioRunbookScheduler {}'.format(yamlFilePath))
+                    return 'cannot load resultDict aioRunbookScheduler {}'.format(yamlFilePath)
+        #pprint.pprint(resultDict)
+        fileList = self.runbookDict[yamlDir]
+        jsonDateDict = self._upDateJsonDateDict(yamlDir)
+        stepCommandOutputs = []
+        stepCommandOutputIds = []
+        for cmdOutputId in resultDict.keys():
+            loopCounter,stepCounter,cmdCounter = _decomposeOutputInformationTag(cmdOutputId)
+            stepCommandOutputId =  loopCounter*1000000+stepCounter*1000+cmdCounter
+            stepCommandOutputIds.append(stepCommandOutputId)
+            resultDict[cmdOutputId]["Id"] = stepCommandOutputId
+        stepCommandOutputIds.sort()
+        #print(stepCommandOutputIds)
+        #pprint.pprint(resultDict)
+        for Id in stepCommandOutputIds:
+            stepCommandOutputs.append([ resultDict[x] for x in resultDict.keys() if resultDict[x]["Id"] == Id ][0])
+        #print(jsonDateDict)
+
+        return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
+                "jsonDateDict":jsonDateDict, "stepCommandOutputs":stepCommandOutputs,"filename":yamFileName}
+
+
 
 
     def _readYamlFile (self,configFile):
@@ -169,6 +319,10 @@ class aioRunbookHttpServer():
             self.httpPort = self.configDict["httpPort"]
         except:
             self.httpPort = 8080
+        userNamedTuple = namedtuple('User', ['username', 'password', 'permissions'])
+        self.user_map = {user.username: user for user in [userNamedTuple(self.configDict["user"],self.configDict["password"], ('protected'))]}
+        pprint.pprint(self.user_map)
+        #{'test': User(username='test', password='test', permissions=('protected',))}
         return True
 
     def _upDateJsonDateDict (self,yamlDir):

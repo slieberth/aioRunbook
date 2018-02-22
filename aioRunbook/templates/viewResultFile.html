@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>ioRunbook.listDir</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<style>
+body {margin:0;}
+
+.topnav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <a href={{root}}>home</a>
+   {% for NavDir in runbookDirSplitDirs|sort %}
+  <a href={{root}}/listDir?dir={{NavDir}}>{{NavDir}}</a>
+   {% endfor %}
+    <ul class="nav navbar-nav navbar-right">
+     <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+    </ul>
+</div>
+
+
+<div class="container-fluid">
+   
+<h3> Output of the loops/steps/commands of runbook {{filename}}</h3> 
+   <div class="row no-gutters">
+      <div class="col-sm-1" style="background-color:#eee0ee;" >lllsssccc</div>
+      <div class="col-sm-2" style="background-color:#eee0ee;" >name</div>
+      <div class="col-sm-8" style="background-color:#eee0ee;" >command output</div>
+      <div class="col-sm-1" style="background-color:#eee0ee;" >pass</div>
+   </div>
+
+    {% for step in stepCommandOutputs %}
+   <div class="row no-gutters">
+      <div class="col-sm-1" style="background-color:#eeeeee;" >{{step["Id"]}}</div>
+      <div class="col-sm-2" style="background-color:#eeeeee;" >{{step["name"]|truncate(16)}}</div>
+      <div class="col-sm-8" style="background-color:#eeeeee;" >   
+        <div id="accordion" role="tablist">
+          <div class="card">
+            <div class="card-header" role="tab" id="heading{{ loop.index }}">
+                <a data-toggle="collapse" href="#collapse{{ loop.index }}" aria-expanded="true" aria-controls="collapse{{ loop.index }}">
+                <span class="glyphicon glyphicon-chevron-up"></span>
+                   {{step["output"]|truncate(60)}}
+                </a>
+            </div>
+            <div id="collapse{{ loop.index }}" class="collapse" role="tabpanel" aria-labelledby="heading{{ loop.index }}" data-parent="#accordion">
+              <div class="card-body">
+                <pre>{{step["output"]}}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if step["pass"] == False %}
+        <div class="col-sm-1" style="background-color:#ff4500;">{{step["pass"]}}</div>
+      {% else %}
+        <div class="col-sm-1" style="background-color:#98FB98;">{{step["pass"]}}</div>
+      {% endif %}
+
+   </div>
+    {% endfor %}
+</div>
+</body>
+</html>
+
+

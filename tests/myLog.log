@@ -1,4 +1,23 @@
 INFO:root:reading config file: aioServerConfig.yml
 DEBUG:asyncio:Using selector: KqueueSelector
-INFO:aiohttp.access:127.0.0.1 [21/Feb/2018:21:19:15 +0000] "GET / HTTP/1.1" 200 1456 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
-INFO:aiohttp.access:127.0.0.1 [21/Feb/2018:21:19:16 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 2927 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:17:15:33 +0000] "GET /logout HTTP/1.1" 200 2057 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:17:15:33 +0000] "GET /login HTTP/1.1" 401 200 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:17:15:34 +0000] "GET / HTTP/1.1" 200 2057 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:17:15:34 +0000] "GET / HTTP/1.1" 200 2057 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:17:15:38 +0000] "POST /login HTTP/1.1" 302 407 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:17:15:38 +0000] "GET / HTTP/1.1" 200 1606 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:17:15:41 +0000] "GET /listDir?dir=testDir2 HTTP/1.1" 200 3059 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:17:15:43 +0000] "GET /logout HTTP/1.1" 200 2143 "http://127.0.0.1:4711/listDir?dir=testDir2" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:17:15:58 +0000] "POST /login HTTP/1.1" 302 407 "http://127.0.0.1:4711/logout" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:17:15:58 +0000] "GET / HTTP/1.1" 200 1606 "http://127.0.0.1:4711/logout" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:17:55:04 +0000] "GET /logout HTTP/1.1" 200 2143 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:18:43:12 +0000] "POST /login HTTP/1.1" 302 407 "http://127.0.0.1:4711/logout" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:18:43:12 +0000] "GET / HTTP/1.1" 200 1606 "http://127.0.0.1:4711/logout" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:18:43:35 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3091 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:root:reading config file: testDir1/test11.yml
+DEBUG:root:configured hostfiles: []
+INFO:root:configured varFiles: []
+INFO:root:getResultFileContent Json: testDir1/test11_outputs.json
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:18:44:18 +0000] "GET /viewResultFile?file=test11.yml&dir=testDir1 HTTP/1.1" 200 6137 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:18:46:47 +0000] "GET / HTTP/1.1" 200 1606 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [22/Feb/2018:18:46:47 +0000] "GET / HTTP/1.1" 200 1606 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
