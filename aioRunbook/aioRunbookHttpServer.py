@@ -84,6 +84,7 @@ class aioRunbookHttpServer():
         app.router.add_get('/logout', self.logout)
         app.router.add_get('/home', self.home)
         app.router.add_get('/listDir', self.listDir)
+        app.router.add_get('/viewYamlFile', self.viewYamlFile)
         app.router.add_get('/execYamlFile', self.execYamlFile)
         app.router.add_get('/viewResultFile', self.viewResultFile)
         app.user_map = self.user_map
@@ -206,6 +207,8 @@ class aioRunbookHttpServer():
         if yamlDir != None and yamFileName  != None:
             yamlFilePath = os.sep.join([yamlDir,yamFileName])
             print (yamlFilePath)
+            fileList = self.runbookDict[yamlDir]
+            jsonDateDict = self._upDateJsonDateDict(yamlDir)
             try:
                 with open(yamlFilePath) as fh:
                     YamlDictString = fh.read ()
@@ -219,23 +222,21 @@ class aioRunbookHttpServer():
                     loop = asyncio.get_event_loop()
                     threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,) 
                     #loop.run_until_complete(myRunbook.execSteps(loop,threadExecutor)) 
-                    await myRunbook.execSteps(loop,threadExecutor)
-                    #pprint.pprint(myRunbook.configDict)
-                    #logging.debug("adding background tasks {}".format(stepDict["name"]))  
-                    #threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,)                      
-                    #bgTask = eventLoop.create_task(myRunbook.execSteps(loop,threadExecutor))
-                except:
-                    logging.error('cannot run  aioRunbookScheduler {}'.format(yamlFilePath))
-                    return 'cannot run  aioRunbookScheduler {}'.format(yamlFilePath)
-                else:
-                    #pprint.pprint(myRunbook.configDict)
-                    await myRunbook.saveConfigDictToJsonFile()
-                    await myRunbook.saveResultDictToJsonFile()
-                    pass
-        fileList = self.runbookDict[yamlDir]
-        jsonDateDict = self._upDateJsonDateDict(yamlDir)
-        #print(jsonDateDict)
+                    #await myRunbook.execSteps(loop,threadExecutor)
+                    #logging.debug("adding background tasks myRunbook.execSteps(loop,threadExecutor)")  
+                    threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,)                      
+                    bgTask = loop.create_task(myRunbook.execStepsAndSaveDicts(loop))
 
+                except Exception as e:
+                    logging.error('cannot run  aioRunbookScheduler {} {}'.format(yamlFilePath,e))
+                    errorMessage =  'cannot run  aioRunbookScheduler {}: {}'.format(yamlFilePath,e)
+                    return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
+                        "jsonDateDict":jsonDateDict,"errorMessage":errorMessage}
+                else:
+                    #await myRunbook.saveConfigDictToJsonFile()
+                    #await myRunbook.saveResultDictToJsonFile()
+                    return web.HTTPFound('{}/listDir?dir={}'.format(root,yamlDir))
+        #print(jsonDateDict)
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
                 "jsonDateDict":jsonDateDict}
 
@@ -287,11 +288,45 @@ class aioRunbookHttpServer():
         for Id in stepCommandOutputIds:
             stepCommandOutputs.append([ resultDict[x] for x in resultDict.keys() if resultDict[x]["Id"] == Id ][0])
         #print(jsonDateDict)
-
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
                 "jsonDateDict":jsonDateDict, "stepCommandOutputs":stepCommandOutputs,"filename":yamFileName}
 
 
+    @has_permission('protected')
+    @aiohttp_jinja2.template('viewYamlFile.html')
+    async def viewYamlFile(self,request):
+        root="http://"+request.host
+        all_args = request.query
+        #print(all_args)
+        if "dir" in all_args.keys():
+            yamlDir = all_args["dir"]
+        else:
+            yamlDir = None 
+        yamFileName  = None
+        if "file" in all_args.keys():
+            yamFileName = all_args["file"]
+        if yamlDir != None and yamFileName  != None:
+            yamlFilePath = os.sep.join([yamlDir,yamFileName])
+            #print (yamlFilePath)
+            try:
+                with open(yamlFilePath) as fh:
+                    yamlLines = [ x.rstrip().replace(" ","&nbsp;") for x in fh.readlines() ]
+                    fh.close ()
+            except Exception as e:
+                logging.error('cannot open configFile {} {}'.format(yamlFilePath,e))
+                return {"errorMessage":'cannot open configFile {} {}'.format(yamlFilePath,e)}
+        fileList = self.runbookDict[yamlDir]
+        return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"yamlLines":yamlLines}
+
+
+#    def saveConfigDictToJsonFile(self,future):
+#         configDict = future.result()
+#         await myRunbook.saveConfigDictToJsonFile()
+#         await myRunbook.saveResultDictToJsonFile()
+#         stepCount = resultBackgroundStepDict["output"][0]["stepCount"]
+#         stepId = resultBackgroundStepDict["output"][0]["stepType"]
+#         self.configDict["config"]["steps"][stepCount][stepId] = resultBackgroundStepDict
+#         pass
 
 
     def _readYamlFile (self,configFile):

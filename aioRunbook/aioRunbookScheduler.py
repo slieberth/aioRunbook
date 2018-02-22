@@ -412,6 +412,14 @@ class aioRunbookScheduler():
         return True
 
 
+    async def execStepsAndSaveDicts (self,eventLoop,**kwargs): 
+            await self.execSteps(self,eventLoop,**kwargs)
+            await self.saveConfigDictToJsonFile()
+            await self.saveResultDictToJsonFile()
+
+
+
+
     async def saveConfigDictToJsonFile (self,*args):
         """coroutine to save the current processed configDict to a JSON File.
 

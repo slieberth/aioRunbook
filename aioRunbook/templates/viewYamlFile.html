@@ -52,25 +52,14 @@ body {margin:0;}
 </div>
 
 
-<div class="container-fluid">
-   
-<h4> list of runbooks in {{yamlDir}}  </h4> 
-
-   {% for filename in fileList|sort %}
-   <div class="row">
-      <div class="col-sm-4" style="background-color:#eeeeee;">{{filename}}</div>
-      <div class="col-sm-1" style="background-color:#eeeeee;">view
-        <a href="{{root}}/viewYamlFile?file={{filename}}&dir={{yamlDir}}"><span class="glyphicon glyphicon-eye-open"></span></a>
-        </div>
-      <div class="col-sm-1" style="background-color:#eeeeee;">
-        <a href="{{root}}/execYamlFile?file={{filename}}&dir={{yamlDir}}"><span class="glyphicon glyphicon-play"></span></a>
-        </div>
-      <div class="col-sm-2" style="background-color:#eeeeee;">{{jsonDateDict[filename]}}
-        <a href="{{root}}/viewResultFile?file={{filename}}&dir={{yamlDir}}"><span class="glyphicon glyphicon-list"></span></a>
-        </div>
-   </div>
-   {% endfor %}
-
+<div class="container-fluid"> 
+  <h3> view runbook {{filename}}</h3> 
+  <div style="padding-left:16px">
+    {% for line in yamlLines %}
+      <div>{{loop.index}}{{line|safe}}</div>
+    {% endfor %}
+  </div>
+</div>
 {% if errorMessage %}
 <div class="alert alert-warning" role="alert">
 	<button type="button" class="close" data-dismiss="alert">×</button>

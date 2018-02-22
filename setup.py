@@ -33,6 +33,8 @@ with open(path.join(base_dir, 'README.rst')) as desc:
 with open(path.join(base_dir, 'version.py')) as version:
     exec(version.read())
 
+#aiohttp-session-2.3.0
+
 setup(name = 'aioRunbook',
       version = __version__,
       author = __author__,
