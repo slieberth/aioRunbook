@@ -356,7 +356,7 @@ class aioRunbookHttpServer():
             self.httpPort = 8080
         userNamedTuple = namedtuple('User', ['username', 'password', 'permissions'])
         self.user_map = {user.username: user for user in [userNamedTuple(self.configDict["user"],self.configDict["password"], ('protected'))]}
-        pprint.pprint(self.user_map)
+        #pprint.pprint(self.user_map)
         #{'test': User(username='test', password='test', permissions=('protected',))}
         return True
 

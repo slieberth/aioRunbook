@@ -19,8 +19,8 @@ for interaction with the netwok elements.
 .. figure::  images/aioRunbook.jpg
    :align:   center
 
-aioRunbook is designed to be controlled by either shell execution respectively an 
-aihttp web microservice (future). 
+aioRunbook is designed to be controlled by either shell execution (aioRunbookScheduler) respectively 
+aihttp web api (aioRunbookHttpServer), which utilizes the procedures from aioRunbookScheduler.
 
 Use cases for aioRunbook are:
 
