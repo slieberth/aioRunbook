@@ -36,8 +36,23 @@ runbookDirs:
   - "./testDir2"
   - "./testDir3"
 httpPort: 4711  
-user: test
-password: test"""
+userAuth:
+- - username: CharlieBrown
+  - password: test
+  - permissions: 
+    - viewResults
+- - username: MissSophie
+  - password: test
+  - permissions: 
+    - viewResults
+    - runTests
+- - username: MajorTom
+  - password: test
+  - permissions: 
+    - viewResults
+    - runTests
+    - editTests
+"""
         fh = open("aioServerConfig.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
@@ -46,6 +61,8 @@ password: test"""
         app = myHttpServer.init(loop)
         if app != None:
             loop.run_until_complete(run_app(app,port=myHttpServer.httpPort))
+        else:
+            logging.error("cannot load app")
 
 if __name__ == '__main__':
     logLevel = logging.ERROR

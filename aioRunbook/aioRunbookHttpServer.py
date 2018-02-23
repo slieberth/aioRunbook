@@ -82,7 +82,6 @@ class aioRunbookHttpServer():
         app.router.add_get('/', self.index)
         app.router.add_get('/login', self.login)
         app.router.add_get('/logout', self.logout)
-        app.router.add_get('/home', self.home)
         app.router.add_get('/listDir', self.listDir)
         app.router.add_get('/viewYamlFile', self.viewYamlFile)
         app.router.add_get('/execYamlFile', self.execYamlFile)
@@ -105,19 +104,19 @@ class aioRunbookHttpServer():
         else:
             return None
 
-    @has_permission('protected')
-    @aiohttp_jinja2.template('index.html')
-    async def home(self,request):
-        root="http://"+request.host
-        #print (self.runbookDirs)
-        self.runbookDirSplitDirs = []
-        self.runbookDict = {}
-        for runbookDir in self.runbookDirs:
-            runbookDirSplitDir = os.path.abspath(runbookDir).split(os.sep)[-1]
-            self.runbookDirSplitDirs.append(runbookDirSplitDir)
-            self.runbookDict[runbookDirSplitDir] = [f for f in os.listdir(runbookDir) if f.endswith('.yml')]
-        #print(self.runbookDict)
-        return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs}
+#     @has_permission('viewResults')
+#     @aiohttp_jinja2.template('index.html')
+#     async def home(self,request):
+#         root="http://"+request.host
+#         #print (self.runbookDirs)
+#         self.runbookDirSplitDirs = []
+#         self.runbookDict = {}
+#         for runbookDir in self.runbookDirs:
+#             runbookDirSplitDir = os.path.abspath(runbookDir).split(os.sep)[-1]
+#             self.runbookDirSplitDirs.append(runbookDirSplitDir)
+#             self.runbookDict[runbookDirSplitDir] = [f for f in os.listdir(runbookDir) if f.endswith('.yml')]
+#         #print(self.runbookDict)
+#         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs}
 
     #@has_permission('protected')
     @aiohttp_jinja2.template('index.html')
@@ -176,7 +175,7 @@ class aioRunbookHttpServer():
         #return web.Response(text=template,content_type='text/html',)
         return {"root":root,"username":None}
 
-    @has_permission('protected')
+    #@has_permission('viewResults')
     @aiohttp_jinja2.template('listDir.html')
     async def listDir(self,request):
         root="http://"+request.host
@@ -191,7 +190,7 @@ class aioRunbookHttpServer():
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
                 "jsonDateDict":jsonDateDict}
 
-    @has_permission('protected')
+    @has_permission('runTests')
     @aiohttp_jinja2.template('listDir.html')
     async def execYamlFile(self,request):
         root="http://"+request.host
@@ -240,7 +239,7 @@ class aioRunbookHttpServer():
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
                 "jsonDateDict":jsonDateDict}
 
-    @has_permission('protected')
+    @has_permission('viewResults')
     @aiohttp_jinja2.template('viewResultFile.html')
     async def viewResultFile(self,request):
         root="http://"+request.host
@@ -292,7 +291,7 @@ class aioRunbookHttpServer():
                 "jsonDateDict":jsonDateDict, "stepCommandOutputs":stepCommandOutputs,"filename":yamFileName}
 
 
-    @has_permission('protected')
+    @has_permission('viewResults')
     @aiohttp_jinja2.template('viewYamlFile.html')
     async def viewYamlFile(self,request):
         root="http://"+request.host
@@ -354,10 +353,18 @@ class aioRunbookHttpServer():
             self.httpPort = self.configDict["httpPort"]
         except:
             self.httpPort = 8080
+        pprint.pprint(self.configDict)
         userNamedTuple = namedtuple('User', ['username', 'password', 'permissions'])
-        self.user_map = {user.username: user for user in [userNamedTuple(self.configDict["user"],self.configDict["password"], ('protected'))]}
+        #self.user_map = {user.username: user for user in [userNamedTuple(self.configDict["user"],self.configDict["password"], ('protected'))]}
+        authUserDict = {}
+        self.user_map = {}
+        for authUser in self.configDict["userAuth"]:
+            #print (authUser[0])
+            user = userNamedTuple(authUser[0]["username"],authUser[1]["password"],authUser[2]["permissions"])
+            self.user_map[authUser[0]["username"]] = userNamedTuple(authUser[0]["username"],authUser[1]["password"],authUser[2]["permissions"])
+            #print (userTest)
+            pass
         #pprint.pprint(self.user_map)
-        #{'test': User(username='test', password='test', permissions=('protected',))}
         return True
 
     def _upDateJsonDateDict (self,yamlDir):
