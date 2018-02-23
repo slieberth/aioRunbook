@@ -399,9 +399,10 @@ class aioRunbookScheduler():
                     bgList.append(bgTask)
                 else:
                     await self._asyncTestStep(stepDict,eventLoop,threadExecutor,**kwargs)  
-            logging.info("waiting for background tasks to be done")   
-            await awaitOpenedTasksToBeDone(numberOfTasksBeforeStart)
+            #logging.info("waiting for background tasks to be done {}".format([task for task in bgList if not task.done()]))   
+            await awaitOpenedTasksToBeDone(numberOfTasksBeforeStart) 
             logging.info("background tasks done")
+            #logging.info("waiting for background tasks to be done {}".format([task for task in bgList if not task.done()])) 
             # copy result output containers to resultList
             for stepContainer in self.configDict["config"]["steps"]:
                 stepId = list(stepContainer.keys())[0]

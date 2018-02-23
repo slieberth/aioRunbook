@@ -74,6 +74,8 @@ class aioRunbookHttpServer():
         self.errorCounter = 0
         self.configLoaded = self._readYamlFile(configFile)
         self.runbookDirSplitDirs = []
+        self.bgList = []
+        self.bgYamlDict = {}
 
     def init(self,loop):
         app = Application()
@@ -186,9 +188,17 @@ class aioRunbookHttpServer():
             yamlDir = None  
         fileList = self.runbookDict[yamlDir]
         jsonDateDict = self._upDateJsonDateDict(yamlDir)
-        print(jsonDateDict)
+        #print(jsonDateDict)
+        if len([task for task in self.bgList if not task.done()]) > 0:
+            bgFileList = []
+            for task in self.bgList:
+                if not task.done():
+                    bgFileList.append(self.bgYamlDict[task])
+            errorMessage = "background tasks to be done {}".format(bgFileList)
+        else:
+            errorMessage = None
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
-                "jsonDateDict":jsonDateDict}
+                "jsonDateDict":jsonDateDict,"errorMessage":errorMessage}
 
     @has_permission('runTests')
     @aiohttp_jinja2.template('listDir.html')
@@ -225,6 +235,14 @@ class aioRunbookHttpServer():
                     #logging.debug("adding background tasks myRunbook.execSteps(loop,threadExecutor)")  
                     threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,)                      
                     bgTask = loop.create_task(myRunbook.execStepsAndSaveDicts(loop))
+                    self.bgList.append(bgTask)
+                    NewBgYamlDict = {}
+                    NewBgYamlDict[bgTask] = yamlFilePath
+                    #cleanup existing list
+                    for existingBgTask in self.bgYamlDict.keys():
+                        if not existingBgTask.done():
+                            NewBgYamlDict[existingBgTask] = self.bgYamlDict[existingBgTask]
+                    self.bgYamlDict = NewBgYamlDict
 
                 except Exception as e:
                     logging.error('cannot run  aioRunbookScheduler {} {}'.format(yamlFilePath,e))

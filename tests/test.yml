@@ -1,12 +1,10 @@
-#
 config:
-  loops: 2
+  hostfiles:
+    - ./host.yml
   steps:
-    - check:
-        name: check previous step 
-        method: local-shell
-        commands:
-          - 'pip3 freeze | tail -n 1'
-          - 'pip3 freeze | tail -n 2'
-        checkMethod: diff
-        diffSource: previousLoop
+    - sleep:
+        name: test sleep 1 sec
+        startInBackground: true
+    - sleep:
+        name: test sleep 2 sec
+        startInBackground: true

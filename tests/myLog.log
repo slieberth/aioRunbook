@@ -1,61 +1,132 @@
 INFO:root:reading config file: aioServerConfig.yml
 DEBUG:asyncio:Using selector: KqueueSelector
 WARNING:aiohttp_session:Cannot decrypt cookie value, create a new fresh session
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:32:20 +0000] "GET /logout HTTP/1.1" 200 2057 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:36:56 +0000] "GET /logout HTTP/1.1" 200 2057 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
 WARNING:aiohttp_session:Cannot decrypt cookie value, create a new fresh session
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:32:23 +0000] "POST /login HTTP/1.1" 302 407 "http://127.0.0.1:4711/logout" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:32:23 +0000] "GET / HTTP/1.1" 200 1606 "http://127.0.0.1:4711/logout" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:32:25 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3096 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:00 +0000] "POST /login HTTP/1.1" 302 407 "http://127.0.0.1:4711/logout" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:00 +0000] "GET / HTTP/1.1" 200 1606 "http://127.0.0.1:4711/logout" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:02 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3102 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
 INFO:root:reading config file: testDir1/test11.yml
 DEBUG:root:configured hostfiles: []
 INFO:root:configured varFiles: []
 INFO:root:getResultFileContent Json: testDir1/test11_outputs.json
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:32:26 +0000] "GET /viewResultFile?file=test11.yml&dir=testDir1 HTTP/1.1" 200 5945 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:32:58 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3096 "http://127.0.0.1:4711/viewResultFile?file=test11.yml&dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:07 +0000] "GET /viewResultFile?file=test11.yml&dir=testDir1 HTTP/1.1" 200 5945 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:09 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3102 "http://127.0.0.1:4711/viewResultFile?file=test11.yml&dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
 INFO:root:reading config file: testDir1/test11.yml
 DEBUG:root:configured hostfiles: []
 INFO:root:configured varFiles: []
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:33:01 +0000] "GET /execYamlFile?file=test11.yml&dir=testDir1 HTTP/1.1" 302 218 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:18 +0000] "GET /execYamlFile?file=test11.yml&dir=testDir1 HTTP/1.1" 302 218 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
 INFO:root:execSteps kwargs:{}
 INFO:root:start loop 1
 DEBUG:root:set stepRangeList Indexes to [0]
 DEBUG:root:_asyncTestStep kwargs: {}
 DEBUG:root:async step: 1 started sleep test
 DEBUG:root:checking hostReferenceName sleep
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:33:01 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3096 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:33:04 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3096 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:18 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3309 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:root:reading config file: testDir1/test12.yml
+DEBUG:root:configured hostfiles: []
+INFO:root:configured varFiles: []
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:21 +0000] "GET /execYamlFile?file=test12.yml&dir=testDir1 HTTP/1.1" 302 218 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:root:execSteps kwargs:{}
+INFO:root:start loop 1
+DEBUG:root:set stepRangeList Indexes to [0]
+DEBUG:root:_asyncTestStep kwargs: {}
+DEBUG:root:async step: 1 started check previous step
+DEBUG:root:checking hostReferenceName check
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:21 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3340 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
 DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
 DEBUG:root: checkCommandOffsetFromLastCommand set to -1
 DEBUG:root:diffSource  previousLoop 
 INFO:root:check/await analyserfuntion returns: True
-INFO:root:waiting for background tasks to be done
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:diffSource  previousLoop 
+INFO:root:check/await analyserfuntion returns: True
+INFO:root:background tasks done
+INFO:root:start loop 2
+DEBUG:root:set stepRangeList Indexes to [0]
+DEBUG:root:_asyncTestStep kwargs: {}
+DEBUG:root:async step: 1 started check previous step
+DEBUG:root:checking hostReferenceName check
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:diffSource  previousLoop 
+INFO:root:check/await analyserfuntion returns: True
+INFO:root:background tasks done
+INFO:root:saving configDict to Json: testDir1/test12.json
+INFO:root:saving resultDict to Json: testDir1/test12_outputs.json
 INFO:root:background tasks done
 INFO:root:start loop 2
 DEBUG:root:set stepRangeList Indexes to [0]
 DEBUG:root:_asyncTestStep kwargs: {}
 DEBUG:root:async step: 1 started sleep test
 DEBUG:root:checking hostReferenceName sleep
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:33:07 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3096 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:24 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3309 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:27 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3309 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
 DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
 DEBUG:root: checkCommandOffsetFromLastCommand set to -1
 DEBUG:root:diffSource  previousLoop 
 INFO:root:check/await analyserfuntion returns: True
-INFO:root:waiting for background tasks to be done
 INFO:root:background tasks done
 INFO:root:saving configDict to Json: testDir1/test11.json
 INFO:root:saving resultDict to Json: testDir1/test11_outputs.json
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:33:10 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3096 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:45 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3102 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
 INFO:root:reading config file: testDir1/test11.yml
 DEBUG:root:configured hostfiles: []
 INFO:root:configured varFiles: []
-INFO:root:getResultFileContent Json: testDir1/test11_outputs.json
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:33:12 +0000] "GET /viewResultFile?file=test11.yml&dir=testDir1 HTTP/1.1" 200 5945 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:33:58 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3096 "http://127.0.0.1:4711/viewResultFile?file=test11.yml&dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:34:01 +0000] "GET /viewYamlFile?file=test11.yml&dir=testDir1 HTTP/1.1" 200 2462 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:34:02 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3096 "http://127.0.0.1:4711/viewYamlFile?file=test11.yml&dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:48 +0000] "GET /execYamlFile?file=test11.yml&dir=testDir1 HTTP/1.1" 302 218 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:root:execSteps kwargs:{}
+INFO:root:start loop 1
+DEBUG:root:set stepRangeList Indexes to [0]
+DEBUG:root:_asyncTestStep kwargs: {}
+DEBUG:root:async step: 1 started sleep test
+DEBUG:root:checking hostReferenceName sleep
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:48 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3309 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:diffSource  previousLoop 
+INFO:root:check/await analyserfuntion returns: True
+INFO:root:background tasks done
+INFO:root:start loop 2
+DEBUG:root:set stepRangeList Indexes to [0]
+DEBUG:root:_asyncTestStep kwargs: {}
+DEBUG:root:async step: 1 started sleep test
+DEBUG:root:checking hostReferenceName sleep
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:diffSource  previousLoop 
+INFO:root:check/await analyserfuntion returns: True
+INFO:root:background tasks done
+INFO:root:saving configDict to Json: testDir1/test11.json
+INFO:root:saving resultDict to Json: testDir1/test11_outputs.json
 INFO:root:reading config file: testDir1/test11.yml
 DEBUG:root:configured hostfiles: []
 INFO:root:configured varFiles: []
-INFO:root:getResultFileContent Json: testDir1/test11_outputs.json
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:34:14 +0000] "GET /viewResultFile?file=test11.yml&dir=testDir1 HTTP/1.1" 200 5945 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
-INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:05:34:17 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3096 "http://127.0.0.1:4711/viewResultFile?file=test11.yml&dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:59 +0000] "GET /execYamlFile?file=test11.yml&dir=testDir1 HTTP/1.1" 302 218 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:root:execSteps kwargs:{}
+INFO:root:start loop 1
+DEBUG:root:set stepRangeList Indexes to [0]
+DEBUG:root:_asyncTestStep kwargs: {}
+DEBUG:root:async step: 1 started sleep test
+DEBUG:root:checking hostReferenceName sleep
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:37:59 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3309 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:38:02 +0000] "GET / HTTP/1.1" 200 1606 "http://127.0.0.1:4711/listDir?dir=testDir1" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:diffSource  previousLoop 
+INFO:root:check/await analyserfuntion returns: True
+INFO:root:background tasks done
+INFO:root:start loop 2
+DEBUG:root:set stepRangeList Indexes to [0]
+DEBUG:root:_asyncTestStep kwargs: {}
+DEBUG:root:async step: 1 started sleep test
+DEBUG:root:checking hostReferenceName sleep
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:38:06 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3309 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
+DEBUG:root:analyserFunction set to <bound method diffCheck.checkCliOutputString of <class 'aioRunbook.analyzers.diffCheck.diffCheck'>>
+DEBUG:root: checkCommandOffsetFromLastCommand set to -1
+DEBUG:root:diffSource  previousLoop 
+INFO:root:check/await analyserfuntion returns: True
+INFO:root:background tasks done
+INFO:root:saving configDict to Json: testDir1/test11.json
+INFO:root:saving resultDict to Json: testDir1/test11_outputs.json
+INFO:aiohttp.access:127.0.0.1 [23/Feb/2018:14:38:09 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3102 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/601.7.7 (KHTML, like Gecko) Version/9.1.2 Safari/601.7.7"
