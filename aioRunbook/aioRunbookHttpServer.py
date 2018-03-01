@@ -383,18 +383,6 @@ class aioRunbookHttpServer():
         return web.HTTPFound('{}/listDir?dir={}'.format(root,yamlDir))
 
 
-
-
-#    def saveConfigDictToJsonFile(self,future):
-#         configDict = future.result()
-#         await myRunbook.saveConfigDictToJsonFile()
-#         await myRunbook.saveResultDictToJsonFile()
-#         stepCount = resultBackgroundStepDict["output"][0]["stepCount"]
-#         stepId = resultBackgroundStepDict["output"][0]["stepType"]
-#         self.configDict["config"]["steps"][stepCount][stepId] = resultBackgroundStepDict
-#         pass
-
-
     def _readYamlFile (self,configFile):
         self.yamlConfigFile = configFile
         self.runbookDict = {}
@@ -420,18 +408,13 @@ class aioRunbookHttpServer():
             self.httpPort = self.configDict["httpPort"]
         except:
             self.httpPort = 8080
-        pprint.pprint(self.configDict)
         userNamedTuple = namedtuple('User', ['username', 'password', 'permissions'])
-        #self.user_map = {user.username: user for user in [userNamedTuple(self.configDict["user"],self.configDict["password"], ('protected'))]}
         authUserDict = {}
         self.user_map = {}
         for authUser in self.configDict["userAuth"]:
-            #print (authUser[0])
             user = userNamedTuple(authUser[0]["username"],authUser[1]["password"],authUser[2]["permissions"])
             self.user_map[authUser[0]["username"]] = userNamedTuple(authUser[0]["username"],authUser[1]["password"],authUser[2]["permissions"])
-            #print (userTest)
             pass
-        #pprint.pprint(self.user_map)
         try:
             self.templateDir = self.configDict["templateDir"]
         except:
@@ -475,10 +458,6 @@ class aioRunbookHttpServer():
             except:
                 jsonErrorCountDict[yamlFile] = {"errorCounter": 0}                    
         return jsonErrorCountDict
-
-
-
-
 
 
     async def _fifoSchedulerForRunbookList(self):
