@@ -1,4 +1,5 @@
 #
+templateDir: "../aioRunbook/templates/"
 runbookDirs:
   - "./testDir1"
   - "./testDir2"
@@ -20,3 +21,7 @@ userAuth:
     - viewResults
     - runTests
     - editTests
+pdfOutput:
+  author: SL
+  pdfResultDir: ./results_pdfTests
+  template: templates/template2.tex

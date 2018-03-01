@@ -29,38 +29,31 @@ PREPEND_DATE = True
 
 class aioPdfRender:
 
-    def __init__(self,processedConfigDict,loopCheckResult,keepTexFile):
+    def __init__(self,processedConfigDict,resultDict,keepTexFile,pdfConfigDict={}):
         logging.debug('init aioPdfRender pwd:{} '.format(os.getcwd()))
         self.blockingError = False
         self.processedConfigDict = processedConfigDict
-        self.loopCheckResult = loopCheckResult 
+        self.resultDict = resultDict 
 
         try:
             self.pdfDict = self.processedConfigDict["config"]["pdfOutput"]
             logging.debug('found pdfOutput in configDict')
-        except:
-            self.pdfDict = None
-            logging.error('cannot locate pdfOutput block in configDict, please check input yml')
-            self.blockingError = True
-        else:
-            try:
-                self.pdfResultDir = self.processedConfigDict["config"]["pdfOutput"]["pdfResultDir"]
-                logging.debug('found pdfResultDir in configDict.pdfOutput: {}'.format(self.pdfResultDir))
-            except:
-                try:
-                    self.pdfResultDir = self.processedConfigDict["config"]["workingDir"]
-                    logging.debug('found pdfResultDir in configDict.workingDir: {}'.format(self.pdfResultDir))
-                except:
-                    self.pdfResultDir = os.getcwd()
-                    logging.warning('cannot locate pdfResultDir using pwd instead : {}'.format(self.pdfResultDir))
+            self.pdfResultDir = self.processedConfigDict["config"]["pdfOutput"]["pdfResultDir"]
+            self.template = self.processedConfigDict["config"]["pdfOutput"]["template"]
             self.keepTexFile = _isInDictionary ("keepTexFile",self.processedConfigDict["config"]["pdfOutput"],keepTexFile)
+            self.prependDate = _isInDictionary ("prepend-date-to-working-dir",self.processedConfigDict["config"]["pdfOutput"],PREPEND_DATE)
+        except:
             try:
-                self.template = self.processedConfigDict["config"]["pdfOutput"]["template"]
-                logging.debug('found template in configDict.pdfOutput: {}'.format(self.template))
+                self.pdfDict = pdfConfigDict
+                self.pdfResultDir = pdfConfigDict["pdfResultDir"]
+                self.template = pdfConfigDict["template"]
+                self.keepTexFile = _isInDictionary ("keepTexFile",pdfConfigDict,keepTexFile)
+                self.prependDate = _isInDictionary ("prepend-date-to-working-dir",pdfConfigDict,PREPEND_DATE)
             except:
-                self.template = "template.tex"
-                logging.warning('template not configured configDict.pdfOutput, using default: {}'.format(self.template))
-
+                self.pdfDict = None
+                logging.error('pdfRender cannot set all parameters from pdfOutputDict')
+                self.blockingError = True
+        if not self.blockingError == True:
             try:
                 self.templateDir = os.path.dirname(self.template)
                 logging.debug('templateDir: {}'.format(self.templateDir))
@@ -79,7 +72,6 @@ class aioPdfRender:
                 self.texFileName = None
                 logging.error('cannot detect tex file name from yml file')
                 self.blockingError = True
-            self.prependDate = _isInDictionary ("prepend-date-to-working-dir",self.processedConfigDict["config"],PREPEND_DATE)
             if WORKING_WITH_SUBCATEGORY_DEFAULT:
                 try:
                     self.subcategory = os.path.abspath(self.yamlConfigFile).split(os.sep)[-2]          ###FIXME###
@@ -150,7 +142,6 @@ class aioPdfRender:
                     line_comment_prefix = '%#',
                     trim_blocks = True,
                     autoescape = False,
-                    #loader = jinja2.FileSystemLoader(self.templateDir))
                     loader = jinja2.FileSystemLoader("."))
                 logging.debug("try to open template file: {}".format(self.template))
                 try:
@@ -168,9 +159,9 @@ class aioPdfRender:
                     # to self.processedConfigDict for diffSnapshots
                     # requires adaptation of all existing temlates!!!!!
                     #latexString = j2template.render( configDict = self.processedConfigDict["config"],
-                    #                                 loopCheckResultList = self.loopCheckResult )
+                    #                                 resultDictList = self.resultDict )
                     latexString = j2template.render( configDict = self.processedConfigDict,
-                                                     loopCheckResultList = self.loopCheckResult )
+                                                     resultDictList = self.resultDict )
             
                     try:
                         fo = open(self.texFileName, "w")

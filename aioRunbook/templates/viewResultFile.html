@@ -54,7 +54,7 @@ body {margin:0;}
 
 <div class="container-fluid">
    
-<h3> Output of the loops/steps/commands of runbook {{filename}}</h3> 
+<h3> Overview Output of the loops/steps/commands of runbook {{filename}}</h3> 
    <div class="row no-gutters">
       <div class="col-sm-1" style="background-color:#eee0ee;" >lllsssccc</div>
       <div class="col-sm-2" style="background-color:#eee0ee;" >name</div>
@@ -92,6 +92,15 @@ body {margin:0;}
 
    </div>
     {% endfor %}
+</div>
+
+<h3> json dump of resultDict </h3> 
+<div class="container-fluid"> 
+  <div style="padding-left:16px">
+    {% for line in prettyJsonLines %}
+      <div>{{line|safe}}</div>
+    {% endfor %}
+  </div>
 </div>
 </body>
 </html>

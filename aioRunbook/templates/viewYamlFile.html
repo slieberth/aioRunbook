@@ -53,7 +53,7 @@ body {margin:0;}
 
 
 <div class="container-fluid"> 
-  <h3> view runbook {{filename}}</h3> 
+  <h3> view runbook {{file}}</h3> 
   <div style="padding-left:16px">
     {% for line in yamlLines %}
       <div>{{loop.index}}{{line|safe}}</div>

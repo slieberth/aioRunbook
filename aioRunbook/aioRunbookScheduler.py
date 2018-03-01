@@ -410,6 +410,9 @@ class aioRunbookScheduler():
                     for stepCommandOutput in stepContainer[stepId]["output"]:
                         outputInformationTag = _getOutputInformationTag(stepCommandOutput)
                         self.resultDict[outputInformationTag]=stepCommandOutput 
+                        if stepCommandOutput["pass"] != True and stepCommandOutput["skip"] == False:
+                            self.errorCounter += 1
+                self.configDict["errorCounter"] = self.errorCounter
         return True
 
 
@@ -417,7 +420,6 @@ class aioRunbookScheduler():
             await self.execSteps(self,eventLoop,**kwargs)
             await self.saveConfigDictToJsonFile()
             await self.saveResultDictToJsonFile()
-
 
 
 
@@ -515,6 +517,8 @@ class aioRunbookScheduler():
         logging.info('loading configDict from Json: {}'.format(jsonConfigFile))
         with open(jsonConfigFile) as infile:                ###FIXME potential error if file cannot be read
             self.configDict = json.load(infile)
+
+
 
 
 

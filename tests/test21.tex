@@ -1,0 +1,26 @@
+%version 0.0.2
+
+\documentclass[10pt,a4paper]{article}
+
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  frame=single,
+  breaklines=true,
+}
+
+\begin{document}
+
+configDict:
+
+\begin{lstlisting}[]]
+{'config': {'loops': 2, 'steps': [{'check': {'name': 'check previous step', 'method': 'local-shell', 'commands': ['pip3 freeze | tail -n 1', 'pip3 freeze | tail -n 2'], 'checkMethod': 'diff', 'diffSource': 'previousLoop'}}]}, 'yamlConfigFile': 'testDir2/test21.yml'}
+\end{lstlisting}
+
+
+
+Iteration Example:
+
+         
+\end{document}

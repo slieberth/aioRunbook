@@ -54,19 +54,30 @@ body {margin:0;}
 
 <div class="container-fluid">
    
-<h4> list of runbooks in {{yamlDir}}  </h4> 
-
+<h4> list of runbooks in {{yamlDir}} ... ( exec all: <a href="{{root}}/execAllFilesFromDir?execAllFilesFromDir=true&dir={{yamlDir}}"><span class="glyphicon glyphicon-play"></span></a> ) </h4> 
    {% for filename in fileList|sort %}
    <div class="row">
       <div class="col-sm-4" style="background-color:#eeeeee;">{{filename}}</div>
       <div class="col-sm-1" style="background-color:#eeeeee;">view
         <a href="{{root}}/viewYamlFile?file={{filename}}&dir={{yamlDir}}"><span class="glyphicon glyphicon-eye-open"></span></a>
         </div>
-      <div class="col-sm-1" style="background-color:#eeeeee;">run
+      <div class="col-sm-1" style="background-color:#eeeeee;">exec
         <a href="{{root}}/execYamlFile?file={{filename}}&dir={{yamlDir}}"><span class="glyphicon glyphicon-play"></span></a>
         </div>
-      <div class="col-sm-2" style="background-color:#eeeeee;">{{jsonDateDict[filename]}}
+
+      {% set errorCounter = jsonErrorDict[filename]["errorCounter"] %}
+      {% if errorCounter > 0 %}
+      <div class="col-sm-2" style="background-color:#ff4500;">{{jsonDateDict[filename]}}
         <a href="{{root}}/viewResultFile?file={{filename}}&dir={{yamlDir}}"><span class="glyphicon glyphicon-list"></span></a>
+        </div>
+      {% else %}
+      <div class="col-sm-2" style="background-color:#98FB98;">{{jsonDateDict[filename]}}
+        <a href="{{root}}/viewResultFile?file={{filename}}&dir={{yamlDir}}"><span class="glyphicon glyphicon-list"></span></a>
+        </div>
+      {% endif %}
+
+      <div class="col-sm-2" style="background-color:#eeeeee;">create PDF
+        <a href="{{root}}/createPDF?file={{filename}}&dir={{yamlDir}}"><span class="glyphicon glyphicon-share"></span></a>
         </div>
    </div>
    {% endfor %}

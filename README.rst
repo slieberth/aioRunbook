@@ -48,10 +48,11 @@ Hello-World aioRunbookHttpServer
     import asyncio
 
     ymlConfigString = """#
+    templateDir: "./templates/"
     runbookDirs:
-      - "./testDir1"
-      - "./testDir2"
-      - "./testDir3"
+      - "./runbookDir1"
+      - "./runbookDir2"
+      - "./runbookDir3"
     httpPort: 4711  
     userAuth:
     - - username: CharlieBrown
@@ -78,4 +79,6 @@ Hello-World aioRunbookHttpServer
     if app != None:
         loop.run_until_complete(run_app(app,port=myHttpServer.httpPort))
 
-
+On your local machine you must copy all *.html files from the git template into a local folder ./templates.
+On your local machine you must create the directories for the configured runbooks directories: ./runbookDir[1-3]
+All directories are customizable in the config file. The given ones are just examples.

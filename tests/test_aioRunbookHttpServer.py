@@ -31,6 +31,7 @@ class test_aioRunbookHttpServer(unittest.TestCase):
 
     def test_app1(self):
         ymlConfigString = """#
+templateDir: "../aioRunbook/templates/"
 runbookDirs:
   - "./testDir1"
   - "./testDir2"
@@ -52,6 +53,10 @@ userAuth:
     - viewResults
     - runTests
     - editTests
+pdfOutput:
+  author: SL
+  pdfResultDir: ./results_pdfTests
+  template: templates/template2.tex
 """
         fh = open("aioServerConfig.yml",'w')
         fh.write(ymlConfigString)

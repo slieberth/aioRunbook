@@ -28,6 +28,7 @@ import pprint
 import re
 import datetime
 from textwrap import dedent
+import json
 
 import base64
 from cryptography import fernet
@@ -53,6 +54,7 @@ from collections import namedtuple
 
 from .aioRunbookScheduler import aioRunbookScheduler
 from aioRunbook.tools.helperFunctions import _getOutputInformationTag,_decomposeOutputInformationTag
+from aioRunbook.postProcessing.aioPdfRender import aioPdfRender
 import textwrap
 
 from aiohttp.web import Application, Response, StreamResponse, run_app
@@ -76,10 +78,11 @@ class aioRunbookHttpServer():
         self.runbookDirSplitDirs = []
         self.bgList = []
         self.bgYamlDict = {}
+        self.fifoFileList = []
 
     def init(self,loop):
         app = Application()
-        aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('../aioRunbook/templates'))
+        aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader(self.templateDir))
         #aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader('/Users/slieberth/git/aioRunbook/aioRunbook/templates'))
         app.router.add_get('/', self.index)
         app.router.add_get('/login', self.login)
@@ -87,7 +90,9 @@ class aioRunbookHttpServer():
         app.router.add_get('/listDir', self.listDir)
         app.router.add_get('/viewYamlFile', self.viewYamlFile)
         app.router.add_get('/execYamlFile', self.execYamlFile)
+        app.router.add_get('/execAllFilesFromDir', self.execYamlFile)
         app.router.add_get('/viewResultFile', self.viewResultFile)
+        app.router.add_get('/createPDF', self.createPDF)
         app.user_map = self.user_map
         configure_handlers(app)
 
@@ -188,6 +193,7 @@ class aioRunbookHttpServer():
             yamlDir = None  
         fileList = self.runbookDict[yamlDir]
         jsonDateDict = self._upDateJsonDateDict(yamlDir)
+        jsonErrorDict = self._upDateJsonErrorDict(yamlDir)
         #print(jsonDateDict)
         if len([task for task in self.bgList if not task.done()]) > 0:
             bgFileList = []
@@ -198,7 +204,7 @@ class aioRunbookHttpServer():
         else:
             errorMessage = None
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
-                "jsonDateDict":jsonDateDict,"errorMessage":errorMessage}
+                "jsonDateDict":jsonDateDict,"errorMessage":errorMessage,"jsonErrorDict":jsonErrorDict}
 
     @has_permission('runTests')
     @aiohttp_jinja2.template('listDir.html')
@@ -213,47 +219,61 @@ class aioRunbookHttpServer():
         yamFileName  = None
         if "file" in all_args.keys():
             yamFileName = all_args["file"]
-        if yamlDir != None and yamFileName  != None:
-            yamlFilePath = os.sep.join([yamlDir,yamFileName])
-            print (yamlFilePath)
-            fileList = self.runbookDict[yamlDir]
-            jsonDateDict = self._upDateJsonDateDict(yamlDir)
-            try:
-                with open(yamlFilePath) as fh:
-                    YamlDictString = fh.read ()
-                    fh.close ()
-            except:
-                logging.error('cannot open configFile {}'.format(yamlFilePath))
-                return 'cannot open configFile {}'.format(yamlFilePath)
-            else:
+            if yamlDir != None and yamFileName  != None:
+                yamlFilePath = os.sep.join([yamlDir,yamFileName])
+                print (yamlFilePath)
+                fileList = self.runbookDict[yamlDir]
+                jsonDateDict = self._upDateJsonDateDict(yamlDir)
+                jsonErrorDict = self._upDateJsonErrorDict(yamlDir)
                 try:
-                    myRunbook = aioRunbookScheduler(yamlFilePath)
-                    loop = asyncio.get_event_loop()
-                    threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,) 
-                    #loop.run_until_complete(myRunbook.execSteps(loop,threadExecutor)) 
-                    #await myRunbook.execSteps(loop,threadExecutor)
-                    #logging.debug("adding background tasks myRunbook.execSteps(loop,threadExecutor)")  
-                    threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,)                      
-                    bgTask = loop.create_task(myRunbook.execStepsAndSaveDicts(loop))
-                    self.bgList.append(bgTask)
-                    NewBgYamlDict = {}
-                    NewBgYamlDict[bgTask] = yamlFilePath
-                    #cleanup existing list
-                    for existingBgTask in self.bgYamlDict.keys():
-                        if not existingBgTask.done():
-                            NewBgYamlDict[existingBgTask] = self.bgYamlDict[existingBgTask]
-                    self.bgYamlDict = NewBgYamlDict
-
-                except Exception as e:
-                    logging.error('cannot run  aioRunbookScheduler {} {}'.format(yamlFilePath,e))
-                    errorMessage =  'cannot run  aioRunbookScheduler {}: {}'.format(yamlFilePath,e)
-                    return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
-                        "jsonDateDict":jsonDateDict,"errorMessage":errorMessage}
+                    with open(yamlFilePath) as fh:
+                        YamlDictString = fh.read ()
+                        fh.close ()
+                except:
+                    logging.error('cannot open configFile {}'.format(yamlFilePath))
+                    return 'cannot open configFile {}'.format(yamlFilePath)
                 else:
-                    #await myRunbook.saveConfigDictToJsonFile()
-                    #await myRunbook.saveResultDictToJsonFile()
-                    return web.HTTPFound('{}/listDir?dir={}'.format(root,yamlDir))
-        #print(jsonDateDict)
+                    try:
+                        myRunbook = aioRunbookScheduler(yamlFilePath)
+                        loop = asyncio.get_event_loop()
+                        threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,) 
+                        #loop.run_until_complete(myRunbook.execSteps(loop,threadExecutor)) 
+                        #await myRunbook.execSteps(loop,threadExecutor)
+                        #logging.debug("adding background tasks myRunbook.execSteps(loop,threadExecutor)")  
+                        threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,)                      
+                        bgTask = loop.create_task(myRunbook.execStepsAndSaveDicts(loop))
+                        self.bgList.append(bgTask)
+                        NewBgYamlDict = {}
+                        NewBgYamlDict[bgTask] = yamlFilePath
+                        #cleanup existing list
+                        for existingBgTask in self.bgYamlDict.keys():
+                            if not existingBgTask.done():
+                                NewBgYamlDict[existingBgTask] = self.bgYamlDict[existingBgTask]
+                        self.bgYamlDict = NewBgYamlDict
+                    except Exception as e:
+                        logging.error('cannot run  aioRunbookScheduler {} {}'.format(yamlFilePath,e))
+                        errorMessage =  'cannot run  aioRunbookScheduler {}: {}'.format(yamlFilePath,e)
+                        return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
+                            "jsonDateDict":jsonDateDict,"errorMessage":errorMessage,"jsonErrorDict":jsonErrorDict}
+                    else:
+                        return web.HTTPFound('{}/listDir?dir={}'.format(root,yamlDir))
+        elif "execAllFilesFromDir" in all_args.keys():
+            fileList = self.runbookDict[yamlDir]
+            if len(self.fifoFileList) > 0:
+                logging.error('still processing last fifo list {}'.format(self.fifoFileList))
+                errorMessage =  'still processing last fifo list {}'.format(self.fifoFileList)
+                fileList = self.runbookDict[yamlDir]
+                jsonDateDict = self._upDateJsonDateDict(yamlDir)
+                jsonErrorDict = self._upDateJsonErrorDict(yamlDir)
+                return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
+                    "jsonDateDict":jsonDateDict,"errorMessage":errorMessage}
+            else:
+                self.fifoFileList = [ os.sep.join([yamlDir,x]) for x in self.runbookDict[yamlDir]]
+                loop = asyncio.get_event_loop()
+                fifoBgTask = loop.create_task(self._fifoSchedulerForRunbookList())
+            jsonDateDict = self._upDateJsonDateDict(yamlDir)
+            jsonErrorDict = self._upDateJsonErrorDict(yamlDir)
+            return web.HTTPFound('{}/listDir?dir={}'.format(root,yamlDir))
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
                 "jsonDateDict":jsonDateDict}
 
@@ -282,16 +302,17 @@ class aioRunbookHttpServer():
                 return 'cannot open configFile {}'.format(yamlFilePath)
             else:
                 try:
-                    myRunbook = aioRunbookScheduler(yamlFilePath)
+                    myRunbook = aioRunbookScheduler(yamlFilePath)  #this is required to get the YAMLfilename 
                     loop = asyncio.get_event_loop()
                     resultDict = await myRunbook.getResultFileContent(loop)
                 except:
                     resultDict = None
                     logging.error('cannot load resultDict aioRunbookScheduler {}'.format(yamlFilePath))
-                    return 'cannot load resultDict aioRunbookScheduler {}'.format(yamlFilePath)
+                    return 'cannot load resultDict aioRunbookScheduler {}'.format(yamlFilePath)     ###FIXME###
         #pprint.pprint(resultDict)
         fileList = self.runbookDict[yamlDir]
         jsonDateDict = self._upDateJsonDateDict(yamlDir)
+        jsonErrorDict = self._upDateJsonErrorDict(yamlDir)
         stepCommandOutputs = []
         stepCommandOutputIds = []
         for cmdOutputId in resultDict.keys():
@@ -300,13 +321,16 @@ class aioRunbookHttpServer():
             stepCommandOutputIds.append(stepCommandOutputId)
             resultDict[cmdOutputId]["Id"] = stepCommandOutputId
         stepCommandOutputIds.sort()
-        #print(stepCommandOutputIds)
-        #pprint.pprint(resultDict)
+
+        prettyJsonString = json.dumps(resultDict,indent=4,sort_keys=True)
+        prettyJsonLines = [ x.rstrip().replace(" ","&nbsp;") for x in prettyJsonString.split("\n") ]
+
         for Id in stepCommandOutputIds:
             stepCommandOutputs.append([ resultDict[x] for x in resultDict.keys() if resultDict[x]["Id"] == Id ][0])
         #print(jsonDateDict)
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
-                "jsonDateDict":jsonDateDict, "stepCommandOutputs":stepCommandOutputs,"filename":yamFileName}
+                "jsonDateDict":jsonDateDict, "stepCommandOutputs":stepCommandOutputs,"filename":yamFileName,
+                "prettyJsonLines":prettyJsonLines }
 
 
     @has_permission('viewResults')
@@ -333,7 +357,32 @@ class aioRunbookHttpServer():
                 logging.error('cannot open configFile {} {}'.format(yamlFilePath,e))
                 return {"errorMessage":'cannot open configFile {} {}'.format(yamlFilePath,e)}
         fileList = self.runbookDict[yamlDir]
-        return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"yamlLines":yamlLines}
+        return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"yamlLines":yamlLines,"file":yamFileName}
+
+
+    @has_permission('viewResults')
+    @aiohttp_jinja2.template('listDir.html')
+    async def createPDF(self,request):
+        root="http://"+request.host
+        all_args = request.query
+        #print(all_args)
+        if "dir" in all_args.keys():
+            yamlDir = all_args["dir"]
+        else:
+            yamlDir = None 
+        yamFileName  = None
+        if "file" in all_args.keys():
+            yamFileName = all_args["file"]
+        if yamlDir != None and yamFileName  != None:
+            yamlFilePath = os.sep.join([yamlDir,yamFileName])
+            myRunbook = aioRunbookScheduler(yamlFilePath)
+            loop = asyncio.get_event_loop()
+            threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=3,)
+            myAioPdfRender = aioPdfRender(myRunbook.configDict,myRunbook.resultDict,True,self.configDict["pdfOutput"])
+            await myAioPdfRender.writePdfFile(threadExecutor)
+        return web.HTTPFound('{}/listDir?dir={}'.format(root,yamlDir))
+
+
 
 
 #    def saveConfigDictToJsonFile(self,future):
@@ -383,7 +432,19 @@ class aioRunbookHttpServer():
             #print (userTest)
             pass
         #pprint.pprint(self.user_map)
+        try:
+            self.templateDir = self.configDict["templateDir"]
+        except:
+            logging.error('missing attribute templateDir in File {}'.format(configFile))
+            return False
+        if not os.path.isdir(self.templateDir):
+            logging.error('troubles access templateDir {}'.format(self.templateDir))
+            return False
         return True
+
+
+
+
 
     def _upDateJsonDateDict (self,yamlDir):
         fileList = self.runbookDict[yamlDir]
@@ -400,6 +461,37 @@ class aioRunbookHttpServer():
             dateList.append(modTime)
         jsonDateDict = dict(zip(self.runbookDict[yamlDir], dateList))
         return jsonDateDict
+
+    def _upDateJsonErrorDict (self,yamlDir):
+        fileList = self.runbookDict[yamlDir]
+        jsonErrorCountDict = {}
+        for yamlFile in fileList:
+            yamlFilePath = os.sep.join([yamlDir,yamlFile])
+            jsonFile = yamlFilePath[:-4]+".json"
+            try: 
+                with open(jsonFile) as infile:            
+                    processedConfigDict = json.load(infile)
+                    jsonErrorCountDict[yamlFile] = {"errorCounter": processedConfigDict["errorCounter"]}
+            except:
+                jsonErrorCountDict[yamlFile] = {"errorCounter": 0}                    
+        return jsonErrorCountDict
+
+
+
+
+
+
+    async def _fifoSchedulerForRunbookList(self):
+        """tbd
+
+        """
+        loop = asyncio.get_event_loop()
+        #threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,)   
+        while len(self.fifoFileList) > 0:
+            configFile = self.fifoFileList.pop(0)
+            myRunbook = aioRunbookScheduler(configFile)                   
+            await myRunbook.execStepsAndSaveDicts(loop)
+
 
 
 
