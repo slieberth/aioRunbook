@@ -33,7 +33,6 @@ with open(path.join(base_dir, 'README.rst')) as desc:
 with open(path.join(base_dir, 'version.py')) as version:
     exec(version.read())
 
-#aiohttp-session-2.3.0
 
 setup(name = 'aioRunbook',
       version = __version__,
@@ -44,8 +43,7 @@ setup(name = 'aioRunbook',
       description = doclines[0],
       long_description = long_description,
       platforms = 'Any',
-      install_requires = ['asyncssh >= 1.0','aiohttp>=2.3.10','PyYAML>=3.12','jtextfsm>=0.3.1',
-                          'Jinja2>=2.10','pysnmp>=4.4.4','ncclient>=0.5.3','aiohttp-jinja2>=0.16.0'],
+      install_requires = ['asyncssh >= 1.0'],
       extras_require = {},
       packages = find_packages(),
       scripts = [],
