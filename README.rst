@@ -80,3 +80,15 @@ Hello-World aioRunbookHttpServer
 On your local machine you must copy all *.html files from the git template into a local folder ./templates.
 On your local machine you must create the directories for the configured runbooks directories: ./runbookDir[1-3]
 All directories are customizable in the config file. The given ones are just examples.
+
+testing aioRunbookHttpServer with docker
+========================================
+
+an docker container is available for testing:
+
+.. code-block:: bash
+
+    docker pull slieberth/aiorunbook
+    docker run  -p 4711:4711 slieberth:aioRunbook
+
+The direct your browser to 127.0.0.1:4711
