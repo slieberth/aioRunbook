@@ -16,7 +16,7 @@ Python package providing an orchestration framework for automated
 network tests and network migrations using supporting libraries like asyncssh, netconf and snmp 
 for interaction with the netwok elements.
 
-.. figure::  images/aioRunbook.jpg
+.. figure::  images/overview.jpg
    :align:   center
 
 aioRunbook is designed to be controlled by either shell execution (aioRunbookScheduler) respectively 
