@@ -18,7 +18,7 @@ from aioRunbook.aioRunbookHttpServer import aioRunbookHttpServer
 
 from aiohttp.web import Application, Response, StreamResponse, run_app
 
-myHttpServer = aioRunbookHttpServer("aioServerConfig.yml")
+myHttpServer = aioRunbookHttpServer("/aioRunbook/aioServerConfig.yml")
 loop = asyncio.get_event_loop()
 app = myHttpServer.init(loop)
 if app != None:
