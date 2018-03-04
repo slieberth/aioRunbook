@@ -1,9 +1,7 @@
 Overview
 ========
 
-Current SW status is alpha! - ETA for beta is March 2018
-
-Documentation is under development:
+Please refer to:
 http://aiorunbook.readthedocs.io/en/latest/index.html
 
 Installation
@@ -11,7 +9,7 @@ Installation
 
 .. code-block:: bash
 
-    pip3 install git+https://github.com/slieberth/aioRunbook.git
+    sudo pip3 install git+https://github.com/slieberth/aioRunbook.git
 
 
 Hello-World aioRunbookScheduler
