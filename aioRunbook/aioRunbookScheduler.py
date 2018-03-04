@@ -198,13 +198,18 @@ class aioRunbookScheduler():
                 #valueList = self.configDict["config"]["valueMatrix"][self.loopCounter-1]  ###FIXME###
                 #valueList = self.valueMatrix[self.loopCounter-1]                          ### valueMatrix is deprecated
                 try:
-                    (stepDict["output"][checkCommandOffsetFromLastCommand]["pass"],
-                    stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"]) = \
-                                analyserFunction(stepDict,varDict=self.varDict,configDict = self.configDict,**kwargs)           
+                    resultVektur = analyserFunction(stepDict,varDict=self.varDict,configDict = self.configDict,**kwargs)       
+                    stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = resultVektur[0]
+                    stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"] = resultVektur[1] 
+                    try:
+                        stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = resultVektur[2]  
+                    except:
+                        stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = "not set by analyzer"
                 except Exception as errmsg:
                     logging.error(errmsg) 
                     stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = False
                     stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"] = ["!!! Analyser Error !!!"]
+                    stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = "!!! Analyser Error !!!"
                     logging.error('check function {0}'.format(analyserFunction))
                     #raise
                 logging.info('check/await analyserfuntion returns: {0}'.format(stepDict["output"][checkCommandOffsetFromLastCommand]["pass"]))
@@ -218,13 +223,18 @@ class aioRunbookScheduler():
                         await self.commandFunction(delayTimer=_tWait)
                         #
                         try:
-                            (stepDict["output"][checkCommandOffsetFromLastCommand]["pass"],
-                            stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"]) = \
-                                        analyserFunction(stepDict,varDict=self.varDict,configDict = self.configDict,**kwargs)           
+                            resultVektur = analyserFunction(stepDict,varDict=self.varDict,configDict = self.configDict,**kwargs)   
+                            stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = resultVektur[0]
+                            stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"] = resultVektur[1] 
+                            try:
+                                stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = resultVektur[2]  
+                            except:
+                                stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = "not set by analyzer"        
                         except Exception as errmsg:
                             logging.error(errmsg) 
                             stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = False
                             stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"] = ["!!! Analyser Error !!!"]
+                            stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = "!!! Analyser Error !!!"
                             logging.error('check function {0}'.format(analyserFunction))
                             raise
                     if self.disconnectFunction != None and stepId in ["await"] :

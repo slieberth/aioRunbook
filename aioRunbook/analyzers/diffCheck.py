@@ -111,7 +111,7 @@ class diffCheck:
                 print(compressedStringInHex)
             logging.debug("setting diff for {} to {}".format(diffInformationTag,compressedStringInHex))
             configDict["diffSnapshot"][diffInformationTag] = compressedStringInHex                  
-            return True, "setDiffSnapshot"
+            return True, "setDiffSnapshot",compressedStringInHex  
         else:
             if diffSource == "diffSnapshot":
                 if "diffSnapshot" in configDict:
@@ -134,24 +134,25 @@ class diffCheck:
                             diffStringList = self._diffDecode(compressedDiffStringInHex,compressFlag,diffTextFSMFilterFlag).split("\n")  
                         diffResultList = list(difflib.unified_diff(diffStringList,outputStringList))
                         if len(diffResultList) == 0:
-                            return True, ""
+                            return True, "","\n".join(diffStringList)
                         else:
-                            return False, "\n".join(diffResultList)
+                            return False, "\n".join(diffResultList),"\n".join(diffStringList)
                     else:
                         logging.error ('missing diffSnapshot in ConfigDict'.format(stepCounter)) 
-                        return False, "missingStepDiffSnapshop-{}".format(diffInformationTag)
+                        return False, "missingStepDiffSnapshop-{}".format(diffInformationTag),\
+                                      "missingStepDiffSnapshop-{}".format(diffInformationTag)
                 else:
                     logging.error ('missing diffSnapshot in ConfigDict'.format(stepDict["stepCounter"])) 
-                    return False, "missingGlobalDiffSnapshot"
+                    return False, "missingGlobalDiffSnapshot", "missingGlobalDiffSnapshot"
             elif diffSource.startswith("outputFromStep"):
                 match = re.search(r'\d+', diffSource)
                 if match:                      
                     sourceStep = int(match.group())
                 else:
                     logging.error('step:{} unable to identify diffSource {}'.format(stepCounter,diffSource))
-                    return False, "unable to identify outputFromStep diffSource "
+                    return False, "unable to identify outputFromStep diffSource ", "unable to identify outputFromStep diffSource "
                 if sourceStep >= stepCounter:
-                    return False, "outputFromStep diffSource must less than stepCounter"
+                    return False, "outputFromStep diffSource must less than stepCounter", "outputFromStep diffSource must less than stepCounter"
                 else:
                     sourceStepId = list(configDict["config"]["steps"][sourceStep-1].keys())[0]
                     diffSourceString = configDict["config"]["steps"][sourceStep-1][sourceStepId]['output'][checkCommandOffsetFromLastCommand]['output'] 
@@ -173,12 +174,12 @@ class diffCheck:
                     diffStringList = diffSourceString.split("\n") 
                 diffResultList = list(difflib.unified_diff(diffStringList,outputStringList))
                 if len(diffResultList) == 0:
-                    return True, ""
+                    return True, "","\n".join(diffStringList)
                 else:
-                    return False, "\n".join(diffResultList)
+                    return False, "\n".join(diffResultList),"\n".join(diffStringList)
             elif diffSource.startswith("previousLoop"):
                 if loopCounter == 1:
-                    return True, "initial Loop" 
+                    return True, "initial Loop" , "diffCheck initial Loop"
                 else:       
                     sourceStepId = list(configDict["config"]["steps"][stepCounter-1].keys())[0]
                     diffSourceString = configDict["config"]["steps"][stepCounter-1][sourceStepId]['output'][checkCommandOffsetFromLastCommand]['output']
@@ -200,11 +201,11 @@ class diffCheck:
                         diffStringList = diffSourceString.split("\n") 
                     diffResultList = list(difflib.unified_diff(diffStringList,outputStringList))
                     if len(diffResultList) == 0:
-                        return True, ""
+                        return True, "","\n".join(diffStringList)
                     else:
-                        return False, "\n".join(diffResultList)
+                        return False, "\n".join(diffResultList),"\n".join(diffStringList)
             else: 
-                return False, "incorrect diffsource attribute"
+                return False, "incorrect diffsource attribute","incorrect diffsource attribute"
 
 
     @classmethod

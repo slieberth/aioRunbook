@@ -80,7 +80,7 @@ class jsonCheck:
             try:
                 jsonObject = yaml.load(stepDict["output"][checkCommandOffsetFromLastCommand]["output"])
             except:
-                return False,[]
+                return False,[],'jsonCheck Yaml Object load error'
             else:
                 logging.debug ('jsonCheck Yaml Object loaded')
         else:
@@ -91,12 +91,74 @@ class jsonCheck:
                 responseObj = eval('jsonObject' + stepDict["jsonString"] )
             except Exception as errmsg:
                 logging.error(errmsg)  
-                return False,[] 
+                return False,[errmsg],stepDict["jsonString"] 
             jsonValueList = [responseObj] ###FIXME check for type !!!
             #logging.info ('jsonValueList: {}'.format(jsonValueList))
+
+
+
+            #
+            #  the remaing lines are related only relate to "jsonString" 
+            #
+            if "evalListElement" in stepDict:
+                evalString = stepDict["evalListElement"].strip()
+                #logging.info ('evalString : {}'.format(evalString))
+                posOpeningBracket = evalString.find("[")
+                posClosingBracket = evalString.find("]")
+                jsonListIndex = int(evalString[posOpeningBracket+1:posClosingBracket].strip())
+                #logging.info ('jsonListIndex : {}  {}-{}'.format(jsonListIndex,posOpeningBracket,posClosingBracket))
+            elif "evalValue" in stepDict:
+                evalString = stepDict["evalValue"].strip()
+                #logging.info ('evalString : {}'.format(evalString))
+                posOpeningBracket = evalString.find("{")
+                posClosingBracket = evalString.find("}")
+                jsonListIndex = 0
+
+            logging.info ('jsonListIndex : {}  {}-{}'.format(jsonListIndex,posOpeningBracket,posClosingBracket))
+            if len (jsonValueList) >= jsonListIndex:
+                evalValue = jsonValueList[jsonListIndex]
+                logging.info ('evalValue : {} '.format(evalValue))
+                if posOpeningBracket > 0:
+                    evalString1 = evalString[:posOpeningBracket-1].strip()
+                    evalString1 = substitudeValue(evalString1,valueList)    
+                    logging.debug ('evalString1: {} '.format(evalString1))         
+                    if type( evalValue) == str:
+                        result1 =  eval( "'" + evalString1 + "' " + evalValue)
+                    else:
+                        result1 =  eval( evalString1 + " " + evalValue)
+                    logging.debug ("evalString1 {} evalValue {} result1 {}".format(evalString1,evalValue,result1))
+                else:
+                    result1 = True
+
+                if posClosingBracket < len(evalString) - 1:
+                    evalString2 = evalString[posClosingBracket+1:].strip()
+                    evalString2 = substitudeValue(evalString2,valueList)  
+                    logging.debug ('evalString2: {} '.format(evalString2))   
+                    if type( evalValue) == str:
+                        logging.info ("'" + evalValue + "' " + evalString2)
+                        result2 =  eval("'" + evalValue + "' " + evalString2)
+                    else:
+                        logging.info ( str(evalValue) + " " + str(evalString2))
+                        result2 =  eval(str(evalValue) + evalString2)
+                    logging.debug ("evalValue {} evalString2 {} result2 {}".format(evalValue,evalString2,result2) )
+                else:
+                    result2 = True
+
+                if result1 == True and result2 == True:
+                    logging.info('json evalListElement returns: True')
+                    return True,jsonValueList,stepDict["jsonString"] 
+                else:
+                    logging.info('json evalListElement returns: False')
+                    return False,jsonValueList,stepDict["jsonString"] 
+            else:
+                logging.info('json evalListElement returns: False, short json output list ')
+                return False,jsonValueList,stepDict["jsonString"] 
+
+
+
         elif "jsonOneLine" in stepDict.keys():     
             jsonOneLineStr = stepDict["jsonOneLine"]
-            return jsonOneLineStringCheck ( jsonOneLineStr , jsonObject )
+            return jsonOneLineStringCheck ( jsonOneLineStr , jsonObject ),jsonOneLineStr
         elif "jsonMultiLine" in stepDict.keys():     
             jsonMultiLines = stepDict["jsonMultiLine"]
             resultTuples = []
@@ -107,65 +169,10 @@ class jsonCheck:
             for resultTuple in resultTuples:
                 if resultTuple[0] == False: resVal = False
                 resList += [resultTuple[1]]
-            return resVal, resList
+            return resVal, resList,"\n".join(jsonMultiLines)
         else:
             logging.error("missing json check selector: jsonOneLine, jsonMultiLine or jsonString ")  
-            return False,[] 
+            return False,[],"missing json check selector: jsonOneLine, jsonMultiLine or jsonString "
 
-        #
-        #  the remaing lines are related only relate to "jsonString" 
-        #
-        if "evalListElement" in stepDict:
-            evalString = stepDict["evalListElement"].strip()
-            #logging.info ('evalString : {}'.format(evalString))
-            posOpeningBracket = evalString.find("[")
-            posClosingBracket = evalString.find("]")
-            jsonListIndex = int(evalString[posOpeningBracket+1:posClosingBracket].strip())
-            #logging.info ('jsonListIndex : {}  {}-{}'.format(jsonListIndex,posOpeningBracket,posClosingBracket))
-        elif "evalValue" in stepDict:
-            evalString = stepDict["evalValue"].strip()
-            #logging.info ('evalString : {}'.format(evalString))
-            posOpeningBracket = evalString.find("{")
-            posClosingBracket = evalString.find("}")
-            jsonListIndex = 0
 
-        logging.info ('jsonListIndex : {}  {}-{}'.format(jsonListIndex,posOpeningBracket,posClosingBracket))
-        if len (jsonValueList) >= jsonListIndex:
-            evalValue = jsonValueList[jsonListIndex]
-            logging.info ('evalValue : {} '.format(evalValue))
-            if posOpeningBracket > 0:
-                evalString1 = evalString[:posOpeningBracket-1].strip()
-                evalString1 = substitudeValue(evalString1,valueList)    
-                logging.debug ('evalString1: {} '.format(evalString1))         
-                if type( evalValue) == str:
-                    result1 =  eval( "'" + evalString1 + "' " + evalValue)
-                else:
-                    result1 =  eval( evalString1 + " " + evalValue)
-                logging.debug ("evalString1 {} evalValue {} result1 {}".format(evalString1,evalValue,result1))
-            else:
-                result1 = True
-
-            if posClosingBracket < len(evalString) - 1:
-                evalString2 = evalString[posClosingBracket+1:].strip()
-                evalString2 = substitudeValue(evalString2,valueList)  
-                logging.debug ('evalString2: {} '.format(evalString2))   
-                if type( evalValue) == str:
-                    logging.info ("'" + evalValue + "' " + evalString2)
-                    result2 =  eval("'" + evalValue + "' " + evalString2)
-                else:
-                    logging.info ( str(evalValue) + " " + str(evalString2))
-                    result2 =  eval(str(evalValue) + evalString2)
-                logging.debug ("evalValue {} evalString2 {} result2 {}".format(evalValue,evalString2,result2) )
-            else:
-                result2 = True
-
-            if result1 == True and result2 == True:
-                logging.info('json evalListElement returns: True')
-                return True,jsonValueList
-            else:
-                logging.info('json evalListElement returns: False')
-                return False,jsonValueList
-        else:
-            logging.info('json evalListElement returns: False, short json output list ')
-            return False,jsonValueList
 

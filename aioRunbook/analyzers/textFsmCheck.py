@@ -75,7 +75,8 @@ class textFsmCheck:
             textFSMString = stepDict["textFSM"]
         except:
             logging.error('check: analyzer without textFSM attribute (textFSM is the default analyzer)')    
-            return False,'check: analyzer without textFSM attribute (textFSM is the default analyzer)'        
+            return False,'check: analyzer without textFSM attribute (textFSM is the default analyzer)',"analyzer error"
+       
         #textFSMString = substitudeValue (stepDict["textFSM"],valueList)
         re_table = textfsm.TextFSM(StringIO(textFSMString))
         #logging.debug('before TextFSMOutput: offset {} relevant output {}'.format(checkCommandOffsetFromLastCommand,
@@ -112,9 +113,9 @@ class textFsmCheck:
                         return False,self.TextFSMOutput
                 else:
                     logging.info('textfsm evalListElement returns: True, short textFSMOutputList ')
-                    return False,self.TextFSMOutput
+                    return False,self.TextFSMOutput,textFSMString
             else:
-                return False,self.TextFSMOutput
+                return False,self.TextFSMOutput,textFSMString
         elif "evalResultCount" in stepDict:
             evalString = stepDict["evalResultCount"].strip()
             posOpeningBracket = evalString.find("[")
@@ -137,14 +138,14 @@ class textFsmCheck:
 
             if result1 == True and result2 == True:
                 logging.info('textfsm evalResultCount returns: True')
-                return True,self.TextFSMOutput
+                return True,self.TextFSMOutput,textFSMString
             else:
                 logging.info('textfsm evalResultCount returns: False')
-                return False,self.TextFSMOutput
+                return False,self.TextFSMOutput,textFSMString
         else:
             if len(self.TextFSMOutput) == stepDict["checkResultCount"]:
-                return True,self.TextFSMOutput
+                return True,self.TextFSMOutput,textFSMString
                 logging.info('textfsm evalResultCount returns: True')
             else:
-                return False,self.TextFSMOutput
+                return False,self.TextFSMOutput,textFSMString
                 logging.info('textfsm evalResultCount returns: False')
