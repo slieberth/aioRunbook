@@ -162,7 +162,7 @@ with the contributing variable/parameter file testParamaterFile.yml:
 Concept of Test Steps
 =====================
 
-A test step comprehends an execution step on a single device. During a test step one or 
+A test step comprehends a set of interactions with a single device. During a test step one or 
 more commands be executed on the specific device. The commands are provided with a list of
 strings, respectively with a list of objects for specific adaptors. In general the device 
 parameters are referenced by the first word of the step attribute name. Optionally the 
@@ -171,7 +171,7 @@ verification criteria. Based on experience is a good habit to verify the test st
 if possible.
 
 .. _stepTypes:
-.. figure::  images/overview1.jpg
+.. figure::  images/steps.jpg
    :align:   center
 
 Following Step Types are implemented:
@@ -230,7 +230,7 @@ Two modes of scheduling for test steps are supported:
 It is possible to loop the list of test steps by configuring a loop counter.:
 
 .. _stepScheduler:
-.. figure::  images/scheduler1.jpg
+.. figure::  images/loopssteps.jpg
    :align:   center
 
 This example lists the config options for aioRunbook step concurrency:
