@@ -33,7 +33,8 @@ RUN apt-get update && apt-get install -y \
     && mkdir testDir3 \
     && cd testDir1/ \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/tests/testDir1/test11.yml > test11.yml \
-    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/tests/testDir1/test12.yml > test12.yml
+    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/tests/testDir1/test12.yml > test12.yml \
+    && cd /
 
-#CMD ["python3 /aioRunbook/runMyServer.py", "-D", "FOREGROUND"]
+CMD ["python3", "/aioRunbook/runMyServer.py" ]
 
