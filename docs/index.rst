@@ -40,8 +40,8 @@ structures, which can be exported as JSON file, for further processing like:
 * rendering to PDF documents
 * dispatching the results in a web app
 
-YAML runbook configs
-====================
+YAML runbook as common abstraction layer 
+========================================
 
 The aioRunbook configuration is defined in a main YAML file. This YAML file defines the order and characteristic of all test steps. 
 The YAML structure is loaded in the beginning and during the execution of the test the data structure is enriched with the output of each test step.
