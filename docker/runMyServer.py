@@ -18,10 +18,10 @@ from aioRunbook.aioRunbookHttpServer import aioRunbookHttpServer
 
 from aiohttp.web import Application, Response, StreamResponse, run_app
 
-        myHttpServer = aioRunbookHttpServer("aioServerConfig.yml")
-        loop = asyncio.get_event_loop()
-        app = myHttpServer.init(loop)
-        if app != None:
-            loop.run_until_complete(run_app(app,port=myHttpServer.httpPort))
-        else:
-            logging.error("cannot load app")
+myHttpServer = aioRunbookHttpServer("aioServerConfig.yml")
+loop = asyncio.get_event_loop()
+app = myHttpServer.init(loop)
+if app != None:
+    loop.run_until_complete(run_app(app,port=myHttpServer.httpPort))
+else:
+    logging.error("cannot load app")

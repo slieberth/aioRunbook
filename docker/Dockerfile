@@ -35,5 +35,5 @@ RUN apt-get update && apt-get install -y \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/tests/testDir1/test11.yml > test11.yml \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/tests/testDir1/test12.yml > test12.yml
 
-CMD ["aioRunbook/runMyServer.py", "-D", "FOREGROUND"]
+#CMD ["cd /aioRunbook; python3 runMyServer.py", "-D", "FOREGROUND"]
 
