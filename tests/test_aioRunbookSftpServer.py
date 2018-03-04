@@ -21,15 +21,16 @@ import logging
 import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
-from aioRunbook.aioRunbookHttpServer import aioRunbookHttpServer
+#from aioRunbook.aioRunbookHttpServer import aioRunbookHttpServer
+from aioRunbook.tools.authSftpServer import ChrootSFTPServer
 import pprint
 import yaml
-from aiohttp.web import Application, Response, StreamResponse, run_app
+#from aiohttp.web import Application, Response, StreamResponse, run_app
 
 
 class test_aioRunbookHttpServer(unittest.TestCase):
 
-    def test_app1(self):
+    def test_sftp1(self):
         ymlConfigString = """#
 templateDir: "../aioRunbook/templates/"
 runbookDirs:
@@ -37,6 +38,8 @@ runbookDirs:
   - "./testDir2"
   - "./testDir3"
 httpPort: 4711
+sftpPort: 4713
+sftpServerHostKeyFile: "id_rsa"
 userAuth:
 - - username: CharlieBrown
   - password: test
@@ -58,16 +61,32 @@ pdfOutput:
   pdfResultDir: ./results_pdfTests
   template: templates/template2.tex
 """
-        fh = open("aioServerConfig.yml",'w')
-        fh.write(ymlConfigString)
-        fh.close()
-        myHttpServer = aioRunbookHttpServer("aioServerConfig.yml")
+#         fh = open("aioServerConfig.yml",'w')
+#         fh.write(ymlConfigString)
+#         fh.close()
+#         myHttpServer = aioRunbookHttpServer("aioServerConfig.yml")
+#         loop = asyncio.get_event_loop()
+#         app = myHttpServer.init(loop)
+#         if app != None:
+#             loop.run_until_complete(run_app(app,port=myHttpServer.httpPort))
+#         else:
+#             logging.error("cannot load app")
+# 
         loop = asyncio.get_event_loop()
-        app = myHttpServer.init(loop)
-        if app != None:
-            loop.run_until_complete(run_app(app,port=myHttpServer.httpPort))
-        else:
-            logging.error("cannot load app")
+        log = logging.getLogger('authSftpServer')
+        configDict = yaml.load(ymlConfigString)
+        try:
+            loop.run_until_complete(ChrootSFTPServer.start_server(configDict))
+        except Exception as e:
+            log.exception("Error starting server {}".format(e))
+        try:
+            loop.run_forever()
+        except KeyboardInterrupt:
+            log.info("User abort")
+
+
+
+
 
 if __name__ == '__main__':
     logLevel = logging.ERROR
@@ -81,6 +100,6 @@ if __name__ == '__main__':
     logging.getLogger("").addHandler(console)
     #unittest.main()
     myTest = test_aioRunbookHttpServer()
-    myTest.test_app1()
+    myTest.test_sftp1()
 
 

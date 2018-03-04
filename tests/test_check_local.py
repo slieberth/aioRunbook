@@ -170,7 +170,8 @@ config:
         myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
-        #print(myRunbook.configDict["config"]["steps"][0]['check'])
+        #print(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['checkCriteris'])
+        self.assertIn("PyYAML",myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['checkCriteris'])
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
 
 if __name__ == '__main__':

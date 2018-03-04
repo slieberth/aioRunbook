@@ -1,9 +1,3 @@
-INFO:root:reading config file: aioServerConfig.yml
 DEBUG:asyncio:Using selector: KqueueSelector
-WARNING:aiohttp_session:Cannot decrypt cookie value, create a new fresh session
-INFO:aiohttp.access:127.0.0.1 [01/Mar/2018:20:40:26 +0000] "GET / HTTP/1.1" 200 2057 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"
-INFO:aiohttp.access:127.0.0.1 [01/Mar/2018:20:40:26 +0000] "GET /favicon.ico HTTP/1.1" 404 172 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"
-WARNING:aiohttp_session:Cannot decrypt cookie value, create a new fresh session
-INFO:aiohttp.access:127.0.0.1 [01/Mar/2018:20:40:28 +0000] "POST /login HTTP/1.1" 302 407 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"
-INFO:aiohttp.access:127.0.0.1 [01/Mar/2018:20:40:28 +0000] "GET / HTTP/1.1" 200 1606 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"
-INFO:aiohttp.access:127.0.0.1 [01/Mar/2018:20:40:30 +0000] "GET /listDir?dir=testDir1 HTTP/1.1" 200 3745 "http://127.0.0.1:4711/" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.186 Safari/537.36"
+INFO:authSftpServer:New connection from: <asyncssh.connection.SSHServerConnection object at 0x1059c65f8> ('127.0.0.1', 62287) None
+INFO:authSftpServer:User abort

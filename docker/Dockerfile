@@ -23,8 +23,17 @@ RUN apt-get update && apt-get install -y \
     && cd templates/ \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/aioRunbook/templates/index.html > index.html  \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/aioRunbook/templates/listDir.html > listDir.html  \
-    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/aioRunbook/templates/viewResultFile.html > viewResultFile.html  \
-    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/aioRunbook/templates/viewYamlFile.html > viewYamlFile.html 
+    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/aioRunbook/templates/viewResultFile.html > viewResultFile.html \
+    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/aioRunbook/templates/viewYamlFile.html > viewYamlFile.html \
+    && cd .. \
+    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/docker/aioServerConfig.yml > aioServerConfig.yml \
+    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/docker/runMyServer.py > runMyServer.py \
+    && mkdir testDir1 \
+    && mkdir testDir2 \
+    && mkdir testDir3 \
+    && cd testDir1/ \
+    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/tests/testDir1/test11.yml > test11.yml \
+    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/tests/testDir1/test12.yml > test12.yml
 
-CMD ["/usr/sbin/apache2", "-D", "FOREGROUND"]
+CMD ["aioRunbook/runMyServer.py", "-D", "FOREGROUND"]
 

@@ -235,6 +235,8 @@ config:
         myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop))
+        self.assertIn("PyYAML",myRunbook.resultDict["loop_2_step_1_command_1"]['checkCriteris'])
+        #pprint.pprint(myRunbook.resultDict)
 
     def test_diff10(self):
 
@@ -245,7 +247,7 @@ config:
   loops: 2
   steps:
     - check:
-        name: check previous step 
+        name: check previous loop
         method: local-shell
         commands:
           - 'pip3 freeze'
@@ -264,6 +266,7 @@ config:
         myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
+        print(myRunbook.resultDict)
 
 
 if __name__ == '__main__':
