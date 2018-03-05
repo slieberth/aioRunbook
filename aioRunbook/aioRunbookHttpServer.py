@@ -404,6 +404,8 @@ class aioRunbookHttpServer():
         except:
             logging.error('cannot find runbookDirs in File {}'.format(configFile))
             return False
+        if isinstance(self.runbookDirs,str):
+            self.runbookDirs = self._findDirsWithYamlFilesInPwd(self.runbookDirs)
         try:
             self.httpPort = self.configDict["httpPort"]
         except:
@@ -424,9 +426,6 @@ class aioRunbookHttpServer():
             logging.error('troubles access templateDir {}'.format(self.templateDir))
             return False
         return True
-
-
-
 
 
     def _upDateJsonDateDict (self,yamlDir):
@@ -458,6 +457,18 @@ class aioRunbookHttpServer():
             except:
                 jsonErrorCountDict[yamlFile] = {"errorCounter": 0}                    
         return jsonErrorCountDict
+
+    def _findDirsWithYamlFilesInPwd (self,parentDir):
+        #print (parentDir)
+        parentDirAbs = os.path.abspath(parentDir)     
+        dirList = [f for f in os.listdir(parentDirAbs) if os.path.isdir(f)]
+        #print (dirList)
+        ymlDirList = []
+        for thisDir in dirList:
+            ymlFilesInThisDir = [f for f in os.listdir(thisDir) if f.endswith('.yml')]
+            if len( ymlFilesInThisDir ) > 0:
+                ymlDirList.append(thisDir)
+        return ymlDirList
 
 
     async def _fifoSchedulerForRunbookList(self):

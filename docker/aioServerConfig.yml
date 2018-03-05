@@ -1,22 +1,10 @@
 templateDir: "/aioRunbook/templates/"
-runbookDirs:
-  - "/aioRunbook/testDir1"
-  - "/aioRunbook/testDir2"
-  - "/aioRunbook/testDir3"
+runbookDirs: "/runbooks"
 httpPort: 4711
 sftpPort: 4713
 sftpServerHostKeyFile: "/aioRunbook/id_rsa"
 userAuth:
-- - username: CharlieBrown
-  - password: test
-  - permissions: 
-    - viewResults
-- - username: MissSophie
-  - password: test
-  - permissions: 
-    - viewResults
-    - runTests
-- - username: MajorTom
+- - username: test
   - password: test
   - permissions: 
     - viewResults
