@@ -126,8 +126,8 @@ class aioRtbRestConnect:
                         for execCommand in commandChunk:            
                             _cmdInCommandStr, _bdsTableString, _attributeDict = self._splitCommandLine(execCommand)
                             #print(execCommand,_cmdInCommandStr, _bdsTableString, _attributeDict)
-                            requestData["objects"].append({})
-                            requestData["objects"][-1]["attribute"] = _attributeDict
+                            #requestData["objects"].append({})
+                            #requestData["objects"][-1]["attribute"] = _attributeDict
                             headers = {'Content-Type': 'application/json'}  
                             urlSuffix = COMMAND_DICT[_cmdInCommandStr]["urlSuffix"]  
                             httpCommand = COMMAND_DICT[_cmdInCommandStr]["httpCommand"] 
@@ -138,6 +138,11 @@ class aioRtbRestConnect:
                                 jsonFh = open(jsonFileName,"r")
                                 requestData = json.load(jsonFh)
                                 print (requestData)
+                            elif _cmdInCommandStr in ["setTable"]:       
+                                requestData["table"].update(_attributeDict)  
+                            else:
+                                requestData["objects"].append({})
+                                requestData["objects"][-1]["attribute"] = _attributeDict       
                             try:       
                                 async with session.post(url,
                                                 data=json.dumps(requestData),

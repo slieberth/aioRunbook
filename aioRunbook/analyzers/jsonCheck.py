@@ -169,7 +169,7 @@ class jsonCheck:
             for resultTuple in resultTuples:
                 if resultTuple[0] == False: resVal = False
                 resList += [resultTuple[1]]
-            return resVal, resList,"\n".join(jsonMultiLines)
+            return resVal, resList, "\n".join(jsonMultiLines)
         else:
             logging.error("missing json check selector: jsonOneLine, jsonMultiLine or jsonString ")  
             return False,[],"missing json check selector: jsonOneLine, jsonMultiLine or jsonString "
