@@ -15,8 +15,17 @@ import asyncio
 import os
 import logging
 from aioRunbook.aioRunbookHttpServer import aioRunbookHttpServer
-
 from aiohttp.web import Application, Response, StreamResponse, run_app
+
+#logLevel = logging.ERROR
+logLevel = logging.DEBUG
+logging.basicConfig(filename="myServerLog.log", filemode='w', level=logLevel)
+logging.getLogger().setLevel(logLevel)
+console = logging.StreamHandler()
+console.setLevel(logLevel)
+formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
+console.setFormatter(formatter)
+logging.getLogger("").addHandler(console)
 
 myHttpServer = aioRunbookHttpServer("/aioRunbook/aioServerConfig.yml")
 loop = asyncio.get_event_loop()
