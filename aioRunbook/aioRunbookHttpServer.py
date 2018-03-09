@@ -460,8 +460,9 @@ class aioRunbookHttpServer():
         return jsonErrorCountDict
 
     def _findDirsWithYamlFilesInPwd (self,parentDir):
-        print ("_findDirsWithYamlFilesInPwd  parentDir {}".format(parentDir))
+        print ("_findDirsWithYamlFilesInPwd  parentDir {} {}".format(parentDir,os.listdir(parentDir)))
         parentDirAbs = os.path.abspath(parentDir)     
+        print ("_findDirsWithYamlFilesInPwd  parentDirAbs {} {}".format(parentDirAbs,os.listdir(parentDirAbs)))
         dirList = [f for f in os.listdir(parentDirAbs) if os.path.isdir(f)]
         print ("_findDirsWithYamlFilesInPwd dirList: {}".format(dirList))
         ymlDirList = []
