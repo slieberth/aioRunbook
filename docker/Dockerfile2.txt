@@ -15,8 +15,8 @@ RUN apt-get update && apt-get install -y \
     python3  \
     python3-pip \
     python3-tk \
-    git \
-    && pip3 install git+https://github.com/slieberth/aioRunbook.git \
+    git
+RUN pip3 install git+https://github.com/slieberth/aioRunbook.git \
     && mkdir aioRunbook  \
     && cd aioRunbook/  \
     && mkdir templates \
@@ -34,8 +34,8 @@ RUN apt-get update && apt-get install -y \
     && cd testDir1/ \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/tests/testDir1/test11.yml > test11.yml \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/tests/testDir1/test12.yml > test12.yml \
-    && cd /
-
+    && mkdir /runbooks \
+    && cd /runbooks
 WORKDIR "/runbooks"
 CMD ["python3", "/aioRunbook/runMyServer.py" ]
 
