@@ -406,6 +406,7 @@ class aioRunbookHttpServer():
             return False
         if isinstance(self.runbookDirs,str):
             self.runbookDirs = self._findDirsWithYamlFilesInPwd(self.runbookDirs)
+        print ("self.runbookDirs: {}".format(self.runbookDirs))
         try:
             self.httpPort = self.configDict["httpPort"]
         except:
@@ -459,15 +460,16 @@ class aioRunbookHttpServer():
         return jsonErrorCountDict
 
     def _findDirsWithYamlFilesInPwd (self,parentDir):
-        #print (parentDir)
+        print ("_findDirsWithYamlFilesInPwd  parentDir {}".format(parentDir))
         parentDirAbs = os.path.abspath(parentDir)     
         dirList = [f for f in os.listdir(parentDirAbs) if os.path.isdir(f)]
-        #print (dirList)
+        print ("_findDirsWithYamlFilesInPwd dirList: {}".format(dirList))
         ymlDirList = []
         for thisDir in dirList:
             ymlFilesInThisDir = [f for f in os.listdir(thisDir) if f.endswith('.yml')]
             if len( ymlFilesInThisDir ) > 0:
                 ymlDirList.append(thisDir)
+        print ("_findDirsWithYamlFilesInPwd ymlDirList: {}".format(ymlDirList))
         return ymlDirList
 
 
