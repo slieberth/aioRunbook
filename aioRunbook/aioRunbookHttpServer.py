@@ -463,7 +463,8 @@ class aioRunbookHttpServer():
         print ("_findDirsWithYamlFilesInPwd  parentDir {} {}".format(parentDir,os.listdir(parentDir)))
         parentDirAbs = os.path.abspath(parentDir)     
         print ("_findDirsWithYamlFilesInPwd  parentDirAbs {} {}".format(parentDirAbs,os.listdir(parentDirAbs)))
-        dirList = [f for f in os.listdir(parentDirAbs) if os.path.isdir(f)]
+        #dirList = [f for f in os.listdir(parentDirAbs) if os.path.isdir(f)]
+        dirList = [f.path for f in os.scandir(parentDirAbs) if f.is_dir() ]
         print ("_findDirsWithYamlFilesInPwd dirList: {}".format(dirList))
         ymlDirList = []
         for thisDir in dirList:
