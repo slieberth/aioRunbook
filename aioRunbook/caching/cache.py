@@ -70,5 +70,5 @@ class cacheCheckResults:
                     varDict[varName] = checkResultItemFromMatrix
             except:
                 varDict[varName] = "ERROR in storeCheckResultToVariable"
-            logging.debug(("new varDict: {}".format(varDict))
+            logging.debug("new varDict: {}".format(varDict))
 
