@@ -141,6 +141,8 @@ example of substitution for a long list of commands
 
 with the contributing macrodefinition file in testMacroFile.yml
 
+.. code-block:: yaml
+
     ECHO5:
       - echo cmdString line1
       - echo cmdString line2
