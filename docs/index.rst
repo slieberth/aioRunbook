@@ -102,12 +102,62 @@ The are two ways to define the connection parameters for device access:
       user: testUser
 
 
-Variable Configs
-----------------
+Macros and Variables
+--------------------
 
-aioRunbook supports variable definitions using Jinja2 variable insertion. The variable dict structure used 
-by Jinja2 can be defined in the yaml runbook or in associated parameters files in yaml. Both options work
-in parallel.
+aioRunbook supports a two stage concept for parameters.
+
+- Macros, which are replaced before the steps are executed. Macros can contain Variables as placeholder.
+- Variables, which are accessed during step execution. Check/Await stes can set variables.
+
+.. figure::  images/variablesAndMacros.jpg
+   :align:   center
+
+
+Macros
+++++++
+
+Macro substitution mechanism is using Jinja2 library with specific tags:
+
+.. code-block:: python
+
+    block_start_string = '#-MACRO-BLOCK',
+    block_end_string = '-#',
+    variable_start_string = '#-MACRO-',
+    variable_end_string = '-#',
+
+example of substitution for a long list of commands
+
+.. code-block:: yaml
+
+    config:
+      macroFiles:
+        - 'testMacroFile.yml'
+      steps:
+        - record:
+            name: a flock of echo commands 
+            method: local-shell
+            commands: #-MACRO-ECHO5-#
+
+with the contributing macrodefinition file in testMacroFile.yml
+
+    ECHO5:
+      - echo cmdString line1
+      - echo cmdString line2
+      - echo cmdString line3
+      - echo cmdString line4
+      - echo cmdString line5
+
+
+Variables
++++++++++
+
+Macro substitution mechanism is using Jinja2 library with specific tags:
+
+.. code-block:: python
+
+    variable_start_string = '.VAR.',
+    variable_end_string = '.',
 
 Variables can be used in a subset for following step attributes:
 
@@ -129,10 +179,10 @@ Var Defs Inline
         text2: freeze
       steps:
         - record:
-            name: '{{text1}}'
+            name: '.VAR.text1.'
             method: local-shell
             commands:
-              - 'pip3 {{text2}}'
+              - 'pip3 .VAR.text2'
 
 
 Var Defs via Files
@@ -145,10 +195,10 @@ Var Defs via Files
         - 'testParamaterFile.yml'
       steps:
         - record:
-            name: '{{text1}}'
+            name: '.VAR.text1.'
             method: local-shell
             commands:
-              - 'pip3 {{text2}}'
+              - 'pip3 .VAR.text2.'
 
 with the contributing variable/parameter file testParamaterFile.yml:
 

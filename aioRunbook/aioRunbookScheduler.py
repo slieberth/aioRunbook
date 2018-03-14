@@ -55,6 +55,7 @@ from aioRunbook.analyzers.jsonCheck import jsonCheck
 from aioRunbook.analyzers.diffCheck import diffCheck
 from aioRunbook.caching.cacheCheckResults import cacheCheckResults
 from aioRunbook.tools.helperFunctions import _isInDictionary, _substitudeVarsInString, _addTimeStampsToStepDict
+from aioRunbook.tools.helperFunctions import _substitudeVarsInString, _substitudeMacrosInString
 from aioRunbook.tools.helperFunctions import _createOutputList, _setHostfileAttributes
 from aioRunbook.tools.helperFunctions import _getOutputInformationTag,_decomposeOutputInformationTag
 from aioRunbook.tools.aioRunbookYmlBlockParser import aioRunbookYmlBlockParser
@@ -286,16 +287,42 @@ class aioRunbookScheduler():
         except:
             logging.error('cannot load YAML File {}'.format(configFile))
             return False  
-        self.configDict["yamlConfigFile"] = self.yamlConfigFile #for pdfRender
+        #
+        #  Macroreader
+        #
+        self.macroDict = {}
+        self.macroFiles = _isInDictionary("macroFiles",self.configDict["config"],[])
+        logging.info('configured macroFiles: {0}'.format(self.macroFiles))
+        if len(self.macroFiles) > 0:
+            for macroFile in self.macroFiles:
+                try:
+                    with open(macroFile) as fh:
+                        YamlDictString = fh.read ()
+                        fh.close ()
+                    newMacroDict = yaml.load(YamlDictString)
+                    tempMacroDict = {**self.macroDict,**newMacroDict}
+                    self.macroDict = deepcopy(tempMacroDict)
+                except:
+                    logging.error('cannot load macroFile {}'.format(macroFile))
+                    self.macroDict = {}
+            #pprint.pprint(self.macroDict)
+            newYamlDictString = _substitudeMacrosInString (self.yamlConfigFile,macroDict=self.macroDict)
+            #print(newYamlDictString)
+            try:     
+                self.configDict = yaml.load(newYamlDictString)
+            except:
+                logging.error('cannot load YAML File {}'.format(configFile))
+                return False  
+        self.configDict["yamlConfigFile"] = self.yamlConfigFile #for pdfRender        
         #
         #   FIXME Start Host Dict Reader should be a function
         #
         self.hostDict = {'SELF': {'device': 'self','vendor': 'self', 'method': 'self'}}
         self.hostfiles = _isInDictionary("hostfiles",self.configDict["config"],[])
-        logging.debug('configured hostfiles: {0}'.format(self.hostfiles))
+        logging.info('configured hostfiles: {0}'.format(self.hostfiles))
         if len(self.hostfiles) > 0:
             for hostfileString in self.hostfiles:
-                logging.info('reading config host file: {0}'.format(hostfileString))
+                logging.debug('reading config host file: {0}'.format(hostfileString))
                 with open(hostfileString) as fh:
                     YamlDictString = fh.read ()
                     fh.close ()
@@ -332,6 +359,8 @@ class aioRunbookScheduler():
         newVarDict = _isInDictionary("vars",self.configDict["config"],{})
         tempVarDict = {**self.varDict,**newVarDict}
         self.varDict = deepcopy(tempVarDict)
+        #
+        #
         self.loops = _isInDictionary("loops",self.configDict["config"],1)
         return True   
 

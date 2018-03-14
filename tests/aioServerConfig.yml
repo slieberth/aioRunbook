@@ -1,10 +1,7 @@
 #
 templateDir: "../aioRunbook/templates/"
-runbookDirs:
-  - "./testDir1"
-  - "./testDir2"
-  - "./testDir3"
-httpPort: 4711  
+runbookDirs: "."
+httpPort: 4711
 userAuth:
 - - username: CharlieBrown
   - password: test

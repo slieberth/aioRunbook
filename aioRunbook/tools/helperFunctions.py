@@ -24,7 +24,8 @@ from copy import deepcopy
 import pprint
 import re
 import datetime
-from jinja2 import Template
+import jinja2
+import os
 
 def _isInDictionary (searchKey,inDictionary,defaultValue):
     """verify the presence of a dict key
@@ -85,10 +86,29 @@ def _substitudeVarsInString (myObject,varDict={},loopIndex=0,stepIndex=0):
 
     """
     #logging.debug ('substitudeValue: {} varDict {}'.format(myObject,varDict))
+    tE_jinja_env = jinja2.Environment(\
+        block_start_string = '{{',
+        block_end_string = '}}',
+        variable_start_string = '.VAR.',
+        variable_end_string = '.',
+        comment_start_string = '#!#',
+        comment_end_string = '#!#',
+        line_statement_prefix = '%%_',
+        line_comment_prefix = '%%#',
+        trim_blocks = True,
+        autoescape = False,
+        loader = jinja2.FileSystemLoader("."))
+
     if isinstance(myObject,str):
         try:
-            template = Template(myObject) 
-            renderedString = template.render(varDict,loopIndex=loopIndex,stepIndex=stepIndex) 
+            fh = open("aioRunbookVariable.tmp",'w')
+            fh.write(myObject)
+            fh.close()
+            #template = jinja2.Template(myObject) 
+            j2template = tE_jinja_env.get_template('aioRunbookVariable.tmp')
+            renderedString = j2template.render(varDict,loopIndex=loopIndex,stepIndex=stepIndex)
+            #renderedString = template.render(varDict,loopIndex=loopIndex,stepIndex=stepIndex) 
+            os.remove("aioRunbookVariable.tmp")
         except:
             logging.error("_substitudeValue jinja2 rendering error")
             return myObject
@@ -97,6 +117,25 @@ def _substitudeVarsInString (myObject,varDict={},loopIndex=0,stepIndex=0):
     else:
         logging.error("_substitudeValue jinja2 not yet implemented just for strings")
         return myObject
+
+def _substitudeMacrosInString (configFileName,macroDict={}):
+    macro_jinja_env = jinja2.Environment(\
+        block_start_string = '#-MACRO-BLOCK',
+        block_end_string = '-#',
+        variable_start_string = '#-MACRO-',
+        variable_end_string = '-#',
+        comment_start_string = '#%#',
+        comment_end_string = '#%#',
+        line_statement_prefix = '#*#',
+        line_comment_prefix = '#!#',
+        trim_blocks = True,
+        autoescape = False,
+        loader = jinja2.FileSystemLoader("."))
+    #logging.debug (' _substitudeMacro: {} macroDict {} '.format(myObject,macroDict))
+    j2template = macro_jinja_env.get_template(configFileName)
+    newConfigString = j2template.render(macroDict)
+    return newConfigString
+
 
 def _retrieveVarFromVarDict_Depr (myObject,varDict={}):     #Deprecated for cacheCheckResults._retrieveVarFromVarDict
     logging.debug ('substitudeValue: {} valueMatrix {} varDict {}'.format(myObject,valueMatrix,varDict))

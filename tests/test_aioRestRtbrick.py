@@ -54,6 +54,7 @@ class test_aioRestRtbrick(unittest.TestCase):
           - setTable default.bgp.1.peer-group.iBGP_1.ipv4.unicast table_type bgp.pg type 1
           - '[ "set default.bgp.1.peer-group.iBGP_1.ipv4.unicast prefix4 {}.{}.{}.0/24".format(P1,P2,P3) for P1 in range(89,90) for P2 in range(0,1) for P3 in range(0,2)]'
           - setObjectsFromJsonFile jsonObjects.json
+          - setTable default.isis.lsp.inject table_type isis.lsp.inject.table 
 """
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
@@ -66,7 +67,7 @@ class test_aioRestRtbrick(unittest.TestCase):
         print(yaml.load(myRunbook.configDict["config"]["steps"][0]['record']['output'][2]['output'])['request'])
         print(yaml.load(myRunbook.configDict["config"]["steps"][0]['record']['output'][3]['output'])['request'])
         print(yaml.load(myRunbook.configDict["config"]["steps"][0]['record']['output'][4]['output'])['request'])
-
+        print(yaml.load(myRunbook.configDict["config"]["steps"][0]['record']['output'][5]['output'])['request'])
 
 
 

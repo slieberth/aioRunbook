@@ -24,7 +24,7 @@ from copy import deepcopy
 import pprint
 import re
 import datetime
-from jinja2 import Template
+from jinja2 import Template, Environment
 
 def _isInDictionary (searchKey,inDictionary,defaultValue):
     if searchKey in inDictionary.keys():
@@ -100,6 +100,22 @@ def _substitudeValue (myObject,valueMatrix=[[]],varDict={},loopIndex=0,stepIndex
     else:
         logging.error("_substitudeValue jinja2 not yet implemented just for strings")
         return myObject
+
+
+def _substitudeMacro (myObject,macroDict={}):
+    macro_jinja_env = Environment(\
+        block_start_string = '\MACRO_BLOCK{{',
+        block_end_string = '}}',
+        variable_start_string = '\MACRO_VAR{{',
+        variable_end_string = '}}',
+        comment_start_string = '\#{',
+        comment_end_string = '}',
+        line_statement_prefix = '%-',
+        line_comment_prefix = '%#',
+        trim_blocks = True,
+        autoescape = False,
+        loader = jinja2.FileSystemLoader("."))
+    logging.debug (' _substitudeMacro: {} macroDict {} '.format(myObject,macroDict))
 
 
 def _addTimeStampsToStepDict(t1,stepDict,commandCounter=0):

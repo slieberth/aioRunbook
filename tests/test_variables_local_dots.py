@@ -52,11 +52,11 @@ config:
         myRunbook = aioRunbookScheduler("test.yml")
         varDict =  myRunbook.configDict["config"]["vars"]
         self.assertEqual(_substitudeVarsInString("test",varDict=varDict),"test")
-        self.assertEqual( _substitudeVarsInString("{{testVar}}",varDict=varDict),"helloWorld")
-        self.assertEqual( _substitudeVarsInString("{{testSeconds}}",varDict=varDict),"1")
-        self.assertEqual( _substitudeVarsInString("{{valueMatrix[0][0]}}",varDict=varDict),"var11")
-        self.assertEqual( _substitudeVarsInString("{{valueMatrix[loopIndex][0]}}",varDict=varDict,loopIndex=0),"var11")
-        self.assertEqual( _substitudeVarsInString("{{ valueMatrix[loopIndex][1] }}",varDict=varDict,loopIndex=1),"var22")
+        self.assertEqual( _substitudeVarsInString(".VAR.testVar.",varDict=varDict),"helloWorld")
+        self.assertEqual( _substitudeVarsInString(".VAR.testSeconds.",varDict=varDict),"1")
+        self.assertEqual( _substitudeVarsInString(".VAR.valueMatrix[0][0].",varDict=varDict),"var11")
+        self.assertEqual( _substitudeVarsInString(".VAR.valueMatrix[loopIndex][0].",varDict=varDict,loopIndex=0),"var11")
+        self.assertEqual( _substitudeVarsInString(".VAR.valueMatrix[loopIndex][1].",varDict=varDict,loopIndex=1),"var22")
         #pprint.pprint(myRunbook.configDict)
 
     def test_var2(self):
@@ -75,7 +75,7 @@ config:
         fh.close()
         myRunbook = aioRunbookScheduler("test.yml")
         varDict =  myRunbook.configDict["config"]["vars"]
-        self.assertEqual( _substitudeVarsInString("{{testVar1}}",varDict=varDict),"helloWorld1")
+        self.assertEqual( _substitudeVarsInString(".VAR.testVar1.",varDict=varDict),"helloWorld1")
         #pprint.pprint(myRunbook.configDict)
 
     def test_var3(self):
@@ -99,8 +99,8 @@ config:
         fh.write(ymlConfigString)
         fh.close()
         myRunbook = aioRunbookScheduler("test.yml")
-        self.assertEqual( _substitudeVarsInString("{{testVar1}}",varDict=myRunbook.varDict),"helloWorld1")
-        self.assertEqual( _substitudeVarsInString("{{testVar2}}",varDict=myRunbook.varDict),"helloWorld2")
+        self.assertEqual( _substitudeVarsInString(".VAR.testVar1.",varDict=myRunbook.varDict),"helloWorld1")
+        self.assertEqual( _substitudeVarsInString(".VAR.testVar2.",varDict=myRunbook.varDict),"helloWorld2")
         #pprint.pprint(myRunbook.configDict)
 
 
@@ -143,10 +143,10 @@ config:
     text2: freeze
   steps:
     - record:
-        name: 'VAR.text1.'
+        name: '.VAR.text1.'
         method: local-shell
         commands:
-          - 'pip3 VAR.text2.'
+          - 'pip3 .VAR.text2.'
   pdfOutput:
     template: "./template_v3.tex"
     author: SL """

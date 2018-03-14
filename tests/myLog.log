@@ -1,3 +1,31 @@
+INFO:root:reading config file: test.yml
+INFO:root:configured macroFiles: []
+INFO:root:configured hostfiles: []
+INFO:root:configured varFiles: []
+INFO:root:reading config file: test.yml
+INFO:root:configured macroFiles: []
+INFO:root:configured hostfiles: []
+INFO:root:configured varFiles: ['testParamaterFile.yml']
+INFO:root:imported varFile: testParamaterFile.yml
+INFO:root:reading config file: test.yml
+INFO:root:configured macroFiles: []
+INFO:root:configured hostfiles: []
+INFO:root:configured varFiles: ['testParamaterFile.yml']
+INFO:root:imported varFile: testParamaterFile.yml
+INFO:root:reading config file: test.yml
+INFO:root:configured macroFiles: []
+INFO:root:configured hostfiles: []
+INFO:root:configured varFiles: ['testParamaterFile.yml']
+INFO:root:imported varFile: testParamaterFile.yml
+INFO:root:reading config file: test.yml
+INFO:root:configured macroFiles: []
+INFO:root:configured hostfiles: []
+INFO:root:configured varFiles: []
 DEBUG:asyncio:Using selector: KqueueSelector
-INFO:authSftpServer:New connection from: <asyncssh.connection.SSHServerConnection object at 0x1059c65f8> ('127.0.0.1', 62287) None
-INFO:authSftpServer:User abort
+INFO:root:execSteps kwargs:{}
+INFO:root:start loop 1
+DEBUG:root:set stepRangeList Indexes to [0]
+DEBUG:root:_asyncTestStep kwargs: {}
+DEBUG:root:async step: 1 started test for substituion in the name attribute
+DEBUG:root:checking hostReferenceName test
+INFO:root:background tasks done

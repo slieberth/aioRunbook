@@ -1,0 +1,7 @@
+#macros
+MACRO1:
+  - '          - echo cmdString line1'
+  - '          - echo cmdString line2'
+  - '          - echo cmdString line3'
+  - '          - echo cmdString line4'
+  - '          - echo cmdString line5'

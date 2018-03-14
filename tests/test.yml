@@ -1,11 +1,18 @@
 #
 config:
-  loops: 2
+  description : ""
+  expected : ""
+  preparation : ""
+  workingDir: ./results_tests
+  vars:
+    text1: "test for substituion in the name attribute"
+    text2: freeze
   steps:
-    - check:
-        name: check previous step 
+    - record:
+        name: '.VAR.text1.'
         method: local-shell
         commands:
-          - 'pip3 freeze'
-        checkMethod: diff
-        diffSource: previousLoop
+          - 'pip3 .VAR.text2.'
+  pdfOutput:
+    template: "./template_v3.tex"
+    author: SL 

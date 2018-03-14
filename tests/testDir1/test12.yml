@@ -1,12 +1,9 @@
 #
 config:
-  loops: 2
   steps:
-    - check:
-        name: check previous step 
+    - record:
+        name: local-shell pip commands
         method: local-shell
         commands:
           - 'pip3 freeze | tail -n 1'
           - 'pip3 freeze | tail -n 2'
-        checkMethod: diff
-        diffSource: previousLoop
