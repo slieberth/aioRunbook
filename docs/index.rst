@@ -150,11 +150,29 @@ with the contributing macrodefinition file in testMacroFile.yml
       - echo cmdString line4
       - echo cmdString line5
 
+the resulting-intermediate yml file does look like:
+
+.. code-block:: yaml
+
+    config:
+      macroFiles:
+        - 'testMacroFile.yml'
+      steps:
+        - record:
+            name: a flock of echo commands 
+            method: local-shell
+            commands:
+              - echo cmdString line1
+              - echo cmdString line2
+              - echo cmdString line3
+              - echo cmdString line4
+              - echo cmdString line5
+
 
 Variables
 +++++++++
 
-Macro substitution mechanism is using Jinja2 library with specific tags:
+Variable substitution mechanism is using Jinja2 library with specific tags:
 
 .. code-block:: python
 
