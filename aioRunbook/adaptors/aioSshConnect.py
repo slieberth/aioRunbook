@@ -152,7 +152,8 @@ class aioSshConnect():
         try:
             self._conn = await asyncio.wait_for(asyncssh.connect(self.hostname, 
                                 username=self.username, 
-                                password=self.password), timeout=self.timeout)
+                                password=self.password,known_hosts=()), timeout=self.timeout)
+#                                password=self.password), timeout=self.timeout)
         except:
             logging.error ("aioSshConnect.connect to {} finally failed".format(self.hostname))  
             self._conn = None
