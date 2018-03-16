@@ -38,5 +38,5 @@ RUN apt-get update && apt-get install -y \
     && cd /
 
 WORKDIR "/runbooks"
-CMD ["python3", "/aioRunbook/runMyServer.py" ]
+#CMD ["python3", "/aioRunbook/runMyServer.py" ]
 
