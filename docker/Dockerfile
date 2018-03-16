@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y \
     python3-pip \
     python3-tk \
     git \
+    ssh \
     && pip3 install git+https://github.com/slieberth/aioRunbook.git \
     && mkdir aioRunbook  \
     && cd aioRunbook/  \
