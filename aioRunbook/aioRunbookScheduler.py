@@ -203,14 +203,14 @@ class aioRunbookScheduler():
                     stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = resultVektur[0]
                     stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"] = resultVektur[1] 
                     try:
-                        stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = resultVektur[2]  
+                        stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteria"] = resultVektur[2]  
                     except:
-                        stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = "not set by analyzer"
+                        stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteria"] = "not set by analyzer"
                 except Exception as errmsg:
                     logging.error(errmsg) 
                     stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = False
                     stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"] = ["!!! Analyser Error !!!"]
-                    stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = "!!! Analyser Error !!!"
+                    stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteria"] = "!!! Analyser Error !!!"
                     logging.error('check function {0}'.format(analyserFunction))
                     #raise
                 logging.info('check/await analyserfuntion returns: {0}'.format(stepDict["output"][checkCommandOffsetFromLastCommand]["pass"]))
@@ -228,14 +228,14 @@ class aioRunbookScheduler():
                             stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = resultVektur[0]
                             stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"] = resultVektur[1] 
                             try:
-                                stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = resultVektur[2]  
+                                stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteria"] = resultVektur[2]  
                             except:
-                                stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = "not set by analyzer"        
+                                stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteria"] = "not set by analyzer"        
                         except Exception as errmsg:
                             logging.error(errmsg) 
                             stepDict["output"][checkCommandOffsetFromLastCommand]["pass"] = False
                             stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"] = ["!!! Analyser Error !!!"]
-                            stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteris"] = "!!! Analyser Error !!!"
+                            stepDict["output"][checkCommandOffsetFromLastCommand]["checkCriteria"] = "!!! Analyser Error !!!"
                             logging.error('check function {0}'.format(analyserFunction))
                             raise
                     if self.disconnectFunction != None and stepId in ["await"] :
@@ -307,7 +307,7 @@ class aioRunbookScheduler():
                     self.macroDict = {}
             #pprint.pprint(self.macroDict)
             newYamlDictString = _substitudeMacrosInString (self.yamlConfigFile,macroDict=self.macroDict)
-            #print(newYamlDictString)
+            print(newYamlDictString)
             try:     
                 self.configDict = yaml.load(newYamlDictString)
             except:

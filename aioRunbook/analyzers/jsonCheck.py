@@ -37,7 +37,7 @@ class jsonCheck:
     """
 
     @classmethod
-    def checkOutputData (self,stepDict,valueList,configDict={},**kwargs):
+    def checkOutputData (self,stepDict,varDict={},configDict={},**kwargs):
 
         """classmethod function for validatiting the CLI output of a stepdict.
 
@@ -158,7 +158,8 @@ class jsonCheck:
 
         elif "jsonOneLine" in stepDict.keys():     
             jsonOneLineStr = stepDict["jsonOneLine"]
-            return jsonOneLineStringCheck ( jsonOneLineStr , jsonObject ),jsonOneLineStr
+            resVal, resList = list (jsonOneLineStringCheck ( jsonOneLineStr , jsonObject ))
+            return resVal, resList, jsonOneLineStr
         elif "jsonMultiLine" in stepDict.keys():     
             jsonMultiLines = stepDict["jsonMultiLine"]
             resultTuples = []
