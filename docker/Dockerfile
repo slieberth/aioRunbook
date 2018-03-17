@@ -40,8 +40,9 @@ RUN apt-get update && apt-get install -y \
     && ssh-keygen -f ca_key -t rsa -N '' \
     && ssh-keygen -f id_rsa -t rsa -N '' \
     && ssh-keygen -s ca_key -I user -n user id_rsa \
-    && ssh-keyscan bitbucket.org > /root/.ssh/known_hosts \
+    && ssh-keyscan -t rsa,dsa 10.10.20.157 2>&1 >> /root/.ssh/known_hosts \
+    && ssh-keyscan -t rsa,dsa -p 2211 10.10.20.157 2>&1 >> /root/.ssh/known_hosts \
     && cd /
 WORKDIR "/runbooks"
-#CMD ["python3", "/aioRunbook/runMyServer.py" ]
+CMD ["python3", "/aioRunbook/runMyServer.py" ]
 
