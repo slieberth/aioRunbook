@@ -103,6 +103,7 @@ class aioSshConnect():
         self.hostname = stepDict["device"]
         self.vendor= stepDict["vendor"]
         self.port = _isInDictionary ("port",stepDict,port)
+        logging.debug('port: {0}'.format(self.port))
         self.startShellCommand = _isInDictionary ("startShellCommand",stepDict,"")
         if self.vendor in [ "juniper" , "cisco" , "ubuntu" ] :
             self.stripPrologueLines = _isInDictionary("stripPrologueLines",stepDict,VENDOR_DICT[self.vendor]["stripPrologueLines"])
@@ -150,7 +151,7 @@ class aioSshConnect():
         logging.debug('connect {} {}'.format(self.stepDict["hostname"],self.stepDict["device"]))
         #def task(self):
         try:
-            self._conn = await asyncio.wait_for(asyncssh.connect(self.hostname, 
+            self._conn = await asyncio.wait_for(asyncssh.connect(self.hostname,port=self.port,
                                 username=self.username, 
 #                                password=self.password,known_hosts=()), timeout=self.timeout)
                                 password=self.password), timeout=self.timeout)
