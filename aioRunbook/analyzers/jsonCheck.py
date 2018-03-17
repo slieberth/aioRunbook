@@ -54,6 +54,26 @@ class jsonCheck:
 
         """
 
+#         def jsonOneLineStringCheck ( jsonOneLineStr , jsonOneLineStringCheckJsonObject ):
+#             separators = [ " == " ]
+#             separatorIncludedFlag = None
+#             for i,separator in enumerate(separators):
+#                 if separator in jsonOneLineStr: separatorIncludedFlag = i
+#             if separatorIncludedFlag != None:
+#                 jsonString = jsonOneLineStr.split(separators[i])[0]
+#                 try:
+#                     responseObj = eval('jsonOneLineStringCheckJsonObject' + jsonString )
+#                 except Exception as errmsg:
+#                     logging.error(errmsg)  
+#                     return False,[] 
+#                 jsonMatch = jsonOneLineStr.split(separators[i])[1]
+#                 evalString = str(responseObj) + " == " + jsonMatch
+#                 return eval(evalString),str(responseObj)
+#             else:
+#                 logging.error("jsonOnelLine split error")  
+#                 return False,[] 
+
+
         def jsonOneLineStringCheck ( jsonOneLineStr , jsonOneLineStringCheckJsonObject ):
             separators = [ " == " ]
             separatorIncludedFlag = None
@@ -67,11 +87,16 @@ class jsonCheck:
                     logging.error(errmsg)  
                     return False,[] 
                 jsonMatch = jsonOneLineStr.split(separators[i])[1]
-                evalString = str(responseObj) + " == " + jsonMatch
+                if isinstance(responseObj,str):
+                    evalString = '"' + responseObj + '"' + " == " + jsonMatch
+                else:
+                    evalString = str(responseObj) + " == " + jsonMatch
                 return eval(evalString),str(responseObj)
             else:
                 logging.error("jsonOnelLine split error")  
-                return False,[] 
+                return False,[]
+
+
 
         checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1        
         try:
