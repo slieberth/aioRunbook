@@ -35,8 +35,13 @@ RUN apt-get update && apt-get install -y \
     && cd testDir1/ \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/tests/testDir1/test11.yml > test11.yml \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/tests/testDir1/test12.yml > test12.yml \
+    && mkdir -p /root/.ssh \
+    && cd /root/.ssh \
+    && ssh-keygen -f ca_key -t rsa -N '' \
+    && ssh-keygen -f id_rsa -t rsa -N '' \
+    && ssh-keygen -s ca_key -I user -n user id_rsa \
+    && ssh-keyscan bitbucket.org > /root/.ssh/known_hosts \
     && cd /
-
 WORKDIR "/runbooks"
 #CMD ["python3", "/aioRunbook/runMyServer.py" ]
 
