@@ -156,11 +156,8 @@ class aioRtbRestConnect:
                     if _isInDictionary ("includeRequestInOutput",self.stepDict,False):                   
                         responseDict["request"] = {}  
                         responseDict["request"]["url"] = url          
-                        responseDict["request"]["command"] = httpCommand  
-                        if len(json.dumps(requestData)) < 500:         
-                            responseDict["request"]["json"] = requestData
-                        else:         
-                            responseDict["request"]["json"] = {"text": "request longer than 500 chars"}
+                        responseDict["request"]["command"] = httpCommand          
+                        responseDict["request"]["json"] = requestData
                     if self.response:
                         logging.info (self.response.status)
                         #logging.info (self.response.headers)   
