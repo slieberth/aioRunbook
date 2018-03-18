@@ -57,16 +57,16 @@ body {margin:0;}
 <h3> Overview Output of the loops/steps/commands of runbook {{filename}}</h3> 
    <div class="row no-gutters">
       <div class="col-sm-1" style="background-color:#eee0ee;" >lllsssccc</div>
-      <div class="col-sm-2" style="background-color:#eee0ee;" >name</div>
-      <div class="col-sm-8" style="background-color:#eee0ee;" >command output</div>
+      <div class="col-sm-3" style="background-color:#eee0ee;" >name</div>
+      <div class="col-sm-7" style="background-color:#eee0ee;" >command output</div>
       <div class="col-sm-1" style="background-color:#eee0ee;" >pass</div>
    </div>
 
     {% for step in stepCommandOutputs %}
    <div class="row no-gutters">
       <div class="col-sm-1" style="background-color:#eeeeee;" >{{step["Id"]}}</div>
-      <div class="col-sm-2" style="background-color:#eeeeee;" >{{step["name"]|truncate(30)}}</div>
-      <div class="col-sm-8" style="background-color:#eeeeee;" >   
+      <div class="col-sm-3" style="background-color:#eeeeee;" >{{step["name"]|truncate(30)}}</div>
+      <div class="col-sm-7" style="background-color:#eeeeee;" >   
         <div id="accordion" role="tablist">
           <div class="card">
             <div class="card-header" role="tab" id="heading{{ loop.index }}">
