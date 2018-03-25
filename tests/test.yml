@@ -1,18 +1,24 @@
-#
 config:
-  description : ""
-  expected : ""
-  preparation : ""
-  workingDir: ./results_tests
-  vars:
-    text1: "test for substituion in the name attribute"
-    text2: freeze
+  hostfiles:
+    - ./host.yml
   steps:
     - record:
-        name: '.VAR.text1.'
-        method: local-shell
-        commands:
-          - 'pip3 .VAR.text2.'
-  pdfOutput:
-    template: "./template_v3.tex"
-    author: SL 
+        name: "DUT - fg"
+        #startInBackground: true
+        timeout: 3
+        commands: 
+          - show system users
+    - record:
+        name: "DUT - bg"
+        startInBackground: true
+        timeout: 3
+        commands: 
+          - show system users
+    - sleep:
+        name: 1 sec
+    - record:
+        name: "DUT - fg2"
+        #startInBackground: true
+        timeout: 3
+        commands: 
+          - show system users

@@ -1,7 +1,7 @@
 #macros
 MACRO1:
-  - '          - echo cmdString line1'
-  - '          - echo cmdString line2'
-  - '          - echo cmdString line3'
-  - '          - echo cmdString line4'
-  - '          - echo cmdString line5'
+  - '          - echo .VAR.myVar. line1'
+  - '          - echo .VAR.myVar. line2'
+  - '          - echo .VAR.myVar. line3'
+  - '          - echo .VAR.myVar. line4'
+  - '          - echo .VAR.myVar. line5'

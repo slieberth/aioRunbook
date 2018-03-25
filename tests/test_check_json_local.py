@@ -10,7 +10,8 @@
 # Contributors:
 #     Stefan Lieberth - initial implementation, API, and documentation
 
-"""Unit tests for Macro Tests"""
+"""Unit tests for testExecutor connection API"""
+
 
 import asyncio
 from copy import copy
@@ -18,94 +19,92 @@ import os
 import unittest
 from unittest.mock import patch
 
-import os
 import sys
 sys.path.insert(0, os.path.abspath('..'))
 from aioRunbook.aioRunbookScheduler import aioRunbookScheduler
 from aioRunbook.tools.helperFunctions import _substitudeVarsInString
-from aioRunbook.caching.cacheCheckResults import cacheCheckResults
 import logging
 import pprint
 
 
 
-class test_aioRunbook_macros(unittest.TestCase):
+class test_check_local(unittest.TestCase):
 
 
-    def test_macro1(self):
-        ymlMacroString = """#macros
-ECHO5:
-  - echo cmdString line1
-  - echo cmdString line2
-  - echo cmdString line3
-  - echo cmdString line4
-  - echo cmdString line5
-"""
-        fh = open("testMacroFile.yml",'w')
-        fh.write(ymlMacroString)
+
+    def test_json_check1(self):
+
+        jsonString = '{"Result":42}'
+        fh = open("test.json",'w')
+        fh.write(jsonString)
         fh.close()
-        ymlConfigString = """#macroTest
+
+        ymlConfigString = """#
 config:
-  macroFiles:
-    - 'testMacroFile.yml'
-  steps:
-    - record:
-        name: a flock of echo commands 
-        method: local-shell
-        commands: #-MACRO-ECHO5-#
-"""
-
-        fh = open("test.yml",'w')
-        fh.write(ymlConfigString)
-        fh.close()
-        myRunbook = aioRunbookScheduler("test.yml")
-        loop = asyncio.get_event_loop()
-        loop.run_until_complete(myRunbook.execSteps(loop)) 
-        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['record']['output'][4]['output'],'cmdString line5')
-        pprint.pprint(myRunbook.configDict)
-
-    def test_macro2(self):
-        ymlMacroString = """#macros
-MACRO1:
-  - '          - echo .VAR.myVar. line1'
-  - '          - echo .VAR.myVar. line2'
-  - '          - echo .VAR.myVar. line3'
-  - '          - echo .VAR.myVar. line4'
-  - '          - echo .VAR.myVar. line5'
-"""
-        fh = open("testMacroFile.yml",'w')
-        fh.write(ymlMacroString)
-        fh.close()
-        ymlConfigString = """#macroTest
-config:
-  macroFiles:
-    - 'testMacroFile.yml'
+  description : ""
+  expected : ""
+  preparation : ""
+  workingDir: ./results_tests
   vars:
-    myVar: mySubstitudeString
+    testVar: 3.12
   steps:
-#-MACRO-BLOCK for ELEMENT in MACRO1 -#
-    - record:
-        name: a flock of echo commands 
+    - check:
+        name: record test local-shell
         method: local-shell
         commands:
-#-MACRO-ELEMENT-#
-#-MACRO-BLOCK endfor -#
-"""
-
+          - cat test.json
+        jsonOneLine: '["Result"] == 42'
+  pdfOutput:
+    template: "./template_v3.tex"
+    author: SL """
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
         myRunbook = aioRunbookScheduler("test.yml")
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
-        self.assertEqual(myRunbook.configDict["config"]["steps"][4]['record']['output'][0]['output'],'mySubstitudeString line5')
-        #pprint.pprint(myRunbook.configDict)
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
 
+    def test_json_check2(self):
+
+        jsonString = '{"Result":42,"parfume":4711}'
+        fh = open("test.json",'w')
+        fh.write(jsonString)
+        fh.close()
+
+        ymlConfigString = """#
+config:
+  description : ""
+  expected : ""
+  preparation : ""
+  workingDir: ./results_tests
+  vars:
+    testVar: 3.12
+  steps:
+    - check:
+        name: record test local-shell
+        method: local-shell
+        commands:
+          - cat test.json
+        jsonMultiLine:
+          - '["Result"] == 42'
+          - '["parfume"] == 4711'
+  pdfOutput:
+    template: "./template_v3.tex"
+    author: SL """
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
+        #print (myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['checkCriteria'])
 
 
 if __name__ == '__main__':
+    logLevel = logging.ERROR
     logLevel = logging.DEBUG
-    #logLevel = logging.ERROR
     logging.basicConfig(filename="myLog.log", filemode='w', level=logLevel)
     logging.getLogger().setLevel(logLevel)
     console = logging.StreamHandler()
@@ -114,10 +113,6 @@ if __name__ == '__main__':
     formatter = logging.Formatter('%(asctime)s : %(levelname)s : %(message)s')
     console.setFormatter(formatter)
     logging.getLogger("").addHandler(console)
-
-    #unittest.main()
-    #myTest = test_aioRunbook_break()
-    #myTest.test_break1()
 
     unittest.main()
 

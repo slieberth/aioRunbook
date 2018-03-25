@@ -103,6 +103,7 @@ class aioRunbookScheduler():
         self.errorCounter = 0
         self.configLoaded = self._readYamlFile(configFile)
         self.resultDict = {}
+        self.sshConnectionTags = {}
 
     @classmethod
     def errorAdaptor(self,stepDict):
@@ -110,7 +111,7 @@ class aioRunbookScheduler():
             stepDict["output"][0]["output"] = "error adpater selection ###"
             _addTimeStampsToStepDict(t1,stepDict)
 
-    #async def _asyncTestStep(self,stepDict,eventLoop,threadExecutor,stepRange = [],**kwargs):
+
     async def _asyncTestStep(self,stepDict,eventLoop,threadExecutor,**kwargs):
         """method asyncTestStep
 
@@ -147,11 +148,21 @@ class aioRunbookScheduler():
             self.disconnectFunction = None
             if method in ["ssh"]: 
                 self.adaptor = aioSshConnect(stepDict,**kwargs)
-                await self.adaptor.connect()
-                self.commandFunction =  self.adaptor.runCommands        
+                await aioSshConnect.pruneAgedSessions(self.sshConnectionTags)
+                sessionTag = self.adaptor.getSessionTag()  #returns None for BG steps
+                if sessionTag in self.sshConnectionTags:      
+                    self.adaptor.setConn(self.sshConnectionTags[sessionTag])
+                    logging.info ("reusing {}".format(sessionTag))
+                else: 
+                    await self.adaptor.connect()
+                self.commandFunction =  self.adaptor.runCommands       
+                if self.adaptor.getConn():
+                    if sessionTag:
+                        self.sshConnectionTags[sessionTag] = self.adaptor.getConn() 
                 await self.commandFunction()
                 self.disconnectFunction = self.adaptor.disconnect
-                await self.disconnectFunction()
+                if not sessionTag:
+                    await self.disconnectFunction()
             elif method in ["telnet"]: 
                 self.adaptor = aioTelnetConnect(stepDict,eventLoop=eventLoop,**kwargs)      
                 await self.adaptor.connect()
@@ -452,6 +463,10 @@ class aioRunbookScheduler():
                         if stepCommandOutput["pass"] != True and stepCommandOutput["skip"] == False:
                             self.errorCounter += 1
                 self.configDict["errorCounter"] = self.errorCounter
+            for connKey in self.sshConnectionTags.keys():                     #disconnect persistanct ssh 
+                await aioSshConnect.disconnectStoredSession(connKey,self.sshConnectionTags[connKey])
+
+
         return True
 
 

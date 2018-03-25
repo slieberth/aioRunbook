@@ -57,6 +57,7 @@ VENDOR_DICT = { "juniper" : { "initPrompt" : ">",
                             "outputCorrections" : [ lambda output : re.sub(r'(\r\n|\r|\n)', '\n',  output) , 
                                                     lambda output : re.sub(r'\[\d+(;\d+)*m', '', output)  ] } }
 
+PERSISITANT_SSH_TIMER = 15
 
 
 class aioSshConnect():
@@ -103,7 +104,7 @@ class aioSshConnect():
         self.hostname = stepDict["device"]
         self.vendor= stepDict["vendor"]
         self.port = _isInDictionary ("port",stepDict,port)
-        logging.debug('port: {0}'.format(self.port))
+        #logging.debug('port: {0}'.format(self.port))
         self.startShellCommand = _isInDictionary ("startShellCommand",stepDict,"")
         if self.vendor in [ "juniper" , "cisco" , "ubuntu" ] :
             self.stripPrologueLines = _isInDictionary("stripPrologueLines",stepDict,VENDOR_DICT[self.vendor]["stripPrologueLines"])
@@ -134,8 +135,7 @@ class aioSshConnect():
         else:
             self.optionalPrompts = []
         self.optionalPrompts = _isInDictionary("optionalPrompts",stepDict,self.optionalPrompts)
-
-
+        self.t1=datetime.datetime.now()
 
     async def connect(self):
         """This function establishes the communication channel to the device by
@@ -153,16 +153,16 @@ class aioSshConnect():
         try:
             self._conn = await asyncio.wait_for(asyncssh.connect(self.hostname,port=self.port,
                                 username=self.username, 
-#                                password=self.password,known_hosts=()), timeout=self.timeout)
+                                known_hosts = None,       #test for known_host ignorance
+#                                client_keys=None,          #test for known_host ignorance
                                 password=self.password), timeout=self.timeout)
         except:
-            logging.error ("aioSshConnect.connect to {} finally failed".format(self.hostname))  
+            logging.error ("aioSshConnect.connect to {} failed".format(self.hostname))  
             self._conn = None
             return False
         self._stdin, self._stdout, self._stderr = await self._conn.open_session(term_type='Dumb', term_size=(200, 24))
-
-        #print (VENDOR_DICT[self.vendor])
-
+        self._sessionTag = self.getSessionTag()
+        logging.debug ("set _sessionTag to {}".format(self._sessionTag))
         if self.vendor in [ "juniper" , "cisco" , "ubuntu" ] :
             foundPrompt = False
             while not foundPrompt:
@@ -199,7 +199,9 @@ class aioSshConnect():
         time = await asyncio.sleep(delayTimer)
         for i,command in enumerate(self.stepDict["commands"]):
             if self._conn:
-                t1=datetime.datetime.now()
+                #t1=datetime.datetime.now()
+                t1 = self.t1
+                logging.debug("sending command {}".format(command))
                 #self.stepDict["output"][i]["startTS"] = t1.strftime('%Y-%m-%d %H:%M:%S.%f')   
                 self._stdin.write(command + "\n")
                 output = ""
@@ -211,11 +213,11 @@ class aioSshConnect():
                             if re.search(rePattern,output): gotPrompt = True
                 except:
                     logging.warning ("prompt timeout step {} command {}".format(i,self.stepDict["stepCounter"]))
-                    #print (output)
                 t2=datetime.datetime.now()
                 for correctionLambda in VENDOR_DICT[self.vendor]["outputCorrections"]:
                     output = correctionLambda(output)
                 output = "\n".join(output.split("\n")[self.stripPrologueLines:-self.stripEpilogueLines])
+                logging.debug ("output {}".format(output))
                 _addTimeStampsToStepDict(t1,self.stepDict,i)  
                 self.stepDict["output"][i]["output"] = output
             else:
@@ -229,4 +231,59 @@ class aioSshConnect():
         if self._conn:
             self._conn.close()
         return True
+
+    def getSessionTag (self):
+        backgroundStep = _isInDictionary("startInBackground",self.stepDict,False)
+        if backgroundStep:
+            return "ssh-{}-{}-{}-bg".format(self.hostname,self.port,self.username)
+        else:
+            return "ssh-{}-{}-{}-fg".format(self.hostname,self.port,self.username)
+
+    def setConn (self,connDict):
+        self._conn = connDict["_conn"]
+        self._stdin = connDict["_stdin"]
+        self._stdout = connDict["_stdout"]
+        self._stderr = connDict["_stderr"]
+        self.rePromptList = connDict["rePromptList"]   
+        self.tsLastUsage = datetime.datetime.now()       
+
+
+    def getConn (self):
+        return {"_conn":self._conn,
+                "_stdin":self._stdin,
+                "_stdout":self._stdout,
+                "_stderr":self._stderr,
+                "rePromptList":self.rePromptList,
+                "tsLastUsage":self.t1}
+
+    @classmethod
+    def checkConnUsageTimer (self,connDict):
+        t1 = connDict["tsLastUsage"] 
+        t2 = datetime.datetime.now()
+        if (t2-t1).total_seconds() < PERSISITANT_SSH_TIMER:
+            return False
+        else:
+            return True
+
+    @classmethod
+    async def disconnectStoredSession (self,connTag,connDict):
+        if connDict["_conn"]:
+            connDict["_conn"].close()
+            logging.debug ("disconnected ssh Session: {}".format(connTag))
+        return True
+
+    @classmethod
+    async def pruneAgedSessions(self,sshConnectionTags):
+        delKeys = []
+        for connKey in sshConnectionTags.keys():  
+            if aioSshConnect.checkConnUsageTimer(sshConnectionTags[connKey]):                
+                await aioSshConnect.disconnectStoredSession(connKey,sshConnectionTags[connKey])
+                delKeys.append(connKey)
+                logging.debug ("destroyed session: {}".format(connKey))
+            else:
+                logging.debug ("keep session: {}".format(connKey))
+        for connKey in delKeys:  
+            del sshConnectionTags[connKey]
+
+
 
