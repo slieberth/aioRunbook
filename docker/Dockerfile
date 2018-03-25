@@ -17,6 +17,16 @@ RUN apt-get update && apt-get install -y \
     python3-tk \
     git \
     ssh
+RUN pip3 install asyncssh
+RUN pip3 install aiohttp
+RUN pip3 install PyYAML
+RUN pip3 install jtextfsm
+RUN pip3 install Jinja2
+RUN pip3 install pysnmp
+RUN pip3 install ncclient
+RUN pip3 install aiohttp-jinja2
+RUN pip3 install aiohttp-session
+RUN pip3 install aiohttp-security
 RUN pip3 install git+https://github.com/slieberth/aioRunbook.git
 RUN && mkdir aioRunbook  \
     && cd aioRunbook/  \
