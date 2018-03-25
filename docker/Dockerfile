@@ -30,7 +30,7 @@ RUN pip3 install aiohttp-jinja2
 RUN pip3 install aiohttp-session
 RUN pip3 install aiohttp-security
 RUN pip3 install git+https://github.com/slieberth/aioRunbook.git
-RUN && mkdir aioRunbook  \
+RUN mkdir aioRunbook  \
     && cd aioRunbook/  \
     && mkdir templates \
     && cd templates/ \
