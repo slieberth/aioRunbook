@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     python3-tk \
     git \
     ssh
+RUN apt-get -y install build-essential libssl-dev libffi-dev python-dev
 RUN pip3 install cryptography
 RUN pip3 install asyncssh
 RUN pip3 install aiohttp
