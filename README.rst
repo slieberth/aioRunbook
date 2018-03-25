@@ -2,7 +2,7 @@ Overview
 ========
 
 Please refer to:
-http://aiorunbook.readthedocs.io/en/latest/index.html
+http://aiorunbook.readthedocs.io/
 
 Installation
 ============
