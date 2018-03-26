@@ -41,6 +41,7 @@ class test_aioRunbook(unittest.TestCase):
         ymlConfigString = """config:
   hostfiles:
     - ./host.yml
+  sshKnownHostsCheck: true
   steps:
     - record:
         name: "DUT - show version"
@@ -196,19 +197,17 @@ class test_aioRunbook(unittest.TestCase):
     - ./host.yml
   steps:
     - record:
-        name: "DUT - fg"
-        #startInBackground: true
-        timeout: 3
-        commands: 
-          - show system users
-    - record:
         name: "DUT - bg"
         startInBackground: true
         timeout: 3
         commands: 
           - show system users
-    - sleep:
-        name: 1 sec
+    - record:
+        name: "DUT - fg1"
+        #startInBackground: true
+        timeout: 3
+        commands: 
+          - show system users
     - record:
         name: "DUT - fg2"
         #startInBackground: true
@@ -242,8 +241,8 @@ if __name__ == '__main__':
     console.setFormatter(formatter)
     logging.getLogger("").addHandler(console)
 
-    unittest.main()
-    #myTest = test_aioRunbook()
-    #myTest.test_juniper6()
+    #unittest.main()
+    myTest = test_aioRunbook()
+    myTest.test_juniper6()
 
 

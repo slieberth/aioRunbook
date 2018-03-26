@@ -1,24 +1,20 @@
 config:
   hostfiles:
     - ./host.yml
+  persistantSshSessions: true
   steps:
     - record:
-        name: "DUT - fg"
-        #startInBackground: true
-        timeout: 3
-        commands: 
-          - show system users
-    - record:
-        name: "DUT - bg"
+        name: "DUT - sleep 1 bg0"
         startInBackground: true
-        timeout: 3
         commands: 
-          - show system users
-    - sleep:
-        name: 1 sec
+          - sleep 1
     - record:
-        name: "DUT - fg2"
-        #startInBackground: true
-        timeout: 3
+        name: "DUT - sleep 1 bg1"
+        startInBackground: true
         commands: 
-          - show system users
+          - sleep 1
+    - record:
+        name: "DUT - sleep 1 bg2"
+        startInBackground: true
+        commands: 
+          - sleep 1

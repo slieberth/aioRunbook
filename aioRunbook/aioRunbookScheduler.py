@@ -146,23 +146,28 @@ class aioRunbookScheduler():
         t1=datetime.datetime.now()
         if stepId in  [ "check", "await","config","record"]:
             self.disconnectFunction = None
+#             if method in ["ssh"]: 
+#                 stepDict["sshKnownHostsCheck"] = self.sshKnownHostsCheck
+#                 stepDict["persistantSshSessions"] = self.persistantSshSessions
+#                 self.adaptor = aioSshConnect(stepDict,**kwargs)
+#                 await aioSshConnect.pruneAgedSessions(self.sshConnectionTags)
+#                 sessionTag = self.adaptor.getSessionTag()
+#                 if sessionTag in self.sshConnectionTags:
+#                     stepDict["output"] = await self.adaptor.connectAndRunCommands(reuseConnection=self.sshConnectionTags[sessionTag])       
+#                 else: 
+#                     stepDict["output"] = await self.adaptor.connectAndRunCommands()          
+#                     if self.adaptor.getConn():
+#                         self.sshConnectionTags[sessionTag] = self.adaptor.getConn() 
+
+        #
+        #   FIXME implemnt mutual excluse of background and persistance
+        # 
+
             if method in ["ssh"]: 
+                stepDict["sshKnownHostsCheck"] = self.sshKnownHostsCheck
                 self.adaptor = aioSshConnect(stepDict,**kwargs)
-                await aioSshConnect.pruneAgedSessions(self.sshConnectionTags)
-                sessionTag = self.adaptor.getSessionTag()  #returns None for BG steps
-                if sessionTag in self.sshConnectionTags:      
-                    self.adaptor.setConn(self.sshConnectionTags[sessionTag])
-                    logging.info ("reusing {}".format(sessionTag))
-                else: 
-                    await self.adaptor.connect()
-                self.commandFunction =  self.adaptor.runCommands       
-                if self.adaptor.getConn():
-                    if sessionTag:
-                        self.sshConnectionTags[sessionTag] = self.adaptor.getConn() 
-                await self.commandFunction()
-                self.disconnectFunction = self.adaptor.disconnect
-                if not sessionTag:
-                    await self.disconnectFunction()
+                stepDict["output"] = await self.adaptor.connectAndRunCommands(sshConnectionTags=self.sshConnectionTags) 
+
             elif method in ["telnet"]: 
                 self.adaptor = aioTelnetConnect(stepDict,eventLoop=eventLoop,**kwargs)      
                 await self.adaptor.connect()
@@ -373,6 +378,8 @@ class aioRunbookScheduler():
         #
         #
         self.loops = _isInDictionary("loops",self.configDict["config"],1)
+        self.sshKnownHostsCheck = _isInDictionary("sshKnownHostsCheck",self.configDict["config"],False)
+        self.persistantSshSessions = _isInDictionary("persistantSshSessions",self.configDict["config"],False)
         return True   
 
     def writeDiffSnapshotToFile (self):
@@ -414,6 +421,7 @@ class aioRunbookScheduler():
             return False            
         logging.info ("execSteps kwargs:{}".format(kwargs))
         numberOfTasksBeforeStart =  len([task for task in asyncio.Task.all_tasks() if not task.done()])
+        logging.info("numberOfTasksBeforeStart {}".format(numberOfTasksBeforeStart))   
         for self.loopCounter in range(1,self.loops+1):
             logging.info('start loop {}'.format(self.loopCounter))
             self.loopIndex = self.loopCounter - 1
@@ -448,11 +456,14 @@ class aioRunbookScheduler():
                     bgTask = eventLoop.create_task(self._asyncTestStep(stepDict,eventLoop,threadExecutor))
                     bgList.append(bgTask)
                 else:
-                    await self._asyncTestStep(stepDict,eventLoop,threadExecutor,**kwargs)  
-            #logging.info("waiting for background tasks to be done {}".format([task for task in bgList if not task.done()]))   
+                    await self._asyncTestStep(stepDict,eventLoop,threadExecutor,**kwargs)
+                #logging.debug("background tasks running {}".format([task for task in bgList if not task.done()]))  
+                numberOfTasks =  len([task for task in asyncio.Task.all_tasks() if not task.done()])
+                logging.info("numberOfTasks (bg) {}".format(numberOfTasks))                     
+            logging.info("waiting for background tasks to be done {}".format([task for task in bgList if not task.done()]))   
             await awaitOpenedTasksToBeDone(numberOfTasksBeforeStart) 
             logging.info("background tasks done")
-            #logging.info("waiting for background tasks to be done {}".format([task for task in bgList if not task.done()])) 
+            logging.info("waiting for background tasks to be done {}".format([task for task in bgList if not task.done()])) 
             # copy result output containers to resultList
             for stepContainer in self.configDict["config"]["steps"]:
                 stepId = list(stepContainer.keys())[0]

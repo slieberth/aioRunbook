@@ -134,6 +134,10 @@ class aioRunbookHttpServer():
             #print (self.runbookDirs)
             self.runbookDirSplitDirs = []
             self.runbookDict = {}
+            #
+            if self.autoRunbookDirs == True:
+                self.runbookDirs = self._findDirsWithYamlFilesInPwd(self.runbookParentDir)
+            #
             for runbookDir in self.runbookDirs:
                 runbookDirSplitDir = os.path.abspath(runbookDir).split(os.sep)[-1]
                 self.runbookDirSplitDirs.append(runbookDirSplitDir)
@@ -404,8 +408,11 @@ class aioRunbookHttpServer():
         except:
             logging.error('cannot find runbookDirs in File {}'.format(configFile))
             return False
+        self.autoRunbookDirs = False
         if isinstance(self.runbookDirs,str):
-            self.runbookDirs = self._findDirsWithYamlFilesInPwd(self.runbookDirs)
+            self.autoRunbookDirs = True
+            self.runbookParentDir = self.runbookDirs
+            self.runbookDirs = self._findDirsWithYamlFilesInPwd(self.runbookParentDir)
         print ("self.runbookDirs: {}".format(self.runbookDirs))
         try:
             self.httpPort = self.configDict["httpPort"]

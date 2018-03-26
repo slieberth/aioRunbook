@@ -171,6 +171,7 @@ def _addTimeStampsToStepDict(t1,stepDict,commandCounter=0):
               :type commandCounter: int
 
     """
+    stepDict["output"][commandCounter]["startTS"] = t1.strftime('%Y-%m-%d %H:%M:%S.%f')   
     t2=datetime.datetime.now()
     stepDict["output"][commandCounter]["endTS"] = t2.strftime('%Y-%m-%d %H:%M:%S.%f')   
     stepDict["output"][commandCounter]["elapsed"] = str((t2-t1))

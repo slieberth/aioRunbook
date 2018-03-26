@@ -113,6 +113,7 @@ class aioSshConnect():
         self.device = stepDict["device"]
         self.port = _isInDictionary ("port",stepDict,22)
         self.vendor = stepDict["vendor"]
+
         self.username = _isInDictionary ("user",configDict["config"],None)
         self.username = _isInDictionary ("user",stepDict,self.username)
         self.password = _isInDictionary ("password",configDict["config"],None)     
@@ -136,7 +137,7 @@ class aioSshConnect():
         self.optionalPrompts = _isInDictionary("optionalPrompts",stepDict,self.optionalPrompts)
         self.t1=datetime.datetime.now()
 
-    async def connectAndRunCommands(self,**kwargs):
+    async def connect(self):
         """This function establishes the communication channel to the device by
         setting the pexpect.spawn object in self.device and perform the user auth with
         the credentials stored in self.username ans self.password.
@@ -147,93 +148,87 @@ class aioSshConnect():
         :raises: Exception if self.method is not ssh or telnet.
 
         """ 
-        delayTimer=0 ###FIXME as kwargs
-        t1 = datetime.datetime.now() 
-        backgroundStep = _isInDictionary("startInBackground",self.stepDict,False)
-        #
-        #   FIXME implemnt mutual excluse of background and persistance
-        # 
-        if "reuseConnection" in kwargs:
-            #logging.debug('reusing {} {}'.format(self.stepDict["name"],kwargs["reuseConnection"]))
-            self._conn =    kwargs["reuseConnection"]["_conn"]
-            self._stdin =   kwargs["reuseConnection"]["_stdin"]
-            self._stdout =  kwargs["reuseConnection"]["_stdout"]
-            self._stderr =  kwargs["reuseConnection"]["_stderr"]
-            self._sessionTag = kwargs["reuseConnection"]["_sessionTag"]
-            self.rePromptList = kwargs["reuseConnection"]["rePromptList"]   
-            #self.tsLastUsage = datetime.datetime.now()
+        logging.debug('connect {} {}'.format(self.stepDict["hostname"],self.stepDict["device"]))
+        #def task(self):
+        try:
+            if self.stepDict["sshKnownHostsCheck"]:
+                self._conn = await asyncio.wait_for(asyncssh.connect(self.hostname,port=self.port,
+                                    username=self.username, 
+                                    password=self.password), timeout=self.timeout)
+            else:
+                self._conn = await asyncio.wait_for(asyncssh.connect(self.hostname,port=self.port,
+                                    username=self.username, 
+                                    known_hosts = None,       
+                                    password=self.password), timeout=self.timeout)
+        except:
+            logging.error ("aioSshConnect.connect to {} failed".format(self.hostname))  
+            self._conn = None
+            return False
+        self._stdin, self._stdout, self._stderr = await self._conn.open_session(term_type='Dumb', term_size=(200, 24))
+        self._sessionTag = self.getSessionTag()
+        logging.debug ("set _sessionTag to {}".format(self._sessionTag))
+        if self.vendor in [ "juniper" , "cisco" , "ubuntu" ] :
+            foundPrompt = False
+            while not foundPrompt:
+                output = await self._stdout.read(64000)
+                if VENDOR_DICT[self.vendor]["initPrompt"] in output: foundPrompt = True  
+            self.rePromptList = VENDOR_DICT[self.vendor]["lambdaCliPrompt"](output)
+            if self.optionalPrompts != []:
+                self.rePromptList += self.optionalPrompts
+            logging.debug ("{} set prompts to {}".format(self.stepDict["name"],self.rePromptList))
+            for initCmd in VENDOR_DICT[self.vendor]["initCmds"]:
+                self._stdin.write(initCmd )
+                output = ""
+                gotPrompt = False
+                while not gotPrompt:
+                    output += await self._stdout.read(64000)
+                    for rePattern in self.rePromptList:
+                        if re.search(rePattern,output): gotPrompt = True    
         else:
-            logging.debug('connect {} {}'.format(self.stepDict["hostname"],self.stepDict["device"]))
-            #def task(self):
-            try:
-                if self.stepDict["sshKnownHostsCheck"]:
-                    self._conn = await asyncio.wait_for(asyncssh.connect(self.hostname,port=self.port,
-                                        username=self.username, 
-                                        password=self.password), timeout=self.timeout)
-                else:
-                    self._conn = await asyncio.wait_for(asyncssh.connect(self.hostname,port=self.port,
-                                        username=self.username, 
-                                        known_hosts = None,       
-                                        password=self.password), timeout=self.timeout)
-                self._stdin, self._stdout, self._stderr = await self._conn.open_session(term_type='Dumb', term_size=(200, 24))
-            except:
-                logging.error ("aioSshConnect.connect to {} failed".format(self.hostname))  
-                self._conn = None
-                #return False
-            if self._conn:
-                self._sessionTag = self.getSessionTag()
-                logging.debug ("set _sessionTag to {}".format(self._sessionTag))
-                if self.vendor in [ "juniper" , "cisco" , "ubuntu" ] :
-                    foundPrompt = False
-                    while not foundPrompt:
-                        output = await self._stdout.read(64000)
-                        if VENDOR_DICT[self.vendor]["initPrompt"] in output: foundPrompt = True  
-                    self.rePromptList = VENDOR_DICT[self.vendor]["lambdaCliPrompt"](output)
-                    if self.optionalPrompts != []:
-                        self.rePromptList += self.optionalPrompts
-                    logging.debug ("{} set prompts to {}".format(self.stepDict["name"],self.rePromptList))
-                    for initCmd in VENDOR_DICT[self.vendor]["initCmds"]:
-                        self._stdin.write(initCmd )
-                        output = ""
-                        gotPrompt = False
-                        while not gotPrompt:
-                            output += await self._stdout.read(64000)
-                            for rePattern in self.rePromptList:
-                                if re.search(rePattern,output): gotPrompt = True   
-        if self._conn: 
-            time = await asyncio.sleep(delayTimer)
-            for i,command in enumerate(self.stepDict["commands"]):
-                if self._conn:
-                    logging.debug("step {} sending command {}".format(self.stepDict["name"],command))
-                    #self.stepDict["output"][i]["startTS"] = t1.strftime('%Y-%m-%d %H:%M:%S.%f')   
-                    self._stdin.write(command + "\n")
-                    output = ""
-                    gotPrompt = False
-                    try:
-                        while not gotPrompt:
-                            output += await asyncio.wait_for(self._stdout.read(64000),timeout=self.timeout)
-                            for rePattern in self.rePromptList:
-                                if re.search(rePattern,output): gotPrompt = True
-                    except Exception as e:
-                        logging.warning ("prompt timeout step {} command {} {}".format(self.stepDict["stepCounter"],i+1,e))
-                    t2=datetime.datetime.now()
-                    for correctionLambda in VENDOR_DICT[self.vendor]["outputCorrections"]:
-                        output = correctionLambda(output)
-                    output = "\n".join(output.split("\n")[self.stripPrologueLines:-self.stripEpilogueLines])
-                    #logging.debug ("step {} output {}".format(self.stepDict["name"],output))
-                    logging.debug ("recv output step {} cmd {}".format(self.stepDict["name"],i+1))
-                    _addTimeStampsToStepDict(t1,self.stepDict,i)  
-                    self.stepDict["output"][i]["output"] = output
-                else:
-                    self.stepDict["output"][i]["output"] = "ssh connect failed"
-                    _addTimeStampsToStepDict(t1,self.stepDict,i)
-            return self.stepDict["output"]
-        else:
-            t1=datetime.datetime.now()
-            self.stepDict["output"][i]["output"] = "ssh connect unknown vendor"
-            _addTimeStampsToStepDict(t1,self.stepDict,i)
-            return self.stepDict["output"]
+            logging.error ("aioSshConnect.connect to {} unknown vendor".format(self.hostname))  
+            self._conn = None
+            return None
+        return self._conn
 
+
+    async def runCommands (self,delayTimer=0):
+        """sends all commands from the the test step and stores the return CLI values in the stepDict output section
+
+              :param delayTimer: a waiting time (in seconds) periods before the commands are executed. required for await.
+              :type delayTimer: int
+
+              :return: the enriched stepDict output dict
+
+        """
+        time = await asyncio.sleep(delayTimer)
+        for i,command in enumerate(self.stepDict["commands"]):
+            if self._conn:
+                #t1=datetime.datetime.now()
+                t1 = self.t1
+                logging.debug("step {} sending command {}".format(self.stepDict["name"],command))
+                #self.stepDict["output"][i]["startTS"] = t1.strftime('%Y-%m-%d %H:%M:%S.%f')   
+                self._stdin.write(command + "\n")
+                output = ""
+                gotPrompt = False
+                try:
+                    while not gotPrompt:
+                        output += await asyncio.wait_for(self._stdout.read(64000),timeout=self.timeout)
+                        for rePattern in self.rePromptList:
+                            if re.search(rePattern,output): gotPrompt = True
+                except:
+                    logging.warning ("prompt timeout step {} command {}".format(i,self.stepDict["stepCounter"]))
+                t2=datetime.datetime.now()
+                for correctionLambda in VENDOR_DICT[self.vendor]["outputCorrections"]:
+                    output = correctionLambda(output)
+                output = "\n".join(output.split("\n")[self.stripPrologueLines:-self.stripEpilogueLines])
+                logging.debug ("step {} output {}".format(self.stepDict["name"],output))
+                _addTimeStampsToStepDict(t1,self.stepDict,i)  
+                self.stepDict["output"][i]["output"] = output
+            else:
+                t1=datetime.datetime.now()
+                self.stepDict["output"][i]["output"] = "ssh connect failed"
+                _addTimeStampsToStepDict(t1,self.stepDict,i)
+        return self.stepDict["output"]
 
     async def disconnect (self):
         #print ("self._conn.close() {}".format(self._conn))
@@ -248,13 +243,13 @@ class aioSshConnect():
         else:
             return "ssh-{}-{}-{}-fg".format(self.hostname,self.port,self.username)
 
-#     def setConn (self,connDict):
-#         self._conn = connDict["_conn"]
-#         self._stdin = connDict["_stdin"]
-#         self._stdout = connDict["_stdout"]
-#         self._stderr = connDict["_stderr"]
-#         self.rePromptList = connDict["rePromptList"]   
-#         self.tsLastUsage = datetime.datetime.now()       
+    def setConn (self,connDict):
+        self._conn = connDict["_conn"]
+        self._stdin = connDict["_stdin"]
+        self._stdout = connDict["_stdout"]
+        self._stderr = connDict["_stderr"]
+        self.rePromptList = connDict["rePromptList"]   
+        self.tsLastUsage = datetime.datetime.now()       
 
 
     def getConn (self):
@@ -263,7 +258,6 @@ class aioSshConnect():
                 "_stdout":self._stdout,
                 "_stderr":self._stderr,
                 "rePromptList":self.rePromptList,
-                "_sessionTag":self._sessionTag,
                 "tsLastUsage":self.t1}
 
     @classmethod
