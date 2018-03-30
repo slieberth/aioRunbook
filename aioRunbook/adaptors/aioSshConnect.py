@@ -149,20 +149,26 @@ class aioSshConnect():
         """ 
         delayTimer=0 ###FIXME as kwargs
         t1 = datetime.datetime.now() 
-        backgroundStep = _isInDictionary("startInBackground",self.stepDict,False)
         #
         #   FIXME implemnt mutual excluse of background and persistance
         # 
-        if "reuseConnection" in kwargs:
-            #logging.debug('reusing {} {}'.format(self.stepDict["name"],kwargs["reuseConnection"]))
-            self._conn =    kwargs["reuseConnection"]["_conn"]
-            self._stdin =   kwargs["reuseConnection"]["_stdin"]
-            self._stdout =  kwargs["reuseConnection"]["_stdout"]
-            self._stderr =  kwargs["reuseConnection"]["_stderr"]
-            self._sessionTag = kwargs["reuseConnection"]["_sessionTag"]
-            self.rePromptList = kwargs["reuseConnection"]["rePromptList"]   
-            #self.tsLastUsage = datetime.datetime.now()
-        else:
+        self.reuseConnection = False
+        self._conn = None
+        self.backgroundStep = _isInDictionary("startInBackground",self.stepDict,False)
+        self._sessionTag = self.getSessionTag()
+        if not  self.backgroundStep:
+            if "sshConnectionTags" in kwargs:
+                logging.debug("_sessionTag: {}".format(self._sessionTag))
+                if self._sessionTag in  kwargs["sshConnectionTags"]:
+                    self.reuseConnection = True
+                    logging.debug('reusing {} {}'.format(self.stepDict["name"],kwargs["sshConnectionTags"][self._sessionTag ]))
+                    self._conn =   kwargs["sshConnectionTags"][self._sessionTag]["_conn"]
+                    self._stdin =   kwargs["sshConnectionTags"][self._sessionTag]["_stdin"]
+                    self._stdout =  kwargs["sshConnectionTags"][self._sessionTag]["_stdout"]
+                    self._stderr =  kwargs["sshConnectionTags"][self._sessionTag]["_stderr"]
+                    #self._sessionTag = kwargs["sshConnectionTags"][self.sessionTag]["_sessionTag"]
+                    self.rePromptList = kwargs["sshConnectionTags"][self._sessionTag]["rePromptList"]   
+        if not self.reuseConnection:
             logging.debug('connect {} {}'.format(self.stepDict["hostname"],self.stepDict["device"]))
             #def task(self):
             try:
@@ -181,8 +187,6 @@ class aioSshConnect():
                 self._conn = None
                 #return False
             if self._conn:
-                self._sessionTag = self.getSessionTag()
-                logging.debug ("set _sessionTag to {}".format(self._sessionTag))
                 if self.vendor in [ "juniper" , "cisco" , "ubuntu" ] :
                     foundPrompt = False
                     while not foundPrompt:
@@ -200,45 +204,55 @@ class aioSshConnect():
                             output += await self._stdout.read(64000)
                             for rePattern in self.rePromptList:
                                 if re.search(rePattern,output): gotPrompt = True   
+                    if not self. backgroundStep:
+                        kwargs["sshConnectionTags"][self._sessionTag] = {"_conn":self._conn,
+                            "_stdin":self._stdin,
+                            "_stdout":self._stdout,
+                            "_stderr":self._stderr,
+                            "rePromptList":self.rePromptList,
+                            "_sessionTag":self._sessionTag,
+                            "tsLastUsage":self.t1}
+
         if self._conn: 
             time = await asyncio.sleep(delayTimer)
             for i,command in enumerate(self.stepDict["commands"]):
-                if self._conn:
-                    logging.debug("step {} sending command {}".format(self.stepDict["name"],command))
-                    #self.stepDict["output"][i]["startTS"] = t1.strftime('%Y-%m-%d %H:%M:%S.%f')   
-                    self._stdin.write(command + "\n")
-                    output = ""
-                    gotPrompt = False
-                    try:
-                        while not gotPrompt:
-                            output += await asyncio.wait_for(self._stdout.read(64000),timeout=self.timeout)
-                            for rePattern in self.rePromptList:
-                                if re.search(rePattern,output): gotPrompt = True
-                    except Exception as e:
-                        logging.warning ("prompt timeout step {} command {} {}".format(self.stepDict["stepCounter"],i+1,e))
-                    t2=datetime.datetime.now()
-                    for correctionLambda in VENDOR_DICT[self.vendor]["outputCorrections"]:
-                        output = correctionLambda(output)
-                    output = "\n".join(output.split("\n")[self.stripPrologueLines:-self.stripEpilogueLines])
-                    #logging.debug ("step {} output {}".format(self.stepDict["name"],output))
-                    logging.debug ("recv output step {} cmd {}".format(self.stepDict["name"],i+1))
-                    _addTimeStampsToStepDict(t1,self.stepDict,i)  
-                    self.stepDict["output"][i]["output"] = output
-                else:
-                    self.stepDict["output"][i]["output"] = "ssh connect failed"
-                    _addTimeStampsToStepDict(t1,self.stepDict,i)
+                logging.debug("step {} sending command {}".format(self.stepDict["name"],command))
+                #self.stepDict["output"][i]["startTS"] = t1.strftime('%Y-%m-%d %H:%M:%S.%f')   
+                self._stdin.write(command + "\n")
+                output = ""
+                gotPrompt = False
+                try:
+                    while not gotPrompt:
+                        output += await asyncio.wait_for(self._stdout.read(64000),timeout=self.timeout)
+                        for rePattern in self.rePromptList:
+                            if re.search(rePattern,output): gotPrompt = True
+                except Exception as e:
+                    logging.warning ("prompt timeout step {} command {} {}".format(self.stepDict["stepCounter"],i+1,e))
+                t2=datetime.datetime.now()
+                for correctionLambda in VENDOR_DICT[self.vendor]["outputCorrections"]:
+                    output = correctionLambda(output)
+                output = "\n".join(output.split("\n")[self.stripPrologueLines:-self.stripEpilogueLines])
+                #logging.debug ("step {} output {}".format(self.stepDict["name"],output))
+                logging.debug ("recv output step {} cmd {}".format(self.stepDict["name"],i+1))
+                _addTimeStampsToStepDict(t1,self.stepDict,i)  
+                self.stepDict["output"][i]["output"] = output
+            if self.backgroundStep:
+                self._conn.close()
+                logging.debug ("disconnected ssh Session: {}".format(self._conn))
             return self.stepDict["output"]
         else:
-            t1=datetime.datetime.now()
-            self.stepDict["output"][i]["output"] = "ssh connect unknown vendor"
-            _addTimeStampsToStepDict(t1,self.stepDict,i)
-            return self.stepDict["output"]
+            for i,command in enumerate(self.stepDict["commands"]):
+                t1=datetime.datetime.now()
+                self.stepDict["output"][i]["output"] = "ssh connect error"
+                _addTimeStampsToStepDict(t1,self.stepDict,i)
+                return self.stepDict["output"]
 
 
     async def disconnect (self):
         #print ("self._conn.close() {}".format(self._conn))
         if self._conn:
             self._conn.close()
+            logging.debug ("disconnected ssh Session: {}".format(self._conn))
         return True
 
     def getSessionTag (self):

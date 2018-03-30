@@ -166,8 +166,9 @@ class aioRunbookScheduler():
             if method in ["ssh"]: 
                 stepDict["sshKnownHostsCheck"] = self.sshKnownHostsCheck
                 self.adaptor = aioSshConnect(stepDict,**kwargs)
+                #logging.debug ("before self.sshConnectionTags{}".format(self.sshConnectionTags)) 
                 stepDict["output"] = await self.adaptor.connectAndRunCommands(sshConnectionTags=self.sshConnectionTags) 
-
+                #logging.debug ("after self.sshConnectionTags{}".format(self.sshConnectionTags))               
             elif method in ["telnet"]: 
                 self.adaptor = aioTelnetConnect(stepDict,eventLoop=eventLoop,**kwargs)      
                 await self.adaptor.connect()
@@ -323,7 +324,18 @@ class aioRunbookScheduler():
                     self.macroDict = {}
             #pprint.pprint(self.macroDict)
             newYamlDictString = _substitudeMacrosInString (self.yamlConfigFile,macroDict=self.macroDict)
-            print(newYamlDictString)
+            if _isInDictionary("saveMacroPreprocessorResultToFile",self.macroDict,False):
+                try:
+                    filename = self.macroDict["saveMacroPreprocessorResultToFile"]
+                    fh = open(filename,'w') 
+                    fh.write(newYamlDictString)
+                    fh.close()
+                    logging.info ("saveMacroPreprocessorResultToFile wrote: {}".format(filename))
+                except Exception as e:
+                    logging.error ("error saveMacroPreprocessorResultToFile {}".format(e))
+            if _isInDictionary("stopAfterMacroPreprocessor",self.macroDict,False):
+                logging.info('stopAfterMacroPreprocessor set to True')
+                return False  
             try:     
                 self.configDict = yaml.load(newYamlDictString)
             except:
