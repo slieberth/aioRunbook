@@ -53,6 +53,8 @@ RUN mkdir aioRunbook  \
     && ssh-keygen -f id_rsa -t rsa -N '' \
     && ssh-keygen -s ca_key -I user -n user id_rsa \
     && cd /
+RUN echo "Europe/Berlin" > /etc/timezone
+RUN dpkg-reconfigure tzdata
 WORKDIR "/runbooks"
 CMD ["python3", "/aioRunbook/runMyServer.py" ]
 
