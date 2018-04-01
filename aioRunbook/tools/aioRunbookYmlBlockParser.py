@@ -139,8 +139,9 @@ class aioRunbookYmlBlockParser(object):
         macroEndLine = None
         for i,line in enumerate(self.configLines):
             if macroLine and macroEndLine == None: 
-                if line[3] != "-":
-                    macroEndLine =  i
+                print (line)
+                if not line.startswith("    -"):
+                    macroEndLine =  i -1
                     #print ("macroEndLine: {}".format(macroEndLine))
             if line.startswith("  macroFiles:") :
                 macroLine =  i
