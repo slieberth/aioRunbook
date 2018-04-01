@@ -162,7 +162,89 @@ config:
         #pprint.pprint(myRunbook.configDict)
 
 
+    def test_var6(self):
 
+        ymlVariableString = """#vars
+text1: "test for substitution in the name attribute"
+text2: freeze
+"""
+        fh = open("testVarDefFile.yml",'w')
+        fh.write(ymlVariableString)
+        fh.close()
+
+        ymlConfigString = """#
+config:
+  description : ""
+  expected : ""
+  preparation : ""
+  varFiles:
+    - testVarDefFile.yml
+  steps:
+    - record:
+        name: '.VAR.text1.'
+        method: local-shell
+        commands:
+          - 'pip3 .VAR.text2.'
+  pdfOutput:
+    template: "./template_v3.tex"
+    author: SL """
+
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['record']['name'],'test for substitution in the name attribute')
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['commandOrig'],'pip3 freeze')
+        pprint.pprint(myRunbook.configDict)
+
+    def test_var7(self):
+
+        ymlConfigString = """#
+config:
+  description : ""
+  expected : ""
+  preparation : ""
+  steps:
+    - check:
+        name: 'record echo 2'
+        method: local-shell
+        device: local-shell
+        vendor: local-shell
+        commands:
+          - 'echo 2'
+        textFSM: |
+          Value P0 (\d+)
+
+          Start
+            ^${P0} -> Record
+    
+          End 
+        checkResultCount: 1
+        storeFirstTextFsMElementToVariable: RESULT2
+    - check:
+        name: 'record echo 3'
+        method: local-shell
+        device: local-shell
+        vendor: local-shell
+        commands:
+          - 'echo 3'
+        textFSM: |
+          Value P0 (\d+)
+
+          Start
+            ^${P0} -> Record
+    
+          End 
+        evalListElement: '[0] > .VAR.RESULT2.'
+"""
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        myRunbook = aioRunbookScheduler("test.yml")
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
 
 
 if __name__ == '__main__':
@@ -178,10 +260,9 @@ if __name__ == '__main__':
     logging.getLogger("").addHandler(console)
 
     #unittest.main()
-    #myTest = test_aioRunbook_break()
-    #myTest.test_break1()
+    myTest = test_aioRunbook_variables()
+    myTest.test_var7()
 
-    unittest.main()
 
 
 

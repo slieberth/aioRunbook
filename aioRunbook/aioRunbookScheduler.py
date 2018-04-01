@@ -324,6 +324,7 @@ class aioRunbookScheduler():
                     self.macroDict = {}
             #pprint.pprint(self.macroDict)
             newYamlDictString = _substitudeMacrosInString (self.yamlConfigFile,macroDict=self.macroDict)
+            newYamlDictString = aioRunbookYmlBlockParser.removeMacroAttributeLines(configString=newYamlDictString)
             if _isInDictionary("saveMacroPreprocessorResultToFile",self.macroDict,False):
                 try:
                     filename = self.macroDict["saveMacroPreprocessorResultToFile"]

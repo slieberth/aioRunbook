@@ -105,7 +105,7 @@ The are two ways to define the connection parameters for device access:
 Macros and Variables
 --------------------
 
-aioRunbook supports a two stage concept for parameters.
+aioRunbook supports a two stage concept for parameters:
 
 - Macros, which are replaced before the steps are executed. Macros can contain Variables as placeholder.
 - Variables, which are accessed during step execution. Check/Await stes can set variables.
@@ -188,8 +188,8 @@ Variables can be used in a subset for following step attributes:
 Jinja2 can process dict- and list-structures. aioRunbookScheduler provides
 two parameters ( loopIndex and stepIndex ) to iterate over variable lists, when executing steps/loops.  
 
-Var Defs Inline
-+++++++++++++++
+Variable Defs Inline
+++++++++++++++++++++
 
 .. code-block:: yaml
 
@@ -205,8 +205,8 @@ Var Defs Inline
               - 'pip3 .VAR.text2'
 
 
-Var Defs via Files
-++++++++++++++++++
+Variable Defs via Files
++++++++++++++++++++++++
 
 .. code-block:: yaml
 
@@ -227,6 +227,69 @@ with the contributing variable/parameter file testParamaterFile.yml:
     vars:
       text1: "test for substituion in the name attribute"
       text2: freeze
+
+
+Variables in Macros
++++++++++++++++++++
+
+it is possible to refer in a  macro block to variables:
+
+
+.. code-block:: yaml
+
+    config:
+      macroFiles:
+        - 'testMacroFile.yml'
+      vars:
+        myVar: mySubstitudeString
+      steps:
+#-MACRO-BLOCK for ELEMENT in MACRO1 -#
+        - record:
+            name: a single echo command 
+            method: local-shell
+            commands:
+#-MACRO-ELEMENT-#
+#-MACRO-BLOCK endfor -#
+
+with the contributing macrodefinition file in testMacroFile.yml
+
+.. code-block:: yaml
+
+MACRO1:
+  - '          - echo .VAR.myVar. line1'
+  - '          - echo .VAR.myVar. line2'
+
+
+the intermediate yml input does look like:
+
+.. code-block:: yaml
+
+    config:
+      macroFiles:
+        - 'testMacroFile.yml'
+      vars:
+        myVar: mySubstitudeString
+      steps:
+        - record:
+            name: a single echo command  
+            method: local-shell
+            commands:
+              - echo .VAR.myVar. line1
+        - record:
+            name: a single echo command  
+            method: local-shell
+            commands:
+              - echo .VAR.myVar. line2
+
+
+and the actual executed commands are:
+
+.. code-block:: yaml
+
+        - loop_1_step_1_command_1:
+              - echo mySubstitudeString line1
+        - loop_1_step_2_command_1:
+              - echo mySubstitudeString line2
 
 
 Concept of Test Steps
@@ -664,6 +727,16 @@ aioSshConnect
 adapter used for ssh device access:
 
 * a wrapper around `asyncssh <http://asyncssh.readthedocs.io/en/latest/>`_ .
+
+.. note::
+
+    Since version 0.3 aioRunbook uses persistant ssh connection for foreground ssh steps by default.
+
+.. warning::
+
+    As persistant ssh connections for background steps (which could run in parallel) are mutual exclusive, 
+    all background ssh steps use an seperate ssh connection, even if 
+
 
 example Junos
 +++++++++++++

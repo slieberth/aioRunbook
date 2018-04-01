@@ -125,4 +125,32 @@ class aioRunbookYmlBlockParser(object):
         dumpStr += "\n".join(pdfOutputBlock) 
         return dumpStr
 
+    @classmethod
+    def removeMacroAttributeLines(self,**kwargs): 
+        if "configFile" in kwargs.keys():
+            with open(kwargs["configFile"]) as fh:
+                YamlString = fh.read ()
+                fh.close ()
+            self.configLines = YamlString.split("\n")
+            logging.debug ("removeMacroAttributeLines {} loaded".format(kwargs["configFile"]))
+        elif "configString" in kwargs.keys():
+            self.configLines = kwargs["configString"].split("\n")
+        macroLine = None
+        macroEndLine = None
+        for i,line in enumerate(self.configLines):
+            if macroLine and macroEndLine == None: 
+                if line[3] != "-":
+                    macroEndLine =  i
+                    #print ("macroEndLine: {}".format(macroEndLine))
+            if line.startswith("  macroFiles:") :
+                macroLine =  i
+                #print ("macroLine: {}".format(macroLine))
+        if macroLine and macroEndLine:
+            #print (self.configLines[macroLine:macroEndLine+1])
+            logging.debug ("removeMacroAttributeLines remove lines {}".format(self.configLines[macroLine:macroEndLine+1]))
+        if macroLine and macroEndLine:
+            return "\n".join(self.configLines[:macroLine]+self.configLines[macroEndLine+1:])
+        else:
+            return self.configLines
+
 

@@ -178,10 +178,12 @@ class test_aioRunbook(unittest.TestCase):
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][1]['record']['output'][0]['pass'],True)
         pprint.pprint(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['elapsedRaw'])
+        #pprint.pprint(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['output'])
         pprint.pprint(myRunbook.configDict["config"]["steps"][1]['record']['output'][0]['elapsedRaw'])
         pprint.pprint(myRunbook.configDict["config"]["steps"][2]['record']['output'][0]['elapsedRaw'])
         pprint.pprint(myRunbook.configDict["config"]["steps"][3]['record']['output'][0]['elapsedRaw'])
         pprint.pprint(myRunbook.configDict["config"]["steps"][4]['record']['output'][0]['elapsedRaw'])
+        #pprint.pprint(myRunbook.configDict["config"]["steps"][4]['record']['output'][0]['output'])
 
 
 
@@ -221,12 +223,12 @@ class test_aioRunbook(unittest.TestCase):
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['pass'],True)
-        pprint.pprint(myRunbook.configDict["config"]["steps"][0]['record']['output'])
-        pprint.pprint(myRunbook.configDict["config"]["steps"][1]['record']['output'])
-        pprint.pprint(myRunbook.configDict["config"]["steps"][2]['record']['output'])
-        #pprint.pprint(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['elapsedRaw'])
-        #pprint.pprint(myRunbook.configDict["config"]["steps"][1]['record']['output'][0]['endTS'])
-        #pprint.pprint(myRunbook.configDict["config"]["steps"][1]['record']['output'][0]['elapsedRaw'])
+        #pprint.pprint(myRunbook.configDict["config"]["steps"][0]['record']['output'])
+        #pprint.pprint(myRunbook.configDict["config"]["steps"][1]['record']['output'])
+        #pprint.pprint(myRunbook.configDict["config"]["steps"][2]['record']['output'])
+        pprint.pprint(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['elapsedRaw'])
+        pprint.pprint(myRunbook.configDict["config"]["steps"][1]['record']['output'][0]['endTS'])
+        pprint.pprint(myRunbook.configDict["config"]["steps"][1]['record']['output'][0]['elapsedRaw'])
 
 
 if __name__ == '__main__':
@@ -241,8 +243,8 @@ if __name__ == '__main__':
     console.setFormatter(formatter)
     logging.getLogger("").addHandler(console)
 
-    #unittest.main()
-    myTest = test_aioRunbook()
-    myTest.test_juniper6()
+    unittest.main()
+    #myTest = test_aioRunbook()
+    #myTest.test_juniper5()
 
 
