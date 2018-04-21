@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>tE settings</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<style>
+body {margin:0;}
+
+.topnav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.topnav a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.row-no-padding {
+  margin-left: 0;
+  margin-right: 0;
+  [class*="col-"] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+</style>
+</head>
+<body>
+
+
+<div class="topnav">
+  <a href={{root}}> <i class="glyphicon glyphicon-home"> </i> </a>
+    <ul class="nav navbar-nav navbar-right">
+     <li><a href={{root}}/settings> <span class="glyphicon glyphicon-wrench"> </span> </a></li>
+     <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+    </ul>
+</div>
+
+
+  <br>
+
+  <form class="form-horizontal" action="{{root}}/settings" method="post">
+
+    <div class="form-group">
+      <label class="control-label col-sm-1" for="text">tester</label>
+      <div class="col-sm-3">          
+        <input type="text" class="form-control" id="tester" value="{{settingsDict['tester']}}" name="tester">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label col-sm-1" for="text">logging</label>
+      <div class="col-sm-2">     
+            <div class="choice-select">
+              <select class="form-control" id="loggingSelect" name="loggingSelect" >
+                <option value="warning" {% if settingsDict['logging'] == 'warning' %}selected{% endif %} >warning</option>
+                <option value="info"    {% if settingsDict['logging'] == 'info' %}selected{% endif %} >info</option>
+                <option value="debug"   {% if settingsDict['logging'] == 'debug' %}selected{% endif %} >debug</option>
+              </select>
+            </div>
+      </div>
+    </div>
+
+
+    <div class="form-group">
+      <label class="control-label col-sm-1" for="text">setDiff</label>
+      <label class="checkbox-inline"><input id="setDiffSnapshot" type="checkbox" value="" name="setDiffSnapshot" 
+         {% if settingsDict['setDiffSnapshot'] %}checked {% endif %}>setDiffSnapshot</label>
+    </div>
+
+    <div class="form-group">
+      <label class="control-label col-sm-1" for="text">pdflatex</label>
+      <label class="checkbox-inline"><input id="pdflatex" type="checkbox" value="" name="pdflatex" 
+         {% if settingsDict['pdflatex'] %}checked {% endif %}>pdflatex</label>
+    </div>
+
+
+    <div class="form-group">
+      <div class="col-sm-1">
+      </div>   
+      <div class="col-sm-1">
+        <a href={{root}} id="cancel" name="cancel" class="btn btn-default">Cancel</a>
+      </div>   
+      <div class="col-sm-1">
+        <button type="submit" class="btn btn-warning">Apply</button>
+      </div>
+      <div class="col-sm-1">
+        <a href={{root}}/saveConfig id="saveConfig" name="cancel" class="btn btn-danger">Save To Disk</a>
+      </div>  
+    </div>
+
+  </form>
+
+{% if errorMessage %}
+<div class="alert alert-warning" role="alert">
+	<button type="button" class="close" data-dismiss="alert">×</button>
+	<strong> {{errorMessage}} </strong> 
+</div>
+{% endif %}
+</body>
+</html>
+
+

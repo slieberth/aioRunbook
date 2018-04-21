@@ -71,15 +71,16 @@ class aioRunbookYmlBlockParser(object):
             self.configLines = YamlString.split("\n")
         elif "configString" in kwargs.keys():
             self.configLines = kwargs["configString"].split("\n")
+        logging.debug ("getConfigBlock self.configLines: {}".format(self.configLines))
         configLine = self._findFirstLineStartingWith("config:",self.configLines )
         pdfLine = self._findFirstLineStartingWith("pdfRender:",self.configLines )
         diffStringLine = self._findFirstLineStartingWith("diffSnapshot:",self.configLines )
-        #print (configLine,pdfLine,diffStringLine)
-        if configLine and pdfLine:
+        logging.debug ("getConfigBlock:configLine {},pdfLine {},diffStringLine {}".format(configLine,pdfLine,diffStringLine))
+        if configLine != None and pdfLine != None:
             return "\n".join(self.configLines[configLine:pdfLine])
-        elif configLine and diffStringLine:
+        elif configLine != None and diffStringLine != None:
             return "\n".join(self.configLines[configLine:diffStringLine])
-        elif configLine:
+        elif configLine != None:
             return "\n".join(self.configLines[configLine:])
         else:
             return "###Error###"
@@ -139,7 +140,7 @@ class aioRunbookYmlBlockParser(object):
         macroEndLine = None
         for i,line in enumerate(self.configLines):
             if macroLine and macroEndLine == None: 
-                print (line)
+                #print (line)
                 if not line.startswith("    -"):
                     macroEndLine =  i -1
                     #print ("macroEndLine: {}".format(macroEndLine))

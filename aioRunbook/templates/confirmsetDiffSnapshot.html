@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>aioRunbook.home</title>
+  <title>ioRunbook.listDir</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -36,49 +36,39 @@ body {margin:0;}
     color: white;
 }
 
-.row-no-padding {
-  margin-left: 0;
-  margin-right: 0;
-  [class*="col-"] {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-  }
-}
 
 </style>
 </head>
 <body>
 
-{% if username %}
 <div class="topnav">
   <a href={{root}}>home</a>
    {% for NavDir in runbookDirSplitDirs|sort %}
   <a href={{root}}/listDir?dir={{NavDir}}>{{NavDir}}</a>
    {% endfor %}
     <ul class="nav navbar-nav navbar-right">
-     <li><a href={{root}}/settings> <i class="glyphicon glyphicon-wrench"> </i> </a></li>
      <li><a href="/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
     </ul>
 </div>
-{% else %}
-<div class="topnav">
-  <a href={{root}}>home</a>
-      <form id="signin" class="navbar-form navbar-right" role="form" action="/login" method="post">
-            <div class="input-group">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                <input id="username" type="text" class="form-control" name="username" value="" placeholder="Username">                                        
-            </div>
 
-            <div class="input-group">
-                <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-                <input id="password" type="password" class="form-control" name="password" value="" placeholder="Password">                                        
-            </div>
-
-            <button type="submit" class="btn btn-primary">Login</button>
-  </form>
+<div class="alert alert-danger">
+  <strong>Danger!</strong> please confirm setDiffSnapshot
+        <a href="{{root}}/execYamlFile?file={{filename}}&dir={{yamlDir}}&confirmSetDiffSnapshot=ok"><span class="glyphicon glyphicon-ok"></span></a>.
 </div>
-{% endif %}
+<div class="alert alert-info">
+  <strong>Danger!</strong> or disable setDiffSnapshot in settings:
+        <a href={{root}}/settings> <i class="glyphicon glyphicon-wrench"> </i> </a>
+</div>
 
+<div class="container-fluid">
+   
+
+{% if errorMessage %}
+<div class="alert alert-warning" role="alert">
+	<button type="button" class="close" data-dismiss="alert">×</button>
+	<strong> {{errorMessage}} </strong> 
+	</div>
+{% endif %}
 </body>
 </html>
 

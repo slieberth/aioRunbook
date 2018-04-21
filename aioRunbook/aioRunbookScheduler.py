@@ -99,9 +99,13 @@ class aioRunbookScheduler():
 
     """
 
-    def __init__(self,configFile):    
+    def __init__(self,**kwargs):    
+        logging.debug("aioRunbookScheduler.__init__ kwargs: {}".format(kwargs))
+        configFile = kwargs["file"]
+        self.scheduler_settingsDict = kwargs
         self.errorCounter = 0
-        self.configLoaded = self._readYamlFile(configFile)
+        self.configLoaded = self._readYamlFile(configFile,**kwargs)
+        logging.debug("aioRunbookScheduler.__init__ config loaded: {}".format(self.configLoaded))
         self.resultDict = {}
         self.sshConnectionTags = {}
 
@@ -259,6 +263,8 @@ class aioRunbookScheduler():
                         self.disconnectFunction()
                     _addTimeStampsToStepDict(t1,stepDict)
             cacheCheckResults.storeCheckResultToVarDict (stepDict,varDict=self.varDict)
+            if stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"] == "setDiffSnapshot":
+                self.writeDiffSnapshotToFile()
         elif stepId == "sleep":
             #stepDict["output"][0]["startTS"] = t1.strftime('%Y-%m-%d %H:%M:%S.%f')   
             if "seconds" not in stepDict.keys():
@@ -289,7 +295,7 @@ class aioRunbookScheduler():
             _addTimeStampsToStepDict(t1,stepDict)
         return stepDict
 
-    def _readYamlFile (self,configFile):
+    def _readYamlFile (self,configFile,**kwargs):
         self.yamlConfigFile = configFile
         logging.info('reading config file: {0}'.format(configFile))
         try:
@@ -304,10 +310,16 @@ class aioRunbookScheduler():
         except:
             logging.error('cannot load YAML File {}'.format(configFile))
             return False  
+        logging.info(' _readYamlFile config file loaded: {}'.format(configFile))
+        logging.debug(' _readYamlFile config file loaded: {}'.format(self.configDict))
         #
         #  Macroreader
         #
         self.macroDict = {}
+        if "saveMacroPreprocessorResultToFile" in kwargs:
+            self.macroDict["saveMacroPreprocessorResultToFile"] = kwargs["saveMacroPreprocessorResultToFile"]
+        if "stopAfterMacroPreprocessor" in kwargs:
+            self.macroDict["stopAfterMacroPreprocessor"] = kwargs["stopAfterMacroPreprocessor"]
         self.macroFiles = _isInDictionary("macroFiles",self.configDict["config"],[])
         logging.info('configured macroFiles: {0}'.format(self.macroFiles))
         if len(self.macroFiles) > 0:
@@ -398,13 +410,15 @@ class aioRunbookScheduler():
     def writeDiffSnapshotToFile (self):
         """function to write the current output string to the diffSnapshot section of the YAML config file.
 
-        FIXME - change to coroutine, once aiohttp server can concur simultanously.
+        FIXME - change to coroutine, once multiple aiohttp server can concur simultanously.
 
         """
 
         logging.info('writing config file: {0}'.format(self.yamlConfigFile))
         diffStringYamlBlockLines = diffCheck.getDiffSnapshotYamlBlockLines(self.configDict)
+        print("diffStringYamlBlockLines:{}".format(diffStringYamlBlockLines))
         configBlockLines = aioRunbookYmlBlockParser.getConfigBlock(configFile=self.yamlConfigFile).split("\n")
+        print("configBlockLines:{}".format(configBlockLines))
         newYamlConfigString = "\n".join(configBlockLines+diffStringYamlBlockLines)
         fh = open(self.yamlConfigFile,'w') 
         fh.write(newYamlConfigString)  
@@ -466,10 +480,10 @@ class aioRunbookScheduler():
                 blockingAdapter = _isInDictionary("blockingAdapter",stepDict,False)
                 if backgroundStep:
                     logging.debug("adding background tasks {}".format(stepDict["name"]))                        
-                    bgTask = eventLoop.create_task(self._asyncTestStep(stepDict,eventLoop,threadExecutor))
+                    bgTask = eventLoop.create_task(self._asyncTestStep(stepDict,eventLoop,threadExecutor,**self.scheduler_settingsDict))
                     bgList.append(bgTask)
                 else:
-                    await self._asyncTestStep(stepDict,eventLoop,threadExecutor,**kwargs)
+                    await self._asyncTestStep(stepDict,eventLoop,threadExecutor,**self.scheduler_settingsDict)
                 #logging.debug("background tasks running {}".format([task for task in bgList if not task.done()]))  
                 numberOfTasks =  len([task for task in asyncio.Task.all_tasks() if not task.done()])
                 logging.info("numberOfTasks (bg) {}".format(numberOfTasks))                     

@@ -1,7 +1,3 @@
 #macros
-MACRO1:
-  - '          - echo .VAR.myVar. line1'
-  - '          - echo .VAR.myVar. line2'
-  - '          - echo .VAR.myVar. line3'
-  - '          - echo .VAR.myVar. line4'
-  - '          - echo .VAR.myVar. line5'
+saveMacroPreprocessorResultToFile: test1.pre
+stopAfterMacroPreprocessor: true

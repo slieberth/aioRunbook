@@ -1,24 +1,24 @@
-#
-templateDir: "../aioRunbook/templates/"
-runbookDirs: "."
 httpPort: 4711
-userAuth:
-- - username: CharlieBrown
-  - password: test
-  - permissions: 
-    - viewResults
-- - username: MissSophie
-  - password: test
-  - permissions: 
-    - viewResults
-    - runTests
-- - username: MajorTom
-  - password: test
-  - permissions: 
-    - viewResults
-    - runTests
-    - editTests
 pdfOutput:
   author: SL
   pdfResultDir: ./results_pdfTests
   template: templates/template2.tex
+runbookDirs:
+- ./testDir1
+- ./testDir2
+- ./testDir3
+scheduler:
+  file: testDir2/test23.yml
+  logging: debug
+  pdflatex: false
+  setDiffSnapshot: false
+  tester: SLi
+  verbose: false
+templateDir: ../aioRunbook/templates/
+userAuth:
+- - username: test
+  - password: test
+  - permissions:
+    - viewResults
+    - runTests
+    - editTests

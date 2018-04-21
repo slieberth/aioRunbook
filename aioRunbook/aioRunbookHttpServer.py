@@ -64,6 +64,16 @@ import jinja2
 
 TEMPLATES_ROOT = "templates"
 
+SCHEDULER_DEFAULT_KWARGS = {'macrofile' :None,
+             'logfile': 'testExecutor3.log',
+             'logging': 'info',
+             'pdflatex': False,
+             'keepTexFile': False,
+             'setDiffSnapshot': False,
+             'tester': None,
+             'verbose': True
+             }
+
 
 class aioRunbookHttpServer():
     """ aiohttp
@@ -93,6 +103,9 @@ class aioRunbookHttpServer():
         app.router.add_get('/execAllFilesFromDir', self.execYamlFile)
         app.router.add_get('/viewResultFile', self.viewResultFile)
         app.router.add_get('/createPDF', self.createPDF)
+        app.router.add_route('*','/settings',self.settings)
+        app.router.add_get('/saveConfig',self.saveConfig)
+        app.router.add_get('/confirmSetDiffSnapshot',self.confirmSetDiffSnapshot)
         app.user_map = self.user_map
         configure_handlers(app)
 
@@ -229,6 +242,10 @@ class aioRunbookHttpServer():
                 fileList = self.runbookDict[yamlDir]
                 jsonDateDict = self._upDateJsonDateDict(yamlDir)
                 jsonErrorDict = self._upDateJsonErrorDict(yamlDir)
+                if self.scheduler_settingsDict["setDiffSnapshot"] == True:
+                    if "confirmSetDiffSnapshot" not in all_args.keys():
+                        logging.warning('will redirect to confim page {}/confirmSetDiffSnapshot?yamlDir={}&file={}'.format(root,yamlDir,all_args["file"]))
+                        return web.HTTPFound('{}/confirmSetDiffSnapshot?yamlDir={}&file={}'.format(root,yamlDir,all_args["file"]))
                 try:
                     with open(yamlFilePath) as fh:
                         YamlDictString = fh.read ()
@@ -238,7 +255,9 @@ class aioRunbookHttpServer():
                     return 'cannot open configFile {}'.format(yamlFilePath)
                 else:
                     try:
-                        myRunbook = aioRunbookScheduler(yamlFilePath)
+                        self.scheduler_settingsDict["file"] = yamlFilePath
+                        myRunbook = aioRunbookScheduler(**self.scheduler_settingsDict)
+                        logging.debug('aioRunbookScheduler initialized {}'.format(myRunbook))
                         loop = asyncio.get_event_loop()
                         threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,) 
                         #loop.run_until_complete(myRunbook.execSteps(loop,threadExecutor)) 
@@ -246,6 +265,7 @@ class aioRunbookHttpServer():
                         #logging.debug("adding background tasks myRunbook.execSteps(loop,threadExecutor)")  
                         threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,)                      
                         bgTask = loop.create_task(myRunbook.execStepsAndSaveDicts(loop))
+                        logging.debug('aioRunbookScheduler bgTask added {}'.format(bgTask))
                         self.bgList.append(bgTask)
                         NewBgYamlDict = {}
                         NewBgYamlDict[bgTask] = yamlFilePath
@@ -306,7 +326,8 @@ class aioRunbookHttpServer():
                 return 'cannot open configFile {}'.format(yamlFilePath)
             else:
                 try:
-                    myRunbook = aioRunbookScheduler(yamlFilePath)  #this is required to get the YAMLfilename 
+                    self.scheduler_settingsDict["file"] = yamlFilePath
+                    myRunbook = aioRunbookScheduler(**self.scheduler_settingsDict)  #this is required to get the YAMLfilename 
                     loop = asyncio.get_event_loop()
                     resultDict = await myRunbook.getResultFileContent(loop)
                 except:
@@ -379,7 +400,8 @@ class aioRunbookHttpServer():
             yamFileName = all_args["file"]
         if yamlDir != None and yamFileName  != None:
             yamlFilePath = os.sep.join([yamlDir,yamFileName])
-            myRunbook = aioRunbookScheduler(yamlFilePath)
+            self.scheduler_settingsDict["file"] = yamlFilePath
+            myRunbook = aioRunbookScheduler(**self.scheduler_settingsDict)
             loop = asyncio.get_event_loop()
             threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=3,)
             myAioPdfRender = aioPdfRender(myRunbook.configDict,myRunbook.resultDict,True,self.configDict["pdfOutput"])
@@ -433,7 +455,69 @@ class aioRunbookHttpServer():
         if not os.path.isdir(self.templateDir):
             logging.error('troubles access templateDir {}'.format(self.templateDir))
             return False
+        try:
+            self.scheduler_settingsDict = self.configDict["scheduler"]
+        except:
+            logging.error('cannot set config paramters for tE {}'.format(configFile))
+            self.scheduler_settingsDict = SCHEDULER_DEFAULT_KWARGS
         return True
+
+    @has_permission('viewResults')
+    @aiohttp_jinja2.template('settings.html')
+    async def saveConfig(self,request):
+        root="http://"+request.host
+        all_args = request.query
+        #print ("GET args:",all_args)
+        self.configDict["scheduler"] = self.scheduler_settingsDict
+        yamlConfig = yaml.dump(self.configDict,default_flow_style=False)
+        print(yamlConfig)
+        errorMessage = None
+        try:
+            with open(self.yamlConfigFile, 'w') as outfile:  
+                outfile.write(yamlConfig)
+                outfile.close ()
+        except Exception as e:
+            logging.error('cannot write configFile {}'.format(self.yamlConfigFile))
+            errorMessage = 'cannot write configFile {} {}'.format(self.yamlConfigFile,e) 
+        return {"root":root,"errorMessage":errorMessage,"settingsDict":self.scheduler_settingsDict}
+
+
+    @has_permission('viewResults')
+    @aiohttp_jinja2.template('settings.html')
+    async def settings(self,request):
+        root="http://"+request.host
+        if request.method == "POST":
+            all_args = await request.post()
+            print ("POST args:",all_args)
+            self.scheduler_settingsDict["tester"] = all_args["tester"]
+            self.scheduler_settingsDict["logging"] = all_args["loggingSelect"]  
+            if  "setDiffSnapshot" in all_args.keys():
+                self.scheduler_settingsDict["setDiffSnapshot"] = True       
+            else:
+                self.scheduler_settingsDict["setDiffSnapshot"] = False    
+            if  "pdflatex" in all_args.keys():
+                self.scheduler_settingsDict["pdflatex"] = True       
+            else:
+                self.scheduler_settingsDict["pdflatex"] = False              
+            #pprint.pprint(self.scheduler_settingsDict)
+            self._change_logging(**self.scheduler_settingsDict)
+        else:
+            all_args = request.query
+            #print ("GET args:",all_args)
+        errorMessage = None
+        return {"root":root,"errorMessage":errorMessage,"settingsDict":self.scheduler_settingsDict}
+
+    @has_permission('viewResults')
+    @aiohttp_jinja2.template('confirmSetDiffSnapshot.html')
+    async def confirmSetDiffSnapshot(self,request):
+        root="http://"+request.host
+        all_args = request.query
+        print(all_args)
+        yamlDir = all_args["yamlDir"]
+        yamFileName = all_args["file"]
+        errorMessage = None
+        return {"root":root,"filename":yamFileName,"yamlDir":yamlDir,"errorMessage":errorMessage}
+
 
 
     def _upDateJsonDateDict (self,yamlDir):
@@ -478,6 +562,13 @@ class aioRunbookHttpServer():
         print ("_findDirsWithYamlFilesInPwd ymlDirList: {}".format(ymlDirList))
         return ymlDirList
 
+    def _change_logging(self,**kwargs):
+        if kwargs['logging'] is not None:
+            self.loggingLevel = kwargs['logging']
+            if self.loggingLevel in ["debug", "info", "warning"]:
+                if self.loggingLevel == "debug": logging.getLogger().setLevel(logging.DEBUG)
+                if self.loggingLevel == "info": logging.getLogger().setLevel(logging.INFO)
+                if self.loggingLevel == "warning": logging.getLogger().setLevel(logging.WARNING)
 
     async def _fifoSchedulerForRunbookList(self):
         """tbd
@@ -487,7 +578,8 @@ class aioRunbookHttpServer():
         #threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,)   
         while len(self.fifoFileList) > 0:
             configFile = self.fifoFileList.pop(0)
-            myRunbook = aioRunbookScheduler(configFile)                   
+            self.scheduler_settingsDict["file"] = configFile
+            myRunbook = aioRunbookScheduler(**self.scheduler_settingsDict)                   
             await myRunbook.execStepsAndSaveDicts(loop)
 
 

@@ -38,21 +38,15 @@ runbookDirs:
   - "./testDir3"
 httpPort: 4711
 userAuth:
-- - username: CharlieBrown
-  - password: test
-  - permissions: 
-    - viewResults
-- - username: MissSophie
-  - password: test
-  - permissions: 
-    - viewResults
-    - runTests
-- - username: MajorTom
+- - username: test
   - password: test
   - permissions: 
     - viewResults
     - runTests
     - editTests
+scheduler:
+  logging: debug
+  setDiffSnapshot: true
 pdfOutput:
   author: SL
   pdfResultDir: ./results_pdfTests

@@ -269,6 +269,72 @@ config:
         myRunbook = aioRunbookScheduler("test.yml")
 
 
+    def test_macro6(self):
+        ymlMacroString = """#macros
+saveMacroPreprocessorResultToFile: test1.pre
+stopAfterMacroPreprocessor: true
+"""
+        fh = open("testMacroFile1.yml",'w')
+        fh.write(ymlMacroString)
+        fh.close()
+        ymlMacroString = """#macros
+saveMacroPreprocessorResultToFile: test1.pre
+stopAfterMacroPreprocessor: true
+"""
+        fh = open("testMacroFile2.yml",'w')
+        fh.write(ymlMacroString)
+        fh.close()
+
+        ymlConfigString = """#macroTest
+config:
+  macroFiles:
+    - 'testMacroFile1.yml'
+    - 'testMacroFile2.yml'
+  steps:
+#-MACRO-BLOCK set ECHO_STRINGS = [ "10", "11" ] -#\
+#-MACRO-BLOCK for ECHO_STRING in ECHO_STRINGS -#\
+    - record:
+        name: record test local-shell
+        method: local-shell
+        commands:
+          - 'echo #-MACRO- ECHO_STRING -#'
+#-MACRO-BLOCK endfor -#
+"""
+
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        myRunbook = aioRunbookScheduler("test.yml")
+
+    def test_macro7(self):
+        ymlMacroString = """#macros
+dummy: "dummy"
+"""
+        fh = open("testMacroFile1.yml",'w')
+        fh.write(ymlMacroString)
+        fh.close()
+
+        ymlConfigString = """#macroTest
+config:
+  macroFiles:
+    - 'testMacroFile1.yml'
+  steps:
+#-MACRO-BLOCK set ECHO_STRINGS = [ "10", "11" ] -#\
+#-MACRO-BLOCK for ECHO_STRING in ECHO_STRINGS -#\
+    - record:
+        name: record test local-shell
+        method: local-shell
+        commands:
+          - 'echo #-MACRO- ECHO_STRING -#'
+#-MACRO-BLOCK endfor -#
+"""
+
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        myRunbook = aioRunbookScheduler("test.yml",
+                                  saveMacroPreprocessorResultToFile="test1.pre",
+                                  stopAfterMacroPreprocessor = True)
 
 
 
@@ -286,7 +352,7 @@ if __name__ == '__main__':
 
     #unittest.main()
     myTest = test_aioRunbook_macros()
-    myTest.test_macro5()
+    myTest.test_macro7()
 
 
 
