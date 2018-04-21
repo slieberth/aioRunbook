@@ -38,6 +38,8 @@ RUN mkdir aioRunbook  \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/aioRunbook/templates/listDir.html > listDir.html  \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/aioRunbook/templates/viewResultFile.html > viewResultFile.html \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/aioRunbook/templates/viewYamlFile.html > viewYamlFile.html \
+    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/aioRunbook/templates/settings.html > settings.html \
+    && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/aioRunbook/templates/confirmSetDiffSnapshot.html > confirmSetDiffSnapshot.html \
     && cd .. \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/docker/aioServerConfig.yml > aioServerConfig.yml \
     && curl https://raw.githubusercontent.com/slieberth/aioRunbook/master/docker/runMyServer.py > runMyServer.py \
@@ -53,8 +55,7 @@ RUN mkdir aioRunbook  \
     && ssh-keygen -f id_rsa -t rsa -N '' \
     && ssh-keygen -s ca_key -I user -n user id_rsa \
     && cd /
-RUN echo "Europe/Berlin" > /etc/timezone
-RUN dpkg-reconfigure tzdata
+RUN echo Europe/Berlin > /etc/timezone && dpkg-reconfigure --frontend noninteractive tzdata
 WORKDIR "/runbooks"
 CMD ["python3", "/aioRunbook/runMyServer.py" ]
 
