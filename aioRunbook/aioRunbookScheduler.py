@@ -416,9 +416,9 @@ class aioRunbookScheduler():
 
         logging.info('writing config file: {0}'.format(self.yamlConfigFile))
         diffStringYamlBlockLines = diffCheck.getDiffSnapshotYamlBlockLines(self.configDict)
-        print("diffStringYamlBlockLines:{}".format(diffStringYamlBlockLines))
+        #print("diffStringYamlBlockLines:{}".format(diffStringYamlBlockLines))
         configBlockLines = aioRunbookYmlBlockParser.getConfigBlock(configFile=self.yamlConfigFile).split("\n")
-        print("configBlockLines:{}".format(configBlockLines))
+        #print("configBlockLines:{}".format(configBlockLines))
         newYamlConfigString = "\n".join(configBlockLines+diffStringYamlBlockLines)
         fh = open(self.yamlConfigFile,'w') 
         fh.write(newYamlConfigString)  
