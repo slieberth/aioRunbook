@@ -56,7 +56,8 @@ config:
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbookScheduler("test.yml")
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop,setDiffSnapshot = True)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
@@ -65,7 +66,8 @@ config:
 
 
     def test_diff2(self):
-        myRunbook = aioRunbookScheduler("test.yml")
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
@@ -99,7 +101,8 @@ config:
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbookScheduler("test.yml")
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop,setDiffSnapshot = True)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
@@ -138,7 +141,8 @@ config:
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbookScheduler("test.yml")
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop,setDiffSnapshot = True)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
@@ -173,7 +177,8 @@ config:
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbookScheduler("test.yml")
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['pass'],True)
@@ -208,7 +213,8 @@ config:
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbookScheduler("test.yml")
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['record']['output'][0]['pass'],True)
@@ -232,10 +238,11 @@ config:
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbookScheduler("test.yml")
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop))
-        self.assertIn("PyYAML",myRunbook.resultDict["loop_2_step_1_command_1"]['checkCriteris'])
+        self.assertIn("PyYAML",myRunbook.resultDict["loop_2_step_1_command_1"]['checkCriteria'])
         #pprint.pprint(myRunbook.resultDict)
 
     def test_diff10(self):
@@ -263,10 +270,97 @@ config:
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbookScheduler("test.yml")
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         print(myRunbook.resultDict)
+
+    def test_diff11(self):
+
+        jsonString = '{"Result":42,"parfume":4711}'
+        fh = open("test.json",'w')
+        fh.write(jsonString)
+        fh.close()
+
+        ymlConfigString = """#
+config:
+  steps:
+    - check:
+        name: record test local-shell
+        method: local-shell
+        commands:
+          - cat test.json
+        checkMethod: diff
+        diffSource: diffSnapshot
+        diffJsonFilter: 
+          - ["Result"]
+          - ["parfume"]
+  pdfOutput:
+    template: "./template_v3.tex"
+    author: SL """
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        kwargs = {"file":"test.yml","setDiffSnapshot":True}
+        myRunbook = aioRunbookScheduler(**kwargs)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
+        #print (myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['checkCriteria'])
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
+        #print (myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['checkCriteria'])
+
+    def test_diff12(self):
+
+        jsonString = '{"Result":42,"parfume":4711}'
+        fh = open("test.json",'w')
+        fh.write(jsonString)
+        fh.close()
+
+        ymlConfigString = """#
+config:
+  steps:
+    - check:
+        name: record test local-shell
+        method: local-shell
+        commands:
+          - cat test.json
+        checkMethod: diff
+        diffSource: diffSnapshot
+        diffJsonFilter: 
+          - ["Result"]
+          - ["parfume"]
+  pdfOutput:
+    template: "./template_v3.tex"
+    author: SL """
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        kwargs = {"file":"test.yml","setDiffSnapshot":True}
+        myRunbook = aioRunbookScheduler(**kwargs)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
+
+        jsonString = '{"Result":43,"parfume":4711}'
+        fh = open("test.json",'w')
+        fh.write(jsonString)
+        fh.close()
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+        #print (myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['checkResult'])
+        print (myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['checkCriteria'])
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],False)
+
+
+
 
 
 if __name__ == '__main__':
@@ -283,7 +377,7 @@ if __name__ == '__main__':
 
     #unittest.main()
     myTester = test_diff_analyzer()
-    myTester.test_diff9()
+    myTester.test_diff12()
 
 
 

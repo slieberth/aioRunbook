@@ -91,6 +91,7 @@ class diffCheck:
         diffInformationTag = ("loop_{}_step_{}".format(loopCounter,stepCounter)) 
         compressFlag = _isInDictionary("diffZip",stepDict,False) 
         diffTextFSMFilterFlag = _isInDictionary("diffTextFSMFilter",stepDict,False)
+        diffJsonFilterFlag = _isInDictionary("diffJsonFilter",stepDict,False)
         setDiffSnapshotFlag = _isInDictionary("setDiffSnapshot",kwargs,False)  
         outputString = stepDict["output"][checkCommandOffsetFromLastCommand]["output"]
         diffSource = _isInDictionary("diffSource",stepDict,"diffSnapshot")  
@@ -106,11 +107,38 @@ class diffCheck:
                 textFSMMatrix = re_table.ParseText(outputString)
                 textFSMOutputString  = [ str(x) for sublist in textFSMMatrix for x in sublist ]
                 compressedStringInHex = self._diffEncode(textFSMOutputString,compressFlag,diffTextFSMFilterFlag )
+            elif diffJsonFilterFlag:
+                logging.debug('stepDict["diffJsonFilter"]{}'.format(stepDict["diffJsonFilter"]))
+                relevantJsonObjects = stepDict["diffJsonFilter"]
+                checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1        
+                try:
+                    jsonObject = json.loads(stepDict["output"][checkCommandOffsetFromLastCommand]["output"])
+                except:
+                    try:
+                        jsonObject = yaml.load(stepDict["output"][checkCommandOffsetFromLastCommand]["output"])
+                    except:
+                        return False,[],'diffCheck setDiffSnapshot Yaml Object load error'      ###FIXME###
+                    else:
+                        logging.debug ('diffCheck setDiffSnapshot  Yaml Object loaded')    ###FIXME###
+                else:
+                    logging.debug ('diffCheck setDiffSnapshot  Json Object loaded')
+                relevantJsonObjectValues = []
+                for relevantJsonObject in relevantJsonObjects:
+                    #print(relevantJsonObject)
+                    try:
+                        #print("jsonObject"+str(relevantJsonObject))
+                        #print(eval ("jsonObject"+str(relevantJsonObject)))
+                        relevantJsonObjectValues.append(eval("jsonObject"+str(relevantJsonObject)))
+                    except:
+                        relevantJsonObjectValues.append("jsonObjectKeyError:{}".format(relevantJsonObject))
+                #print(relevantJsonObjectValues)
+                compressedStringInHex = self._diffEncode(relevantJsonObjectValues,compressFlag,diffJsonFilterFlag )
             else:
                 compressedStringInHex = self._diffEncode(outputString,compressFlag,diffTextFSMFilterFlag)
                 print(compressedStringInHex)
             logging.debug("setting diff for {} to {}".format(diffInformationTag,compressedStringInHex))
-            configDict["diffSnapshot"][diffInformationTag] = compressedStringInHex                  
+            configDict["diffSnapshot"][diffInformationTag] = compressedStringInHex   
+            print(  configDict["diffSnapshot"][diffInformationTag] ) ###FIXME###             
             return True, "setDiffSnapshot",compressedStringInHex  
         else:
             if diffSource == "diffSnapshot":
@@ -129,6 +157,30 @@ class diffCheck:
                             outputStringList  = [ str(x) for sublist in textFSMMatrix for x in sublist ]
                             logging.debug("new outputStringList x:{}".format(outputStringList))
                             diffStringList = self._diffDecode(compressedDiffStringInHex,compressFlag,diffTextFSMFilterFlag)
+                        elif diffJsonFilterFlag:
+                            logging.debug('stepDict["diffJsonFilter"]{}'.format(stepDict["diffJsonFilter"]))
+                            relevantJsonObjects = stepDict["diffJsonFilter"]
+                            logging.debug ('diffCheck Json Object loaded')
+                            checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1        
+                            try:
+                                jsonObject = json.loads(stepDict["output"][checkCommandOffsetFromLastCommand]["output"])
+                            except:
+                                try:
+                                    jsonObject = yaml.load(stepDict["output"][checkCommandOffsetFromLastCommand]["output"])
+                                except:
+                                    return False,[],'diffCheck filterYaml Object load error'      ###FIXME###
+                                else:
+                                    logging.debug ('diffCheck filterYaml Object loaded')    ###FIXME###
+                            else:
+                                logging.debug ('diffCheck filterJson Object loaded')
+                            relevantJsonObjectValues = []
+                            for relevantJsonObject in relevantJsonObjects:
+                                try:
+                                    relevantJsonObjectValues.append(eval("jsonObject"+str(relevantJsonObject)))
+                                except:
+                                    relevantJsonObjectValues.append("jsonObjectKeyError:{}".format(relevantJsonObject))
+                            outputStringList  = [ str(x) for x in relevantJsonObjectValues ]
+                            diffStringList = [ str(x) for x in self._diffDecode(compressedDiffStringInHex,compressFlag,diffJsonFilterFlag)]
                         else:
                             outputStringList = outputString.split("\n")
                             diffStringList = self._diffDecode(compressedDiffStringInHex,compressFlag,diffTextFSMFilterFlag).split("\n")  
@@ -168,7 +220,31 @@ class diffCheck:
                     re_table = textfsm.TextFSM(StringIO(newTemplateString))
                     textFSMMatrix = re_table.ParseText(diffSourceString)
                     diffStringList  = [ str(x) for sublist in textFSMMatrix for x in sublist ]   
-                    #logging.debug("diffStringList x:{}".format(diffStringList))                
+                    #logging.debug("diffStringList x:{}".format(diffStringList))         
+                elif diffJsonFilterFlag:
+                    logging.debug('stepDict["diffJsonFilter"]{}'.format(stepDict["diffJsonFilter"]))
+                    relevantJsonObjects = stepDict["diffJsonFilter"]
+                    logging.debug ('diffCheck Json Object loaded')
+                    checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1        
+                    try:
+                        jsonObject = json.loads(stepDict["output"][checkCommandOffsetFromLastCommand]["output"])
+                    except:
+                        try:
+                            jsonObject = yaml.load(stepDict["output"][checkCommandOffsetFromLastCommand]["output"])
+                        except:
+                            return False,[],'diffCheck filterYaml Object load error'      ###FIXME###
+                        else:
+                            logging.debug ('diffCheck filterYaml Object loaded')    ###FIXME###
+                    else:
+                        logging.debug ('diffCheck filterJson Object loaded')
+                    relevantJsonObjectValues = []
+                    for relevantJsonObject in relevantJsonObjects:
+                        try:
+                            relevantJsonObjectValues.append(eval("jsonObject"+str(relevantJsonObject)))
+                        except:
+                            relevantJsonObjectValues.append("jsonObjectKeyError:{}".format(relevantJsonObject))
+                    outputStringList  = [ str(x) for x in relevantJsonObjectValues ]
+                    diffStringList = [ str(x) for x in self._diffDecode(compressedDiffStringInHex,compressFlag,diffJsonFilterFlag)]   
                 else:
                     outputStringList = outputString.split("\n")
                     diffStringList = diffSourceString.split("\n") 
@@ -195,7 +271,31 @@ class diffCheck:
                         re_table = textfsm.TextFSM(StringIO(newTemplateString))
                         textFSMMatrix = re_table.ParseText(diffSourceString)
                         diffStringList  = [ str(x) for sublist in textFSMMatrix for x in sublist ]   
-                        #logging.debug("diffStringList x:{}".format(diffStringList))                
+                        #logging.debug("diffStringList x:{}".format(diffStringList))     
+                    elif diffJsonFilterFlag:
+                        logging.debug('stepDict["diffJsonFilter"]{}'.format(stepDict["diffJsonFilter"]))
+                        relevantJsonObjects = stepDict["diffJsonFilter"]
+                        logging.debug ('diffCheck Json Object loaded')
+                        checkCommandOffsetFromLastCommand = _isInDictionary("checkCommandOffsetFromLastCommand",stepDict,0) - 1        
+                        try:
+                            jsonObject = json.loads(stepDict["output"][checkCommandOffsetFromLastCommand]["output"])
+                        except:
+                            try:
+                                jsonObject = yaml.load(stepDict["output"][checkCommandOffsetFromLastCommand]["output"])
+                            except:
+                                return False,[],'diffCheck filterYaml Object load error'      ###FIXME###
+                            else:
+                                logging.debug ('diffCheck filterYaml Object loaded')    ###FIXME###
+                        else:
+                            logging.debug ('diffCheck filterJson Object loaded')
+                        relevantJsonObjectValues = []
+                        for relevantJsonObject in relevantJsonObjects:
+                            try:
+                                relevantJsonObjectValues.append(eval("jsonObject"+str(relevantJsonObject)))
+                            except:
+                                relevantJsonObjectValues.append("jsonObjectKeyError:{}".format(relevantJsonObject))
+                        outputStringList  = [ str(x) for x in relevantJsonObjectValues ]
+                        diffStringList = [ str(x) for x in self._diffDecode(compressedDiffStringInHex,compressFlag,diffJsonFilterFlag)]           
                     else:
                         outputStringList = outputString.split("\n")
                         diffStringList = diffSourceString.split("\n") 

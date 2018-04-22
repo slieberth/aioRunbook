@@ -60,7 +60,8 @@ config:
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbookScheduler("test.yml")
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
@@ -95,7 +96,8 @@ config:
         fh = open("test.yml",'w')
         fh.write(ymlConfigString)
         fh.close()
-        myRunbook = aioRunbookScheduler("test.yml")
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
         loop = asyncio.get_event_loop()
         loop.run_until_complete(myRunbook.execSteps(loop)) 
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
