@@ -105,7 +105,7 @@ class aioRunbookHttpServer():
         app.router.add_get('/createPDF', self.createPDF)
         app.router.add_route('*','/settings',self.settings)
         app.router.add_get('/saveConfig',self.saveConfig)
-        app.router.add_get('/confirmSetDiffSnapshot',self./confirmSetDiffSnapshot) 
+        app.router.add_get('/confirmSetDiffSnapshot',self.confirmSetDiffSnapshot) 
         app.user_map = self.user_map
         configure_handlers(app)
 
