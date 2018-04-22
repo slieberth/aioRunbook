@@ -278,9 +278,32 @@ config:
 
     def test_diff11(self):
 
-        jsonString = '{"Result":42,"parfume":4711}'
-        fh = open("test.json",'w')
-        fh.write(jsonString)
+        ymlString = """json:
+  objects:
+  - attribute:
+      as_path:
+      - 3320
+      - 3320
+      - 4911
+      bgp_nh4: 49.100.1.1
+      community:
+      - 3320:1276
+      - 3320:2010
+      - 3320:9010
+      origin: EGP
+      peer4: 49.100.1.1
+      prefix4: 49.11.8.0/24
+      received_time: Thu Apr 19 13:40:12 2018
+      recv_path_id: 0
+      send_path_id: 3282071806
+      source: bgp
+      source_ip4: 49.100.1.2
+      sub_src: Local Peer
+    sequence: 285
+    update: true"""
+
+        fh = open("testOutput.yml",'w')
+        fh.write(ymlString)
         fh.close()
 
         ymlConfigString = """#
@@ -290,12 +313,15 @@ config:
         name: record test local-shell
         method: local-shell
         commands:
-          - cat test.json
+          - cat testOutput.yml
         checkMethod: diff
         diffSource: diffSnapshot
         diffJsonFilter: 
-          - ["Result"]
-          - ["parfume"]
+          - '["json"]["objects"][0]["attribute"]["as_path"]'
+          - '["json"]["objects"][0]["attribute"]["bgp_nh4"]'
+          - '["json"]["objects"][0]["attribute"]["community"]'
+          - '["json"]["objects"][0]["attribute"]["origin"]'
+          - '["json"]["objects"][0]["attribute"]["med"]'
   pdfOutput:
     template: "./template_v3.tex"
     author: SL """
@@ -359,7 +385,49 @@ config:
         print (myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['checkCriteria'])
         self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],False)
 
+    def test_diff13(self):
 
+        jsonString = 'string to produce json loaderror'
+        fh = open("test.json",'w')
+        fh.write(jsonString)
+        fh.close()
+
+        ymlConfigString = """#
+config:
+  steps:
+    - check:
+        name: record test local-shell
+        method: local-shell
+        commands:
+          - cat test.json
+        checkMethod: diff
+        diffSource: diffSnapshot
+        diffJsonFilter: 
+          - ["Result"]
+          - ["parfume"]
+  pdfOutput:
+    template: "./template_v3.tex"
+    author: SL """
+        fh = open("test.yml",'w')
+        fh.write(ymlConfigString)
+        fh.close()
+        kwargs = {"file":"test.yml","setDiffSnapshot":True}
+        myRunbook = aioRunbookScheduler(**kwargs)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],True)
+
+        jsonString = '{"Result":43,"parfume":4711}'
+        fh = open("test.json",'w')
+        fh.write(jsonString)
+        fh.close()
+        kwargs = {"file":"test.yml"}
+        myRunbook = aioRunbookScheduler(**kwargs)
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(myRunbook.execSteps(loop)) 
+        #print (myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['checkResult'])
+        print (myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['checkCriteria'])
+        self.assertEqual(myRunbook.configDict["config"]["steps"][0]['check']['output'][0]['pass'],False)
 
 
 
@@ -377,7 +445,7 @@ if __name__ == '__main__':
 
     #unittest.main()
     myTester = test_diff_analyzer()
-    myTester.test_diff12()
+    myTester.test_diff13()
 
 
 

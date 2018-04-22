@@ -122,16 +122,18 @@ class diffCheck:
                         logging.debug ('diffCheck setDiffSnapshot  Yaml Object loaded')    ###FIXME###
                 else:
                     logging.debug ('diffCheck setDiffSnapshot  Json Object loaded')
+                print(jsonObject)
                 relevantJsonObjectValues = []
                 for relevantJsonObject in relevantJsonObjects:
-                    #print(relevantJsonObject)
+                    print(relevantJsonObject)
                     try:
-                        #print("jsonObject"+str(relevantJsonObject))
-                        #print(eval ("jsonObject"+str(relevantJsonObject)))
+                        
+                        print("jsonObject"+str(relevantJsonObject))
+                        print(eval ("jsonObject"+str(relevantJsonObject)))
                         relevantJsonObjectValues.append(eval("jsonObject"+str(relevantJsonObject)))
                     except:
                         relevantJsonObjectValues.append("jsonObjectKeyError:{}".format(relevantJsonObject))
-                #print(relevantJsonObjectValues)
+                print(relevantJsonObjectValues)
                 compressedStringInHex = self._diffEncode(relevantJsonObjectValues,compressFlag,diffJsonFilterFlag )
             else:
                 compressedStringInHex = self._diffEncode(outputString,compressFlag,diffTextFSMFilterFlag)
