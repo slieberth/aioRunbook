@@ -105,7 +105,7 @@ class aioRunbookHttpServer():
         app.router.add_get('/createPDF', self.createPDF)
         app.router.add_route('*','/settings',self.settings)
         app.router.add_get('/saveConfig',self.saveConfig)
-        app.router.add_get('/confirmSetDiffSnapshot',self.confirmSetDiffSnapshot)
+        app.router.add_get('/confirmSetDiffSnapshot',self.confirmSetDiffSnapshot) 
         app.user_map = self.user_map
         configure_handlers(app)
 
@@ -516,8 +516,8 @@ class aioRunbookHttpServer():
         yamlDir = all_args["yamlDir"]
         yamFileName = all_args["file"]
         errorMessage = None
+        logging.debug ("confirmSetDiffSnapshot @End root:{} filename{} yamlDir:{} errorMessage:{}".format (root,yamFileName,yamlDir,errorMessage))
         return {"root":root,"filename":yamFileName,"yamlDir":yamlDir,"errorMessage":errorMessage}
-
 
 
     def _upDateJsonDateDict (self,yamlDir):
