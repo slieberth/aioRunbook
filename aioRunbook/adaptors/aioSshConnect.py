@@ -235,8 +235,15 @@ class aioSshConnect():
                 for correctionLambda in VENDOR_DICT[self.vendor]["outputCorrections"]:
                     output = correctionLambda(output)
                 output = "\n".join(output.split("\n")[self.stripPrologueLines:-self.stripEpilogueLines])
+                bytes = len(output)
+                lines = len(output.split("\n"))
+                if bytes > 50:
+                    content = "<<<" + output[:25].strip() + ">...<" + output[-25:].strip() + ">>>"
+                else:
+                    content = output.strip()
                 #logging.debug ("step {} output {}".format(self.stepDict["name"],output))
-                logging.debug ("recv output step {} cmd {}".format(self.stepDict["name"],i+1))
+                logging.debug ("recv output step {} cmd {} bytes:{} lines:{}".format(self.stepDict["name"],i+1,bytes,lines))
+                logging.debug ("recv output content:{}".format(content.strip()))
                 _addTimeStampsToStepDict(t1,self.stepDict,i)  
                 self.stepDict["output"][i]["output"] = output
             if self.backgroundStep:
