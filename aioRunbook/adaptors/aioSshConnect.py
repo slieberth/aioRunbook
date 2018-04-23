@@ -127,7 +127,7 @@ class aioSshConnect():
             #logging.debug('password: {0}'.format(self.password))     
         if self.password == None:
             logging.error('password not set for stepDict: {0}'.format(stepDict)) 
-        else
+        else:
             logging.debug('password is set')     
         self.timeout = _isInDictionary ("timeout",configDict["config"],60)
         self.timeout = _isInDictionary ("timeout",stepDict,self.timeout)
