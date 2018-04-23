@@ -31,6 +31,7 @@ import pprint
 import datetime
 import os
 import sys
+import base64
 import re
 #sys.path.insert(0, os.path.abspath('../tools'))
 from aioRunbook.tools.helperFunctions import _isInDictionary, _addTimeStampsToStepDict
@@ -117,15 +118,17 @@ class aioSshConnect():
         self.username = _isInDictionary ("user",stepDict,self.username)
         self.password = _isInDictionary ("password",configDict["config"],None)     
         if "enc-password" in configDict["config"].keys():
-            logging.debug('enc-password: {0}'.format(configDict["config"]["enc-password"]))
+            logging.debug('generic enc-password: {0}'.format(configDict["config"]["enc-password"]))
             self.password = base64.b64decode(base64.b64decode(configDict["config"]["enc-password"]).decode('utf-8')).decode('utf-8') ##SECURE##
         self.password = _isInDictionary ("password",stepDict,self.password)
         if "enc-password" in stepDict.keys():
-            logging.debug('enc-password: {0}'.format(stepDict["enc-password"]))
+            logging.debug('device enc-password: {0}'.format(stepDict["enc-password"]))
             self.password = base64.b64decode(base64.b64decode(stepDict["enc-password"]).decode('utf-8')).decode('utf-8') ##SECURE##
-            logging.debug('password: {0}'.format(self.password))     
+            #logging.debug('password: {0}'.format(self.password))     
         if self.password == None:
             logging.error('password not set for stepDict: {0}'.format(stepDict)) 
+        else
+            logging.debug('password is set')     
         self.timeout = _isInDictionary ("timeout",configDict["config"],60)
         self.timeout = _isInDictionary ("timeout",stepDict,self.timeout)
         self.optionalPrompt = _isInDictionary("optionalPrompt",stepDict,None)

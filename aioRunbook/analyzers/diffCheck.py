@@ -100,7 +100,7 @@ class diffCheck:
             configDict["diffSnapshot"] = _isInDictionary("diffSnapshot",configDict,{}) 
             logging.warning ('setting diffSnapshot for {} in ConfigDict'.format(diffInformationTag)) 
             if diffTextFSMFilterFlag:
-                logging.debug('stepDict["diffTextFSMFilter"]{}'.format(stepDict["diffTextFSMFilter"]))
+                #logging.debug('stepDict["diffTextFSMFilter"]{}'.format(stepDict["diffTextFSMFilter"]))
                 existingTemplateString = stepDict["diffTextFSMFilter"]
                 newTemplateString= _substitudeVarsInString(existingTemplateString,varDict=varDict)
                 re_table = textfsm.TextFSM(StringIO(newTemplateString))

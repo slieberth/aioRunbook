@@ -170,9 +170,9 @@ class aioRunbookScheduler():
             if method in ["ssh"]: 
                 stepDict["sshKnownHostsCheck"] = self.sshKnownHostsCheck
                 self.adaptor = aioSshConnect(stepDict,**kwargs)
-                #logging.debug ("before self.sshConnectionTags{}".format(self.sshConnectionTags)) 
+                logging.debug ("before connectAndRunCommands self.sshConnectionTags: {}".format(self.sshConnectionTags)) 
                 stepDict["output"] = await self.adaptor.connectAndRunCommands(sshConnectionTags=self.sshConnectionTags) 
-                #logging.debug ("after self.sshConnectionTags{}".format(self.sshConnectionTags))               
+                logging.debug ("after connectAndRunCommands self.sshConnectionTags{}".format(self.sshConnectionTags))               
             elif method in ["telnet"]: 
                 self.adaptor = aioTelnetConnect(stepDict,eventLoop=eventLoop,**kwargs)      
                 await self.adaptor.connect()
@@ -311,7 +311,7 @@ class aioRunbookScheduler():
             logging.error('cannot load YAML File {}'.format(configFile))
             return False  
         logging.info(' _readYamlFile config file loaded: {}'.format(configFile))
-        logging.debug(' _readYamlFile config file loaded: {}'.format(self.configDict))
+        #logging.debug(' _readYamlFile config file loaded: {}'.format(self.configDict))
         #
         #  Macroreader
         #
