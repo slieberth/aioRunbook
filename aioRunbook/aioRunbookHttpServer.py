@@ -234,7 +234,7 @@ class aioRunbookHttpServer():
     async def execYamlFile(self,request):
         root="http://"+request.host
         all_args = request.query
-        print(all_args)
+        #print(all_args)
         if "dir" in all_args.keys():
             yamlDir = all_args["dir"]
         else:
@@ -244,7 +244,7 @@ class aioRunbookHttpServer():
             yamFileName = all_args["file"]
             if yamlDir != None and yamFileName  != None:
                 yamlFilePath = os.sep.join([yamlDir,yamFileName])
-                print (yamlFilePath)
+                #print (yamlFilePath)
                 fileList = self.runbookDict[yamlDir]
                 jsonDateDict = self._upDateJsonDateDict(yamlDir)
                 jsonErrorDict = self._upDateJsonErrorDict(yamlDir)
@@ -445,7 +445,7 @@ class aioRunbookHttpServer():
             self.autoRunbookDirs = True
             self.runbookParentDir = self.runbookDirs
             self.runbookDirs = self._findDirsWithYamlFilesInPwd(self.runbookParentDir)
-        print ("self.runbookDirs: {}".format(self.runbookDirs))
+        #print ("self.runbookDirs: {}".format(self.runbookDirs))
         try:
             self.httpPort = self.configDict["httpPort"]
         except:
@@ -480,7 +480,7 @@ class aioRunbookHttpServer():
         #print ("GET args:",all_args)
         self.configDict["scheduler"] = self.scheduler_settingsDict
         yamlConfig = yaml.dump(self.configDict,default_flow_style=False)
-        print(yamlConfig)
+        #print(yamlConfig)
         errorMessage = None
         try:
             with open(self.yamlConfigFile, 'w') as outfile:  
@@ -498,7 +498,7 @@ class aioRunbookHttpServer():
         root="http://"+request.host
         if request.method == "POST":
             all_args = await request.post()
-            print ("POST args:",all_args)
+            #print ("POST args:",all_args)
             self.scheduler_settingsDict["tester"] = all_args["tester"]
             self.scheduler_settingsDict["logging"] = all_args["loggingSelect"]  
             if  "setDiffSnapshot" in all_args.keys():
@@ -522,7 +522,7 @@ class aioRunbookHttpServer():
     async def confirmSetDiffSnapshot(self,request):
         root="http://"+request.host
         all_args = request.query
-        print(all_args)
+        #print(all_args)
         yamlDir = all_args["yamlDir"]
         if "file" in all_args:
             yamFileName = all_args["file"]
@@ -576,7 +576,7 @@ class aioRunbookHttpServer():
             ymlFilesInThisDir = [f for f in os.listdir(thisDir) if f.endswith('.yml')]
             if len( ymlFilesInThisDir ) > 0:
                 ymlDirList.append(thisDir)
-        print ("_findDirsWithYamlFilesInPwd ymlDirList: {}".format(ymlDirList))
+        #print ("_findDirsWithYamlFilesInPwd ymlDirList: {}".format(ymlDirList))
         return ymlDirList
 
     def _change_logging(self,**kwargs):

@@ -561,7 +561,7 @@ class aioRunbookScheduler():
             error.logging("error writing saveResultDictToJsonFile {}".format(jsonConfigFile))
 
     async def getResultFileContent (self,*args):
-        print(args)
+        #print(args)
         if len(args) > 1:  # has loop as first attr
             jsonConfigFile = args[1]
         else:
