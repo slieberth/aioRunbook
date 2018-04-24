@@ -262,9 +262,11 @@ class aioRunbookScheduler():
                     if self.disconnectFunction != None and stepId in ["await"] :
                         self.disconnectFunction()
                     _addTimeStampsToStepDict(t1,stepDict)
-            cacheCheckResults.storeCheckResultToVarDict (stepDict,varDict=self.varDict)
-            if stepDict["output"][checkCommandOffsetFromLastCommand]["checkResult"] == "setDiffSnapshot":
-                self.writeDiffSnapshotToFile()
+                cacheCheckResults.storeCheckResultToVarDict (stepDict,varDict=self.varDict)
+                if "setDiffSnapshot" in self.scheduler_settingsDict and _checkMethod == "diff":
+                    if self.scheduler_settingsDict["setDiffSnapshot"]:
+                        logging.info('writeDiffSnapshotToFile')
+                        self.writeDiffSnapshotToFile()
         elif stepId == "sleep":
             #stepDict["output"][0]["startTS"] = t1.strftime('%Y-%m-%d %H:%M:%S.%f')   
             if "seconds" not in stepDict.keys():

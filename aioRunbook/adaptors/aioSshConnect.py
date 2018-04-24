@@ -229,21 +229,22 @@ class aioSshConnect():
                         output += await asyncio.wait_for(self._stdout.read(64000),timeout=self.timeout)
                         for rePattern in self.rePromptList:
                             if re.search(rePattern,output): gotPrompt = True
+                        #logging.debug ("step {} output {}".format(self.stepDict["name"],output))
                 except Exception as e:
                     logging.warning ("prompt timeout step {} command {} {}".format(self.stepDict["stepCounter"],i+1,e))
                 t2=datetime.datetime.now()
-                for correctionLambda in VENDOR_DICT[self.vendor]["outputCorrections"]:
-                    output = correctionLambda(output)
-                output = "\n".join(output.split("\n")[self.stripPrologueLines:-self.stripEpilogueLines])
                 bytes = len(output)
                 lines = len(output.split("\n"))
                 if bytes > 50:
                     content = "<<<" + output[:25].strip() + ">...<" + output[-25:].strip() + ">>>"
                 else:
                     content = output.strip()
-                #logging.debug ("step {} output {}".format(self.stepDict["name"],output))
                 logging.debug ("recv output step {} cmd {} bytes:{} lines:{}".format(self.stepDict["name"],i+1,bytes,lines))
                 logging.debug ("recv output content:{}".format(content.strip()))
+                for correctionLambda in VENDOR_DICT[self.vendor]["outputCorrections"]:
+                    output = correctionLambda(output)
+                #logging.debug ("step {} output {}".format(self.stepDict["name"],output))
+                output = "\n".join(output.split("\n")[self.stripPrologueLines:-self.stripEpilogueLines])
                 _addTimeStampsToStepDict(t1,self.stepDict,i)  
                 self.stepDict["output"][i]["output"] = output
             if self.backgroundStep:

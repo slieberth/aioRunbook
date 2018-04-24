@@ -220,6 +220,12 @@ class aioRunbookHttpServer():
             errorMessage = "background tasks to be done {}".format(bgFileList)
         else:
             errorMessage = None
+        if len(self.fifoFileList) > 0:
+            files = [ x[0] for x in self.fifoFileList ]
+            if errorMessage == None:
+                errorMessage = "background files to be done {}".format(files)
+            else:
+                errorMessage += "background files to be done {}".format(files)
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
                 "jsonDateDict":jsonDateDict,"errorMessage":errorMessage,"jsonErrorDict":jsonErrorDict}
 
@@ -292,7 +298,11 @@ class aioRunbookHttpServer():
                 return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
                     "jsonDateDict":jsonDateDict,"errorMessage":errorMessage}
             else:
-                self.fifoFileList = [ os.sep.join([yamlDir,x]) for x in self.runbookDict[yamlDir]]
+                if self.scheduler_settingsDict["setDiffSnapshot"] == True:
+                    if "confirmSetDiffSnapshot" not in all_args.keys():
+                        logging.warning('will redirect to confim page {}/confirmSetDiffSnapshot?yamlDir={}&execAllFilesFromDir=true'.format(root,yamlDir))
+                        return web.HTTPFound('{}/confirmSetDiffSnapshot?yamlDir={}&execAllFilesFromDir=true'.format(root,yamlDir))
+                self.fifoFileList = [ [os.sep.join([yamlDir,x]),self.scheduler_settingsDict] for x in self.runbookDict[yamlDir]]
                 loop = asyncio.get_event_loop()
                 fifoBgTask = loop.create_task(self._fifoSchedulerForRunbookList())
             jsonDateDict = self._upDateJsonDateDict(yamlDir)
@@ -514,10 +524,17 @@ class aioRunbookHttpServer():
         all_args = request.query
         print(all_args)
         yamlDir = all_args["yamlDir"]
-        yamFileName = all_args["file"]
+        if "file" in all_args:
+            yamFileName = all_args["file"]
+        else:
+            yamFileName = None
+        if "execAllFilesFromDir" in all_args:
+            execAllFilesFromDir = True
+        else:
+            execAllFilesFromDir = False
         errorMessage = None
         logging.debug ("confirmSetDiffSnapshot @End root:{} filename{} yamlDir:{} errorMessage:{}".format (root,yamFileName,yamlDir,errorMessage))
-        return {"root":root,"filename":yamFileName,"yamlDir":yamlDir,"errorMessage":errorMessage}
+        return {"root":root,"filename":yamFileName,"yamlDir":yamlDir,"errorMessage":errorMessage,"execAllFilesFromDir":execAllFilesFromDir}
 
 
     def _upDateJsonDateDict (self,yamlDir):
@@ -577,9 +594,9 @@ class aioRunbookHttpServer():
         loop = asyncio.get_event_loop()
         #threadExecutor = concurrent.futures.ThreadPoolExecutor(max_workers=10,)   
         while len(self.fifoFileList) > 0:
-            configFile = self.fifoFileList.pop(0)
-            self.scheduler_settingsDict["file"] = configFile
-            myRunbook = aioRunbookScheduler(**self.scheduler_settingsDict)                   
+            configFile,scheduler_settingsDict = self.fifoFileList.pop(0)
+            scheduler_settingsDict["file"] = configFile
+            myRunbook = aioRunbookScheduler(**scheduler_settingsDict)                   
             await myRunbook.execStepsAndSaveDicts(loop)
 
 
