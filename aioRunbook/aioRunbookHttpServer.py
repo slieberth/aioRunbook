@@ -151,12 +151,13 @@ class aioRunbookHttpServer():
             if self.autoRunbookDirs == True:
                 self.runbookDirs = self._findDirsWithYamlFilesInPwd(self.runbookParentDir)
             #
+            self.runbookDirSplitDirs = self.runbookDirs ###Temp###
             for runbookDir in self.runbookDirs:
-                runbookDirSplitDir = os.path.abspath(runbookDir).split(os.sep)[-1]
-                self.runbookDirSplitDirs.append(runbookDirSplitDir)
+                #runbookDirSplitDir = os.path.abspath(runbookDir).split(os.sep)[-1]
+                #self.runbookDirSplitDirs.append(runbookDirSplitDir)
+                #self.runbookDict[runbookDirSplitDir] = [f for f in os.listdir(runbookDir) if f.endswith('.yml')]
+                runbookDirSplitDir = runbookDir 
                 self.runbookDict[runbookDirSplitDir] = [f for f in os.listdir(runbookDir) if f.endswith('.yml')]
-                #template = index_template.format(
-                #message='Hello, {username}!'.format(username=username))
             return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"username":username}
         else:
             index_template = dedent("""
@@ -244,7 +245,7 @@ class aioRunbookHttpServer():
             yamFileName = all_args["file"]
             if yamlDir != None and yamFileName  != None:
                 yamlFilePath = os.sep.join([yamlDir,yamFileName])
-                #print (yamlFilePath)
+                print (yamlFilePath)
                 fileList = self.runbookDict[yamlDir]
                 jsonDateDict = self._upDateJsonDateDict(yamlDir)
                 jsonErrorDict = self._upDateJsonErrorDict(yamlDir)
@@ -257,8 +258,10 @@ class aioRunbookHttpServer():
                         YamlDictString = fh.read ()
                         fh.close ()
                 except:
-                    logging.error('cannot open configFile {}'.format(yamlFilePath))
-                    return 'cannot open configFile {}'.format(yamlFilePath)
+                    errorMessage = 'cannot open configFile {}'.format(yamlFilePath)
+                    logging.error(errorMessage)
+                    #return web.HTTPFound('{}/listDir?dir={}'.format(root,yamlDir))          ###FIXME###
+                    return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"errorMessage":errorMessage}
                 else:
                     try:
                         self.scheduler_settingsDict["file"] = yamlFilePath
