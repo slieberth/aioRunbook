@@ -305,7 +305,10 @@ class aioRunbookHttpServer():
                     if "confirmSetDiffSnapshot" not in all_args.keys():
                         logging.warning('will redirect to confim page {}/confirmSetDiffSnapshot?yamlDir={}&execAllFilesFromDir=true'.format(root,yamlDir))
                         return web.HTTPFound('{}/confirmSetDiffSnapshot?yamlDir={}&execAllFilesFromDir=true'.format(root,yamlDir))
-                self.fifoFileList = [ [os.sep.join([yamlDir,x]),self.scheduler_settingsDict] for x in self.runbookDict[yamlDir]]
+
+                sortedList = self.runbookDict[yamlDir]                      ###FIXME### sort list already on self.runbookDict
+                sortedList.sort()
+                self.fifoFileList = [ [os.sep.join([yamlDir,x]),self.scheduler_settingsDict] for x in sortedList]
                 loop = asyncio.get_event_loop()
                 fifoBgTask = loop.create_task(self._fifoSchedulerForRunbookList())
             jsonDateDict = self._upDateJsonDateDict(yamlDir)
