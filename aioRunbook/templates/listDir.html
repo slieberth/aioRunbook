@@ -52,8 +52,12 @@ body {margin:0;}
 </div>
 
 <div class="container-fluid">
-   
+
+{% if execAllFlag %}   
 <h4> list of runbooks in {{yamlDir}} ... ( exec all: <a href="{{root}}/execAllFilesFromDir?execAllFilesFromDir=true&dir={{yamlDir}}"><span class="glyphicon glyphicon-play"></span></a> ) </h4> 
+{% else %}
+<h4> list of runbooks in {{yamlDir}} </h4> 
+{% endif %}
    {% for filename in fileList|sort %}
    <div class="row">
       <div class="col-sm-4" style="background-color:#eeeeee;">{{filename}}</div>

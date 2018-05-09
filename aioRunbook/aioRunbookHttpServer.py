@@ -151,13 +151,19 @@ class aioRunbookHttpServer():
             if self.autoRunbookDirs == True:
                 self.runbookDirs = self._findDirsWithYamlFilesInPwd(self.runbookParentDir)
             #
-            self.runbookDirSplitDirs = self.runbookDirs ###Temp###
-            for runbookDir in self.runbookDirs:
-                #runbookDirSplitDir = os.path.abspath(runbookDir).split(os.sep)[-1]
-                #self.runbookDirSplitDirs.append(runbookDirSplitDir)
-                #self.runbookDict[runbookDirSplitDir] = [f for f in os.listdir(runbookDir) if f.endswith('.yml')]
-                runbookDirSplitDir = runbookDir 
+            self.runbookDirSplitDirs = []
+            self.runbookExecAllDict = {}
+            for runbookDirObj in self.runbookDirs:
+                if type(runbookDirObj) is dict:  #execAll   ###FIXME### 
+                    runbookDir = list(runbookDirObj.keys())[0]
+                    if "execAll" in  runbookDirObj[runbookDir].keys():
+                        self.runbookExecAllDict[runbookDir] = runbookDirObj[runbookDir]
+                else:
+                    runbookDir = runbookDirObj
+                runbookDirSplitDir = runbookDir
+                self.runbookDirSplitDirs.append(runbookDir)
                 self.runbookDict[runbookDirSplitDir] = [f for f in os.listdir(runbookDir) if f.endswith('.yml')]
+            print(self.runbookExecAllDict)
             return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"username":username}
         else:
             index_template = dedent("""
@@ -205,10 +211,16 @@ class aioRunbookHttpServer():
     async def listDir(self,request):
         root="http://"+request.host
         all_args = request.query
+        execAllFlag = False
         if "dir" in all_args.keys():
             yamlDir = all_args["dir"]
+            if yamlDir in self.runbookExecAllDict.keys():
+                if "execAll" in self.runbookExecAllDict[yamlDir].keys():
+                    if self.runbookExecAllDict[yamlDir]["execAll"] == True:
+                        execAllFlag = True
         else:
             yamlDir = None  
+        #print ("execAllFlag = {}".format(execAllFlag))
         fileList = self.runbookDict[yamlDir]
         jsonDateDict = self._upDateJsonDateDict(yamlDir)
         jsonErrorDict = self._upDateJsonErrorDict(yamlDir)
@@ -228,7 +240,7 @@ class aioRunbookHttpServer():
             else:
                 errorMessage += "background files to be done {}".format(files)
         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"yamlDir":yamlDir,"fileList":fileList,
-                "jsonDateDict":jsonDateDict,"errorMessage":errorMessage,"jsonErrorDict":jsonErrorDict}
+                "jsonDateDict":jsonDateDict,"errorMessage":errorMessage,"jsonErrorDict":jsonErrorDict,"execAllFlag":execAllFlag}
 
     @has_permission('runTests')
     @aiohttp_jinja2.template('listDir.html')
