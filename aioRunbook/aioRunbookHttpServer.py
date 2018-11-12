@@ -124,19 +124,6 @@ class aioRunbookHttpServer():
         else:
             return None
 
-#     @has_permission('viewResults')
-#     @aiohttp_jinja2.template('index.html')
-#     async def home(self,request):
-#         root="http://"+request.host
-#         #print (self.runbookDirs)
-#         self.runbookDirSplitDirs = []
-#         self.runbookDict = {}
-#         for runbookDir in self.runbookDirs:
-#             runbookDirSplitDir = os.path.abspath(runbookDir).split(os.sep)[-1]
-#             self.runbookDirSplitDirs.append(runbookDirSplitDir)
-#             self.runbookDict[runbookDirSplitDir] = [f for f in os.listdir(runbookDir) if f.endswith('.yml')]
-#         #print(self.runbookDict)
-#         return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs}
 
     #@has_permission('protected')
     @aiohttp_jinja2.template('index.html')
@@ -151,7 +138,6 @@ class aioRunbookHttpServer():
             if self.autoRunbookDirs == True:
                 self.runbookDirs = self._findDirsWithYamlFilesInPwd(self.runbookParentDir)
             #
-            self.runbookDirSplitDirs = []
             self.runbookExecAllDict = {}
             for runbookDirObj in self.runbookDirs:
                 if type(runbookDirObj) is dict:  #execAll   ###FIXME### 
@@ -163,7 +149,6 @@ class aioRunbookHttpServer():
                 runbookDirSplitDir = runbookDir
                 self.runbookDirSplitDirs.append(runbookDir)
                 self.runbookDict[runbookDirSplitDir] = [f for f in os.listdir(runbookDir) if f.endswith('.yml')]
-            print(self.runbookExecAllDict)
             return {"root":root,"runbookDirSplitDirs":self.runbookDirSplitDirs,"username":username}
         else:
             index_template = dedent("""
@@ -554,6 +539,91 @@ class aioRunbookHttpServer():
         logging.debug ("confirmSetDiffSnapshot @End root:{} filename{} yamlDir:{} errorMessage:{}".format (root,yamFileName,yamlDir,errorMessage))
         return {"root":root,"filename":yamFileName,"yamlDir":yamlDir,"errorMessage":errorMessage,"execAllFilesFromDir":execAllFilesFromDir}
 
+    @has_permission('viewResults')
+    @aiohttp_jinja2.template('checkYamlFile.html')
+    async def checkYamlFile(self,request):
+        root="http://"+request.host
+        if request.method == "POST":
+            all_args = await request.post()
+        if request.method == "GET":
+            all_args = request.query
+        if "dir" in all_args.keys():
+            yamlDir = all_args["dir"]
+        else:
+            yamlDir = None 
+        yamFileName  = None
+        yamlErrors = []
+        if "file" in all_args.keys():
+            yamFileName = all_args["file"]   
+        if yamlDir != None and yamFileName  != None:
+            yamlFilePath = os.sep.join([yamlDir,yamFileName])
+            try:
+                with open(yamlFilePath) as fh:
+                    yamlString = fh.read()
+                    fh.close ()
+            except Exception as e:
+                logging.error('cannot open configFile {} {}'.format(yamlFilePath,e))
+                #return {"errorMessage":'cannot open configFile {} {}'.format(yamlFilePath,e)}  ###FIXME
+                yamlString = None
+            else:
+                logging.info('opened configFile {}'.format(yamlFilePath))
+                self.tE_settingsDict["file"] = yamlFilePath
+                kwargDict = self.tE_settingsDict
+                kwargDict["runMacroPreprocessor"] = True
+                preProcessorResultFilename = ".macroPreprocessorResult.yml"
+                kwargDict["saveMacroPreprocessorResultToFile"] = preProcessorResultFilename
+                try:
+                    #logging.debug('before testExecutor.yamlPreprocessor {}'.format(yamlFilePath))
+                    result = testExecutor.yamlPreprocessor(**self.tE_settingsDict)
+                except Exception as e:
+                    logging.error('testExecutor.yamlPreprocesso exception: {}'.format(e))  #will never hiz
+                yamlDict = {"config":{"pdfOutput":{"template":"???"}}}
+                yamlJsonDumpString = ""
+                if result:
+                    logging.debug('testExecutor.yamlPreprocessor success for {}'.format(yamlFilePath))
+                    with open(preProcessorResultFilename) as fh:
+                        origYamlString = fh.read()
+                        fh.close ()
+                    logging.debug('origYamlString {}'.format(origYamlString))
+                    yamlLineDict = {}
+                    for i,yamlLine in enumerate(origYamlString.split("\n")):
+                        yamlLineDict[i+1] = {}
+                        yamlLineDict[i+1]["yamlLine"] = yamlLine 
+                    conf = YamlLintConfig('extends: default')
+                    f = open(preProcessorResultFilename)
+                    gen = linter.run(f, conf)
+                    logging.debug('linter genrator gen:{} type:{}'.format(gen,type(gen)))
+                    yamlErrors = list(gen)
+                    for yamlError in yamlErrors:
+                        yamlLineDict[yamlError.line]["yamlError"] = yamlError.desc
+                    yamlDict = {"config":{"pdfOutput":{"template":"???"}}}
+                    yamlJsonDumpString = ""
+                    for yamlError in yamlErrors:
+                        yamlLineDict[yamlError.line]["yamlError"] = yamlError.desc
+                    try:
+                        yamlDict = yaml.load(origYamlString)
+                        yamlJsonDumpString = json.dumps(yamlDict, sort_keys=True, indent=4)
+                    except Exception as e:
+                        loadError = e
+                        yamlJsonDumpString = str(e)
+                    else:
+                        loadError = None 
+                else:
+                    logging.error('testExecutor.yamlPreprocessor error {}'.format(yamlFilePath))
+                    loadError = "testExecutor.yamlPreprocessor error" 
+                    yamlLineDict = {}
+                    for i,yamlLine in enumerate(yamlString.split("\n")):
+                        yamlLineDict[i+1] = {}
+                        yamlLineDict[i+1]["yamlLine"] = yamlLine 
+                    conf = YamlLintConfig('extends: default')
+                    f = open(yamlFilePath)
+                    gen = linter.run(f, conf)
+                    yamlErrors = list(gen)
+                    for yamlError in yamlErrors:
+                        yamlLineDict[yamlError.line]["yamlError"] = yamlError.desc
+        return {"root":root,"yamlDir":yamlDir,"yamlString":yamlString,"file":yamFileName,
+                 "yamlErrors":yamlErrors,"yamlLineDict":yamlLineDict,"configDict":yamlDict,
+                  "yamlJsonDumpString":yamlJsonDumpString, "loadError":loadError}
 
     def _upDateJsonDateDict (self,yamlDir):
         fileList = self.runbookDict[yamlDir]
